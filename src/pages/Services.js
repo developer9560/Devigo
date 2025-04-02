@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -17,6 +17,7 @@ import {
   faRocket,
   faCog
 } from '@fortawesome/free-solid-svg-icons';
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 
 const Services = () => {
   const serviceData = [
@@ -197,8 +198,77 @@ const Services = () => {
     }
   ];
 
+  // Timeline fill animation ref
+  const processRef = useRef(null);
+  const processIsInView = useInView(processRef, { once: false, amount: 0.1 });
+  const timelineRef = useRef(null);
+  
+  // Refs for each step
+  const stepRefs = useRef([]);
+  
+  useEffect(() => {
+    // Initialize refs array
+    stepRefs.current = stepRefs.current.slice(0, developmentProcess.length);
+    
+    // Timeline animation
+    const timeline = timelineRef.current;
+    if (timeline && processIsInView) {
+      timeline.style.height = '100%';
+    }
+    
+    // Setup intersection observer for each step
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Add active class to the step
+            entry.target.classList.add('process-step-active');
+            
+            // Get the step index
+            const stepIndex = parseInt(entry.target.dataset.index);
+            
+            // Update timeline fill based on visible steps
+            if (timeline) {
+              const fillPercentage = ((stepIndex + 1) / developmentProcess.length) * 100;
+              timeline.style.height = `${Math.min(fillPercentage, 100)}%`;
+            }
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+    
+    // Observe each step
+    stepRefs.current.forEach((step) => {
+      if (step) observer.observe(step);
+    });
+    
+    return () => {
+      stepRefs.current.forEach((step) => {
+        if (step) observer.unobserve(step);
+      });
+    };
+  }, [processIsInView]);
+
   return (
     <div className="w-full bg-gray-900 text-white">
+      <style jsx>{`
+        .process-step-active .timeline-circle {
+          transform: scale(1.2);
+          box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        
+        @keyframes pulse {
+          0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+          70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+        
+        .process-step-active .icon-container {
+          animation: pulse 2s infinite;
+        }
+      `}</style>
+      
       <div className="bg-gradient-to-r from-blue-700/90 to-black/80 py-12 text-center">
         <h1 className="text-4xl font-bold mb-2 text-white uppercase">Our Services</h1>
         <p className="text-lg text-white/80">Innovative digital solutions tailored to your business needs</p>
@@ -253,7 +323,13 @@ const Services = () => {
       {/* Technology Stack Section */}
       <section className="py-20 px-4 bg-gray-800">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true, amount: 0.3 }}
+          >
             <h2 className="text-4xl font-bold mb-4 inline-block relative">
               Our Technology Stack
               <span className="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"></span>
@@ -261,19 +337,29 @@ const Services = () => {
             <p className="text-gray-400 max-w-3xl mx-auto mt-6">
               We leverage the latest and most powerful technologies to build robust, scalable, and high-performance digital solutions
             </p>
-          </div>
+          </motion.div>
 
           <div className="space-y-16">
             {techStack.map((category, index) => (
-              <div key={index}>
+              <motion.div 
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true, amount: 0.1 }}
+              >
                 <h3 className="text-2xl font-bold mb-8 text-blue-500 border-b border-gray-700 pb-3">
                   {category.category}
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
                   {category.technologies.map((tech, techIndex) => (
-                    <div 
+                    <motion.div 
                       key={techIndex} 
                       className="bg-gray-900/80 rounded-lg p-6 flex flex-col items-center text-center hover:-translate-y-2 transition-transform duration-300 border border-gray-700/30"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.4, delay: techIndex * 0.05 + index * 0.1 }}
+                      viewport={{ once: true, amount: 0.1 }}
                     >
                       <div 
                         className="w-16 h-16 mb-4 flex items-center justify-center"
@@ -283,19 +369,25 @@ const Services = () => {
                         <FontAwesomeIcon icon={faCode} className="text-4xl" />
                       </div>
                       <h4 className="font-semibold text-white">{tech.name}</h4>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Development Process Section */}
-      <section className="py-20 px-4 bg-gray-900">
+      <section ref={processRef} className="py-20 px-4 bg-gray-900 overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true, amount: 0.3 }}
+          >
             <h2 className="text-4xl font-bold mb-4 inline-block relative">
               Our Development Process
               <span className="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"></span>
@@ -303,26 +395,58 @@ const Services = () => {
             <p className="text-gray-400 max-w-3xl mx-auto mt-6">
               Our structured and transparent approach ensures we deliver high-quality solutions that meet your business objectives
             </p>
-          </div>
+          </motion.div>
 
           <div className="relative">
-            {/* Timeline line */}
-            <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-blue-600/80 to-blue-900/80"></div>
+            {/* Timeline line container */}
+            <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gray-700/50">
+              {/* Animated fill line */}
+              <div 
+                ref={timelineRef}
+                className="w-full bg-gradient-to-b from-blue-600 to-blue-900 h-0 transition-all duration-1000 ease-out"
+              ></div>
+            </div>
             
             <div className="space-y-12 relative">
               {developmentProcess.map((step, index) => (
-                <div 
+                <motion.div 
+                  ref={el => stepRefs.current[index] = el}
+                  data-index={index}
                   key={step.id} 
-                  className={`flex flex-col md:flex-row items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+                  className={`flex flex-col md:flex-row items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} process-step`}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ 
+                    duration: 0.6, 
+                    delay: index * 0.15,
+                    ease: [0.25, 0.1, 0.25, 1]
+                  }}
+                  viewport={{ once: false, amount: 0.3 }}
                 >
                   <div className="md:w-1/2 flex items-center justify-center z-10">
-                    <div className="bg-gray-800/80 p-8 rounded-xl shadow-lg border border-gray-700/30 max-w-md hover:-translate-y-2 transition-transform duration-300">
-                      <div 
-                        className="w-14 h-14 rounded-full flex items-center justify-center text-white text-2xl mb-4" 
-                        style={{ backgroundColor: step.color }}
+                    <motion.div 
+                      className="bg-gray-800/80 p-8 rounded-xl shadow-lg border border-gray-700/30 max-w-md transition-all duration-500"
+                      whileInView={{ 
+                        boxShadow: `0 10px 25px -5px ${step.color}20`,
+                        y: 0
+                      }}
+                      initial={{ y: 20 }}
+                      transition={{ duration: 0.5, delay: 0.2 + index * 0.15 }}
+                      viewport={{ once: false, amount: 0.5 }}
+                    >
+                      <motion.div 
+                        className="w-14 h-14 rounded-full flex items-center justify-center text-white text-2xl mb-4 transition-all duration-500 icon-container" 
+                        style={{ backgroundColor: `${step.color}40` }}
+                        whileInView={{ 
+                          backgroundColor: step.color,
+                          scale: [1, 1.1, 1],
+                          rotate: [0, 5, 0, -5, 0]
+                        }}
+                        transition={{ duration: 0.6, delay: 0.3 + index * 0.15 }}
+                        viewport={{ once: false, amount: 0.5 }}
                       >
                         <FontAwesomeIcon icon={step.icon} />
-                      </div>
+                      </motion.div>
                       <h3 className="text-xl font-bold text-white mb-3">
                         <span className="bg-gray-700 rounded-full w-8 h-8 inline-flex items-center justify-center mr-2 text-base">
                           {step.id}
@@ -332,30 +456,49 @@ const Services = () => {
                       <p className="text-gray-400 leading-relaxed">
                         {step.description}
                       </p>
-                    </div>
+                    </motion.div>
                   </div>
                   
                   {/* Circle on timeline */}
-                  <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full border-4 border-gray-900 bg-blue-500"></div>
-                </div>
+                  <motion.div 
+                    className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full border-4 border-gray-900 bg-gray-700 transition-all duration-500 timeline-circle"
+                    whileInView={{ 
+                      backgroundColor: step.color,
+                      scale: [1, 1.5, 1.2],
+                    }}
+                    transition={{ duration: 0.5, delay: 0.25 + index * 0.15 }}
+                    viewport={{ once: false, amount: 0.5 }}
+                  ></motion.div>
+                </motion.div>
               ))}
             </div>
           </div>
         </div>
       </section>
       
-      <div className="py-16 bg-gradient-to-r from-blue-700/90 to-blue-900/90 text-center mt-12 bg-cta-pattern bg-cover bg-center bg-blend-overlay">
+      <motion.div 
+        className="py-16 bg-gradient-to-r from-blue-700/90 to-blue-900/90 text-center mt-12 bg-cta-pattern bg-cover bg-center bg-blend-overlay"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        viewport={{ once: true, amount: 0.3 }}
+      >
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-bold mb-4 text-white">Ready to start your project?</h2>
           <p className="text-xl text-white/80 mb-8">Contact us today to discuss how we can help you achieve your digital goals.</p>
-          <Link 
-            to="/contact" 
-            className="inline-block bg-white text-blue-700 font-semibold py-4 px-10 rounded-md hover:-translate-y-1 hover:shadow-lg transition-all duration-300"
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            Get In Touch
-          </Link>
+            <Link 
+              to="/contact" 
+              className="inline-block bg-white text-blue-700 font-semibold py-4 px-10 rounded-md hover:shadow-lg transition-all duration-300"
+            >
+              Get In Touch
+            </Link>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
