@@ -32,7 +32,8 @@ const Services = () => {
         'E-commerce websites',
         'Progressive Web Apps (PWA)',
         'Custom CMS integration'
-      ]
+      ],
+      headerBg: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop'
     },
     {
       id: 'mobile-dev',
@@ -45,7 +46,8 @@ const Services = () => {
         'Android app development',
         'Cross-platform development',
         'App maintenance and support'
-      ]
+      ],
+      headerBg: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?q=80&w=1600&auto=format&fit=crop'
     },
     {
       id: 'ui-ux',
@@ -58,7 +60,8 @@ const Services = () => {
         'Wireframing & prototyping',
         'Visual design & branding',
         'User testing'
-      ]
+      ],
+      headerBg: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=1600&auto=format&fit=crop'
     },
     {
       id: 'digital-marketing',
@@ -71,7 +74,8 @@ const Services = () => {
         'Social media management',
         'PPC advertising',
         'Marketing analytics'
-      ]
+      ],
+      headerBg: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1600&auto=format&fit=crop'
     },
     {
       id: 'cloud-solutions',
@@ -84,7 +88,8 @@ const Services = () => {
         'AWS & Azure solutions',
         'Serverless architecture',
         'DevOps implementation'
-      ]
+      ],
+      headerBg: 'https://images.unsplash.com/photo-1535191042502-e6a9a3d407e7?q=80&w=1600&auto=format&fit=crop'
     },
     {
       id: 'cybersecurity',
@@ -97,7 +102,8 @@ const Services = () => {
         'Penetration testing',
         'Compliance management',
         'Security training'
-      ]
+      ],
+      headerBg: 'https://images.unsplash.com/photo-1562813733-b31f1c359713?q=80&w=1600&auto=format&fit=crop'
     }
   ];
 
@@ -278,43 +284,61 @@ const Services = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {serviceData.map((service) => (
             <div 
-              className="bg-gray-800/50 rounded-xl p-8 border border-white/5 shadow-lg hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-300 relative overflow-hidden flex flex-col h-full" 
+              className="bg-gray-800/50 rounded-xl overflow-hidden flex flex-col h-full shadow-lg hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-300" 
               key={service.id}
             >
-              <div className="absolute top-[-50px] right-[-50px] w-[100px] h-[100px] bg-radial-gradient from-blue-600/10 to-transparent rounded-full z-0"></div>
-              
-              <div 
-                className="w-[60px] h-[60px] rounded-xl flex items-center justify-center text-2xl text-white mb-6 shadow-lg shadow-blue-600/30" 
-                style={{ backgroundColor: service.iconBg }}
-              >
-                <FontAwesomeIcon icon={service.icon} />
+              {/* Service Header with Background Image */}
+              <div className="relative h-40 overflow-hidden">
+                {/* Background image */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center" 
+                  style={{ 
+                    backgroundImage: `url(${service.headerBg || ''})`,
+                  }}
+                ></div>
+                
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-b from-blue-900/60 to-gray-900/90"></div>
+                
+                {/* Icon positioned in top-left corner of background */}
+                <div className="absolute top-6 left-6">
+                  <div 
+                    className="w-[70px] h-[70px] rounded-xl flex items-center justify-center text-3xl text-white shadow-lg shadow-blue-600/30" 
+                    style={{ backgroundColor: service.iconBg }}
+                  >
+                    <FontAwesomeIcon icon={service.icon} />
+                  </div>
+                </div>
               </div>
               
-              <h2 className="text-2xl font-bold mb-4 text-white">{service.title}</h2>
-              <p className="text-gray-400 mb-6 leading-relaxed">{service.description}</p>
-              
-              <div className="mt-auto mb-6">
-                <h3 className="text-lg text-blue-500 font-semibold mb-4">Key Features:</h3>
-                <ul className="space-y-3">
-                  {service.features.map((feature, index) => (
-                    <li key={index} className="flex items-start text-gray-400">
-                      <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3 mt-1 flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
+              {/* Content */}
+              <div className="p-8">
+                <h2 className="text-2xl font-bold mb-4 text-white">{service.title}</h2>
+                <p className="text-gray-400 mb-6 leading-relaxed">{service.description}</p>
+                
+                <div className="mt-auto mb-6">
+                  <h3 className="text-lg text-blue-500 font-semibold mb-4">Key Features:</h3>
+                  <ul className="space-y-3">
+                    {service.features.map((feature, index) => (
+                      <li key={index} className="flex items-start text-gray-400">
+                        <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3 mt-1 flex-shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <Link 
+                  to={`/services/${service.id}`} 
+                  className="inline-flex items-center text-blue-500 font-semibold hover:text-blue-400 transition-colors duration-300"
+                >
+                  Learn More 
+                  <FontAwesomeIcon 
+                    icon={faArrowRight} 
+                    className="ml-2 group-hover:transform group-hover:translate-x-1 transition-transform duration-300" 
+                  />
+                </Link>
               </div>
-              
-              <Link 
-                to={`/services/${service.id}`} 
-                className="inline-flex items-center text-blue-500 font-semibold hover:text-blue-400 transition-colors duration-300"
-              >
-                Learn More 
-                <FontAwesomeIcon 
-                  icon={faArrowRight} 
-                  className="ml-2 group-hover:transform group-hover:translate-x-1 transition-transform duration-300" 
-                />
-              </Link>
             </div>
           ))}
         </div>

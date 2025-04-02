@@ -243,31 +243,6 @@ const ServiceDetail = () => {
               </div>
             </motion.section>
             
-            {/* About This Service Section - Moved below features */}
-            <motion.section 
-              className="mb-16"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-3xl font-bold mb-6 border-b border-gray-800 pb-3">About This Service</h2>
-              <div className="prose prose-lg prose-invert max-w-none">
-                <p className="text-gray-300 leading-relaxed">
-                  {service.description}
-                </p>
-                
-                <div className="my-8 p-6 bg-gradient-to-r from-blue-900/40 to-blue-800/20 rounded-lg border border-blue-800/30">
-                  <h3 className="text-xl font-semibold mb-3 text-blue-400">Why Choose Us?</h3>
-                  <p className="text-gray-300">
-                    Our team of experienced professionals is dedicated to delivering exceptional 
-                    {service.title.toLowerCase()} services tailored to your specific needs. 
-                    We pride ourselves on our commitment to quality, timely delivery, and customer satisfaction.
-                  </p>
-                </div>
-              </div>
-            </motion.section>
-            
             {/* Benefits Section */}
             <motion.section 
               className="mb-16"
@@ -293,6 +268,31 @@ const ServiceDetail = () => {
                     <span className="text-gray-300">{benefit}</span>
                   </motion.div>
                 ))}
+              </div>
+            </motion.section>
+            
+            {/* About This Service Section - Bottom section (yellow area in screenshot) */}
+            <motion.section 
+              className="mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-3xl font-bold mb-6 border-b border-gray-800 pb-3">About This Service</h2>
+              <div className="prose prose-lg prose-invert max-w-none">
+                <p className="text-gray-300 leading-relaxed">
+                  {service.description}
+                </p>
+                
+                <div className="my-8 p-6 bg-gradient-to-r from-blue-900/40 to-blue-800/20 rounded-lg border border-blue-800/30">
+                  <h3 className="text-xl font-semibold mb-3 text-blue-400">Why Choose Us?</h3>
+                  <p className="text-gray-300">
+                    Our team of experienced professionals is dedicated to delivering exceptional 
+                    {service.title.toLowerCase()} services tailored to your specific needs. 
+                    We pride ourselves on our commitment to quality, timely delivery, and customer satisfaction.
+                  </p>
+                </div>
               </div>
             </motion.section>
           </div>
