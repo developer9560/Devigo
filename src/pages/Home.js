@@ -236,8 +236,8 @@ const Home = () => {
             <Link to="/contact" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white font-semibold rounded-md shadow-lg shadow-blue-600/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-300">
               Get Started
             </Link>
-            <Link to="/portfolio" className="px-8 py-4 bg-transparent text-white font-semibold rounded-md border border-white/30 hover:bg-white/10 hover:border-white transition-all duration-300">
-              View Our Work
+            <Link to="/services" className="px-8 py-4 bg-transparent text-white font-semibold rounded-md border border-white/30 hover:bg-white/10 hover:border-white transition-all duration-300">
+              Explore Services
             </Link>
           </div>
         </div>
