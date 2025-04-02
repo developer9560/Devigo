@@ -1,38 +1,143 @@
-.App {
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary-blue: #0A66C2;
+  --primary-dark: #064584;
+  --primary-bg: #1E1E1E;
+  --secondary-bg: #252525;
+  --primary-white: #FFFFFF;
+  --gray-text: #AAAAAA;
+}
+
+/* Add pattern background as fallback */
+.bg-pattern {
+  background-color: #0A66C2;
+  background-image: radial-gradient(#FFFFFF 0.5px, transparent 0.5px), 
+                   radial-gradient(#FFFFFF 0.5px, #0A66C2 0.5px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+
+/* CTA background fallback */
+.bg-cta-pattern {
+  background: linear-gradient(to right, rgba(10, 102, 194, 0.9), rgba(6, 69, 132, 0.9));
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--primary-bg);
+  color: var(--primary-white);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+  margin-bottom: 1rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+section {
+  padding: 4rem 0;
+}
+
+button, .btn {
+  background-color: var(--primary-blue);
+  color: var(--primary-white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover, .btn:hover {
+  background-color: #0855a1;
+  transform: translateY(-2px);
+}
+
+a {
+  color: var(--primary-blue);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--primary-white);
+}
+
+.page-header {
   text-align: center;
+  margin-bottom: 3rem;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.section-title {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 2rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 3px;
+  background-color: var(--primary-blue);
 }
 
-.App-header {
-  background-color: #282c34;
+.app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.main-content {
+  flex: 1;
+  margin-top: 80px; /* To account for the fixed navbar */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Light theme variables override */
+.light-theme {
+  --primary-bg: #f5f5f5;
+  --secondary-bg: #ffffff;
+  --primary-blue: #0A66C2;
+  --primary-blue-dark: #064584;
+  --primary-white: #333333;
+  --gray-text: rgba(0, 0, 0, 0.7);
+  --border-color: rgba(0, 0, 0, 0.1);
+  --card-bg: rgba(255, 255, 255, 0.8);
+}
+
+/* Dark theme is the default, so no need to override */
+.dark-theme {
+  --primary-bg: #1E1E1E;
+  --secondary-bg: #2A2A2A;
+  --primary-blue: #0A66C2;
+  --primary-blue-dark: #064584;
+  --primary-white: #FFFFFF;
+  --gray-text: rgba(255, 255, 255, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --card-bg: rgba(42, 42, 42, 0.5);
+}
+
+/* Theme transition */
+.app,
+.app * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
