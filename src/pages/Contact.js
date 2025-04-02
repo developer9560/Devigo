@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import styled, { keyframes } from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faMapMarkerAlt, 
   faEnvelope, 
   faPhone, 
-  faWhatsapp 
+  faPaperPlane
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   faTwitter, 
@@ -13,7 +14,460 @@ import {
   faInstagram 
 } from '@fortawesome/free-brands-svg-icons';
 
+// Define animations
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const slideInLeft = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const slideInRight = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const pulse = keyframes`
+  0% {
+    box-shadow: 0 0 0 0 rgba(10, 102, 194, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(10, 102, 194, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(10, 102, 194, 0);
+  }
+`;
+
+// Styled Components
+const ContactPage = styled.div`
+  width: 100%;
+  background-color: var(--primary-bg);
+  color: var(--primary-white);
+  overflow-x: hidden;
+`;
+
+const HeroSection = styled.div`
+  background: linear-gradient(to right, rgba(10, 102, 194, 0.9), rgba(6, 69, 132, 0.9)), 
+              url('/images/contact-hero.jpg') no-repeat center center/cover;
+  padding: 5rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/images/pattern.png');
+    opacity: 0.05;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: linear-gradient(to top, var(--primary-bg), transparent);
+  }
+`;
+
+const HeroTitle = styled.h1`
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  animation: ${fadeIn} 0.8s ease forwards;
+  background: linear-gradient(to right, #fff, #0A66C2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 2rem;
+  }
+`;
+
+const HeroSubtitle = styled.p`
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 600px;
+  margin: 0 auto;
+  animation: ${fadeIn} 1s ease 0.3s forwards;
+  opacity: 0;
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+`;
+
+const ContentContainer = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 5rem 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 3rem;
+  position: relative;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    padding: 3rem 1.5rem;
+  }
+`;
+
+const InfoContainer = styled.div`
+  animation: ${slideInLeft} 1s ease forwards;
+  opacity: 0;
+  
+  @media (max-width: 768px) {
+    margin-bottom: 2rem;
+  }
+`;
+
+const InfoTitle = styled.h2`
+  font-size: 2.5rem;
+  color: var(--primary-white);
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-bottom: 1rem;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(to right, var(--primary-blue), transparent);
+  }
+`;
+
+const InfoText = styled.p`
+  color: var(--gray-text);
+  margin-bottom: 2.5rem;
+  line-height: 1.7;
+  font-size: 1.1rem;
+`;
+
+const ContactMethod = styled.div`
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateX(10px);
+  }
+`;
+
+const IconBox = styled.div`
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(145deg, #1c1c1c, #2a2a2a);
+  color: var(--primary-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  margin-right: 1.5rem;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  
+  ${ContactMethod}:hover & {
+    background-color: var(--primary-blue);
+    color: white;
+    animation: ${pulse} 1.5s infinite;
+  }
+`;
+
+const ContactDetail = styled.div`
+  flex: 1;
+`;
+
+const DetailTitle = styled.h3`
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-white);
+`;
+
+const DetailText = styled.p`
+  color: var(--gray-text);
+  line-height: 1.6;
+`;
+
+const ContactLink = styled.a`
+  color: var(--primary-blue);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  
+  &:hover {
+    text-decoration: underline;
+    color: #4d9fff;
+  }
+`;
+
+const SocialSection = styled.div`
+  margin-top: 3rem;
+`;
+
+const SocialTitle = styled.h3`
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--primary-white);
+`;
+
+const SocialIcons = styled.div`
+  display: flex;
+  gap: 1rem;
+`;
+
+const SocialIcon = styled.a`
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #1c1c1c, #2a2a2a);
+  color: var(--gray-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  
+  &:hover {
+    background-color: var(--primary-blue);
+    color: white;
+    transform: translateY(-5px);
+  }
+`;
+
+const FormContainer = styled.div`
+  background: rgba(30, 30, 30, 0.5);
+  backdrop-filter: blur(5px);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  animation: ${slideInRight} 1s ease forwards;
+  opacity: 0;
+`;
+
+const FormTitle = styled.h2`
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--primary-white);
+  position: relative;
+  padding-bottom: 1rem;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(to right, var(--primary-blue), transparent);
+  }
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
+
+const FormRow = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const FormLabel = styled.label`
+  margin-bottom: 0.8rem;
+  color: var(--gray-text);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+`;
+
+const Required = styled.span`
+  color: #e74c3c;
+  margin-left: 0.3rem;
+`;
+
+const FormInput = styled.input`
+  padding: 1rem 1.2rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--primary-white);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2);
+  }
+  
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+`;
+
+const FormSelect = styled.select`
+  padding: 1rem 1.2rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--primary-white);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230A66C2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2);
+  }
+  
+  & option {
+    background-color: #1c1c1c;
+    color: var(--primary-white);
+    padding: 1rem;
+  }
+
+  & option:hover,
+  & option:focus,
+  & option:active {
+    background-color: var(--primary-blue);
+    color: white;
+  }
+`;
+
+const FormTextarea = styled.textarea`
+  padding: 1rem 1.2rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--primary-white);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  min-height: 150px;
+  resize: vertical;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2);
+  }
+  
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+`;
+
+const SubmitButton = styled.button`
+  background: linear-gradient(to right, #0A66C2, #064584);
+  color: white;
+  border: none;
+  padding: 1.2rem 2rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(10, 102, 194, 0.4);
+  }
+`;
+
+// Animation hook for scroll reveal
+const useElementOnScreen = (options) => {
+  const containerRef = useRef(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate');
+        }
+      });
+    }, options);
+    
+    const elements = document.querySelectorAll('.animate-on-scroll');
+    elements.forEach(el => observer.observe(el));
+    
+    return () => {
+      elements.forEach(el => observer.unobserve(el));
+    };
+  }, [options]);
+  
+  return containerRef;
+};
+
 const Contact = () => {
+  const containerRef = useElementOnScreen({
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.2
+  });
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -47,97 +501,90 @@ const Contact = () => {
   };
 
   return (
-    <div className="w-full bg-gray-900 text-white">
-      <div className="bg-gradient-to-r from-blue-700/90 to-black/80 py-12 text-center">
-        <h1 className="text-4xl font-bold mb-2 text-white uppercase">Contact Us</h1>
-        <p className="text-lg text-white/80">Get in touch with our team for inquiries and collaborations</p>
-      </div>
+    <ContactPage ref={containerRef}>
+      <style>
+        {`
+          .animate-on-scroll {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+          }
+        `}
+      </style>
+      
+      <HeroSection>
+        <HeroTitle>Contact Us</HeroTitle>
+        <HeroSubtitle>Get in touch with our team for inquiries and collaborations</HeroSubtitle>
+      </HeroSection>
 
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-8">
-        <div className="md:pr-8">
-          <h2 className="text-3xl font-bold mb-6 text-white">Get in Touch</h2>
-          <p className="text-gray-400 mb-8 leading-relaxed">
+      <ContentContainer>
+        <InfoContainer>
+          <InfoTitle>Get in Touch</InfoTitle>
+          <InfoText>
             We're here to help with your digital needs. Feel free to reach out to us through any of the methods below, and our team will get back to you as soon as possible.
-          </p>
+          </InfoText>
           
-          <div className="flex items-start mb-6 group">
-            <div className="w-10 h-10 bg-blue-600/10 text-blue-500 flex items-center justify-center rounded-lg mr-4 group-hover:bg-blue-600 group-hover:text-white group-hover:-translate-y-1 transition-all duration-300">
+          <ContactMethod>
+            <IconBox>
               <FontAwesomeIcon icon={faMapMarkerAlt} />
-            </div>
-            <div>
-              <h3 className="text-xl font-medium mb-1 text-white">Address</h3>
-              <p className="text-gray-400 leading-relaxed">123 Tech Street, Suite 456<br />San Francisco, CA 94107</p>
-            </div>
-          </div>
+            </IconBox>
+            <ContactDetail>
+              <DetailTitle>Address</DetailTitle>
+              <DetailText>123 Tech Street, Suite 456<br />San Francisco, CA 94107</DetailText>
+            </ContactDetail>
+          </ContactMethod>
           
-          <div className="flex items-start mb-6 group">
-            <div className="w-10 h-10 bg-blue-600/10 text-blue-500 flex items-center justify-center rounded-lg mr-4 group-hover:bg-blue-600 group-hover:text-white group-hover:-translate-y-1 transition-all duration-300">
+          <ContactMethod>
+            <IconBox>
               <FontAwesomeIcon icon={faEnvelope} />
-            </div>
-            <div>
-              <h3 className="text-xl font-medium mb-1 text-white">Email</h3>
-              <p className="text-gray-400">
-                <a href="mailto:info@devigo.com" className="text-blue-500 hover:underline transition-colors duration-300">info@devigo.com</a>
-              </p>
-            </div>
-          </div>
+            </IconBox>
+            <ContactDetail>
+              <DetailTitle>Email</DetailTitle>
+              <DetailText>
+                <ContactLink href="mailto:info@devigo.com">info@devigo.com</ContactLink>
+              </DetailText>
+            </ContactDetail>
+          </ContactMethod>
           
-          <div className="flex items-start mb-6 group">
-            <div className="w-10 h-10 bg-blue-600/10 text-blue-500 flex items-center justify-center rounded-lg mr-4 group-hover:bg-blue-600 group-hover:text-white group-hover:-translate-y-1 transition-all duration-300">
+          <ContactMethod>
+            <IconBox>
               <FontAwesomeIcon icon={faPhone} />
-            </div>
-            <div>
-              <h3 className="text-xl font-medium mb-1 text-white">Phone</h3>
-              <p className="text-gray-400">
-                <a href="tel:+14155552671" className="text-blue-500 hover:underline transition-colors duration-300">+1 (415) 555-2671</a>
-              </p>
-            </div>
-          </div>
+            </IconBox>
+            <ContactDetail>
+              <DetailTitle>Phone</DetailTitle>
+              <DetailText>
+                <ContactLink href="tel:+14155552671">+1 (415) 555-2671</ContactLink>
+              </DetailText>
+            </ContactDetail>
+          </ContactMethod>
           
-          <div className="mt-10">
-            <h3 className="text-xl font-medium mb-4 text-white">Follow Us</h3>
-            <div className="flex gap-4">
-              <a 
-                href="#" 
-                aria-label="Twitter" 
-                className="w-10 h-10 rounded-full bg-white/10 text-gray-400 flex items-center justify-center hover:bg-blue-600 hover:text-white hover:-translate-y-1 transition-all duration-300"
-              >
+          <SocialSection>
+            <SocialTitle>Follow Us</SocialTitle>
+            <SocialIcons>
+              <SocialIcon href="#" aria-label="Twitter">
                 <FontAwesomeIcon icon={faTwitter} />
-              </a>
-              <a 
-                href="#" 
-                aria-label="LinkedIn" 
-                className="w-10 h-10 rounded-full bg-white/10 text-gray-400 flex items-center justify-center hover:bg-blue-600 hover:text-white hover:-translate-y-1 transition-all duration-300"
-              >
+              </SocialIcon>
+              <SocialIcon href="#" aria-label="LinkedIn">
                 <FontAwesomeIcon icon={faLinkedinIn} />
-              </a>
-              <a 
-                href="#" 
-                aria-label="Facebook" 
-                className="w-10 h-10 rounded-full bg-white/10 text-gray-400 flex items-center justify-center hover:bg-blue-600 hover:text-white hover:-translate-y-1 transition-all duration-300"
-              >
+              </SocialIcon>
+              <SocialIcon href="#" aria-label="Facebook">
                 <FontAwesomeIcon icon={faFacebookF} />
-              </a>
-              <a 
-                href="#" 
-                aria-label="Instagram" 
-                className="w-10 h-10 rounded-full bg-white/10 text-gray-400 flex items-center justify-center hover:bg-blue-600 hover:text-white hover:-translate-y-1 transition-all duration-300"
-              >
+              </SocialIcon>
+              <SocialIcon href="#" aria-label="Instagram">
                 <FontAwesomeIcon icon={faInstagram} />
-              </a>
-            </div>
-          </div>
-        </div>
+              </SocialIcon>
+            </SocialIcons>
+          </SocialSection>
+        </InfoContainer>
         
-        <div className="bg-gray-800/50 p-8 rounded-xl shadow-lg border border-white/5">
-          <h2 className="text-2xl font-bold mb-6 text-white">Send Us a Message</h2>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col">
-                <label htmlFor="name" className="mb-2 text-gray-400 text-sm">
-                  Name <span className="text-red-500">*</span>
-                </label>
-                <input
+        <FormContainer>
+          <FormTitle>Send Us a Message</FormTitle>
+          <Form onSubmit={handleSubmit}>
+            <FormRow>
+              <FormGroup>
+                <FormLabel>
+                  Name <Required>*</Required>
+                </FormLabel>
+                <FormInput
                   type="text"
                   id="name"
                   name="name"
@@ -145,14 +592,13 @@ const Contact = () => {
                   onChange={handleChange}
                   placeholder="Your name"
                   required
-                  className="py-3 px-4 bg-black/20 border border-white/10 rounded-md text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-300"
                 />
-              </div>
-              <div className="flex flex-col">
-                <label htmlFor="email" className="mb-2 text-gray-400 text-sm">
-                  Email <span className="text-red-500">*</span>
-                </label>
-                <input
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>
+                  Email <Required>*</Required>
+                </FormLabel>
+                <FormInput
                   type="email"
                   id="email"
                   name="email"
@@ -160,53 +606,45 @@ const Contact = () => {
                   onChange={handleChange}
                   placeholder="Your email address"
                   required
-                  className="py-3 px-4 bg-black/20 border border-white/10 rounded-md text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-300"
                 />
-              </div>
-            </div>
+              </FormGroup>
+            </FormRow>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col">
-                <label htmlFor="phone" className="mb-2 text-gray-400 text-sm">
-                  Phone Number
-                </label>
-                <input
+            <FormRow>
+              <FormGroup>
+                <FormLabel>Phone Number</FormLabel>
+                <FormInput
                   type="tel"
                   id="phone"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="Your phone number (optional)"
-                  className="py-3 px-4 bg-black/20 border border-white/10 rounded-md text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-300"
                 />
-              </div>
-              <div className="flex flex-col">
-                <label htmlFor="company" className="mb-2 text-gray-400 text-sm">
-                  Company
-                </label>
-                <input
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Company</FormLabel>
+                <FormInput
                   type="text"
                   id="company"
                   name="company"
                   value={formData.company}
                   onChange={handleChange}
                   placeholder="Your company name (optional)"
-                  className="py-3 px-4 bg-black/20 border border-white/10 rounded-md text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-300"
                 />
-              </div>
-            </div>
+              </FormGroup>
+            </FormRow>
             
-            <div className="flex flex-col">
-              <label htmlFor="service" className="mb-2 text-gray-400 text-sm">
-                Service Interested In <span className="text-red-500">*</span>
-              </label>
-              <select
+            <FormGroup>
+              <FormLabel>
+                Service Interested In <Required>*</Required>
+              </FormLabel>
+              <FormSelect
                 id="service"
                 name="service"
                 value={formData.service}
                 onChange={handleChange}
                 required
-                className="py-3 px-4 bg-black/20 border border-white/10 rounded-md text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-300"
               >
                 <option value="" disabled>Select a service</option>
                 <option value="web-development">Web Development</option>
@@ -214,14 +652,14 @@ const Contact = () => {
                 <option value="ui-ux">UI/UX Design</option>
                 <option value="digital-marketing">Digital Marketing</option>
                 <option value="other">Other</option>
-              </select>
-            </div>
+              </FormSelect>
+            </FormGroup>
             
-            <div className="flex flex-col">
-              <label htmlFor="message" className="mb-2 text-gray-400 text-sm">
-                Message <span className="text-red-500">*</span>
-              </label>
-              <textarea
+            <FormGroup>
+              <FormLabel>
+                Message <Required>*</Required>
+              </FormLabel>
+              <FormTextarea
                 id="message"
                 name="message"
                 value={formData.message}
@@ -229,20 +667,17 @@ const Contact = () => {
                 placeholder="Tell us about your project"
                 rows="5"
                 required
-                className="py-3 px-4 bg-black/20 border border-white/10 rounded-md text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-300"
-              ></textarea>
-            </div>
+              ></FormTextarea>
+            </FormGroup>
             
-            <button 
-              type="submit" 
-              className="bg-blue-600 text-white py-4 px-8 rounded-md font-semibold mt-2 hover:bg-blue-700 transition-colors duration-300 w-full"
-            >
+            <SubmitButton type="submit">
+              <FontAwesomeIcon icon={faPaperPlane} />
               Send Message
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
+            </SubmitButton>
+          </Form>
+        </FormContainer>
+      </ContentContainer>
+    </ContactPage>
   );
 };
 
