@@ -6,6 +6,11 @@
   padding: 0;
 }
 
+html, body {
+  overflow-x: hidden; /* Prevent horizontal scrollbar */
+  width: 100%;
+}
+
 :root {
   --primary-blue: #0A66C2;
   --primary-dark: #064584;
@@ -105,11 +110,21 @@ a:hover {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden; /* Prevent horizontal scrollbar */
 }
 
 .main-content {
   flex: 1;
   margin-top: 80px; /* To account for the fixed navbar */
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrollbar */
+}
+
+/* Image fallback styles */
+img {
+  max-width: 100%;
+  height: auto;
+  background-color: #1a1a1a; /* Fallback background color for images */
 }
 
 /* Light theme variables override */
@@ -140,4 +155,14 @@ a:hover {
 .app,
 .app * {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Fix for heading text in gradient backgrounds */
+.gradient-text {
+  background-image: linear-gradient(to right, #fff, #0A66C2);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent; /* Fallback */
+  display: inline-block;
 }

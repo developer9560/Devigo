@@ -8,6 +8,7 @@ import About from './pages/About';
 import Services from './pages/Services';
 import ServiceDetail from './pages/ServiceDetail';
 import Portfolio from './pages/Portfolio';
+import PortfolioDetail from './pages/PortfolioDetail';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
 
@@ -34,6 +35,7 @@ const App = () => {
             <Route path="/services" element={<Services />} />
             <Route path="/services/:serviceId" element={<ServiceDetail />} />
             <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/portfolio/:id" element={<PortfolioDetail />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQ />} />
           </Routes>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 
+// Define the keyframe animations
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -25,6 +26,7 @@ const zoomIn = keyframes`
 
 const PortfolioPage = styled.div`
   width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrollbar */
 `;
 
 const HeroSection = styled.section`
@@ -63,17 +65,24 @@ const HeroSection = styled.section`
 `;
 
 const PageTitle = styled.h1`
-  font-size: 3.8rem;
+  font-size: 3.5rem;
   margin-bottom: 1rem;
   background: linear-gradient(to right, #fff, #0A66C2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text; /* Standard property for future compatibility */
+  color: transparent; /* Fallback */
   text-transform: uppercase;
   letter-spacing: 2px;
   animation: ${fadeIn} 1s ease forwards;
+  text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   
   @media (max-width: 768px) {
     font-size: 2.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 2rem;
   }
 `;
 
@@ -83,12 +92,25 @@ const PageSubtitle = styled.p`
   color: var(--gray-text);
   animation: ${fadeIn} 1s ease 0.3s forwards;
   opacity: 0;
+  margin: 0 auto; /* Center the subtitle */
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    max-width: 90%;
+  }
 `;
 
 const PortfolioSection = styled.section`
   padding: 5rem 0;
   background-color: var(--primary-bg);
   position: relative;
+  
+  /* Add a subtle background pattern */
+  background-image: 
+    radial-gradient(rgba(10, 102, 194, 0.03) 1px, transparent 1px),
+    radial-gradient(rgba(10, 102, 194, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
   
   &::before {
     content: '';
@@ -115,12 +137,51 @@ const PortfolioSection = styled.section`
   }
 `;
 
+const SectionHeading = styled.h2`
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: var(--primary-white);
+  position: relative;
+  padding-bottom: 1rem;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(to right, #0A66C2, transparent);
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+`;
+
 const PortfolioContainer = styled.div`
   max-width: 1200px;
+  width: 95%;
   margin: 0 auto;
-  padding: 0 1.5rem;
   position: relative;
   z-index: 1;
+  
+  /* Add a subtle border to clearly define the container */
+  background: rgba(30, 30, 30, 0.5);
+  backdrop-filter: blur(5px);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  min-height: 600px; /* Ensure enough space for content */
+  
+  @media (max-width: 768px) {
+    width: 90%;
+    padding: 1.5rem;
+  }
 `;
 
 const FilterButtons = styled.div`
@@ -128,6 +189,7 @@ const FilterButtons = styled.div`
   justify-content: center;
   flex-wrap: wrap;
   margin-bottom: 3rem;
+  gap: 0.8rem;
 `;
 
 const FilterButton = styled.button`
@@ -163,13 +225,40 @@ const FilterButton = styled.button`
   }
 `;
 
+const FilterCategory = styled.div`
+  margin-bottom: 2rem;
+  text-align: center;
+`;
+
+const FilterCategoryTitle = styled.h3`
+  font-size: 1.2rem;
+  color: var(--gray-text);
+  margin-bottom: 1rem;
+  position: relative;
+  display: inline-block;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, #0A66C2, transparent);
+  }
+`;
+
 const ProjectsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 2.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  min-height: 300px; /* Ensure grid has height even when empty */
+  margin-top: 3rem; /* Add space after the filters */
   
   @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
   }
 `;
 
@@ -181,29 +270,35 @@ const ProjectCard = styled.div`
   transition: all 0.4s ease;
   height: 350px;
   cursor: pointer;
-  opacity: 0;
-  transform: translateY(30px);
-  animation: ${fadeIn} 0.6s ease forwards;
-  animation-delay: ${props => props.index * 0.1}s;
+  opacity: 1; /* Ensure visibility by default */
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(145deg, #1c1c1c, #2a2a2a);
+  
+  /* Cancel any previous animations */
+  animation: none !important;
+  transform: translateY(0) !important;
   
   &:hover {
-    transform: translateY(-10px);
+    transform: translateY(-10px) !important;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    
-    .project-overlay {
-      opacity: 1;
-    }
     
     .project-image img {
       transform: scale(1.1);
+    }
+    
+    .view-details {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 `;
 
 const ProjectImage = styled.div`
   width: 100%;
-  height: 100%;
+  height: 220px;
   overflow: hidden;
+  background-color: #1a1a1a; /* Fallback color */
   
   img {
     width: 100%;
@@ -211,6 +306,46 @@ const ProjectImage = styled.div`
     object-fit: cover;
     transition: transform 0.6s ease;
   }
+`;
+
+const ProjectInfo = styled.div`
+  padding: 1rem 1.5rem;
+  background: linear-gradient(145deg, #1c1c1c, #2a2a2a);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
+const ProjectCategory = styled.span`
+  font-size: 0.8rem;
+  color: var(--primary-blue);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  display: block;
+`;
+
+const ProjectTitle = styled.h3`
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: white;
+  line-height: 1.4;
+`;
+
+const ProjectTech = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+`;
+
+const TechTag = styled.span`
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0.3rem 0.8rem;
+  border-radius: 30px;
+  font-size: 0.8rem;
 `;
 
 const ProjectOverlay = styled.div`
@@ -228,32 +363,25 @@ const ProjectOverlay = styled.div`
   transition: opacity 0.4s ease;
 `;
 
-const ProjectTitle = styled.h3`
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
+const ViewDetailsButton = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 20px);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
   color: white;
-`;
-
-const ProjectCategory = styled.span`
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-`;
-
-const ProjectTech = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
-`;
-
-const TechTag = styled.span`
-  background-color: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
-  padding: 0.3rem 0.8rem;
+  padding: 0.8rem 1.5rem;
   border-radius: 30px;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
 `;
 
 const ModalOverlay = styled.div`
@@ -441,37 +569,10 @@ const ModalButton = styled.a`
   }
 `;
 
-// Custom hook for animation on scroll
-const useElementOnScreen = (options) => {
-  const containerRef = useRef(null);
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate');
-        }
-      });
-    }, options);
-    
-    const elements = document.querySelectorAll('.animate-on-scroll');
-    elements.forEach(el => observer.observe(el));
-    
-    return () => {
-      elements.forEach(el => observer.unobserve(el));
-    };
-  }, [options]);
-  
-  return containerRef;
-};
-
 const Portfolio = () => {
-  const containerRef = useElementOnScreen({
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.1
-  });
-  
   const [filter, setFilter] = useState('all');
+  const [industryFilter, setIndustryFilter] = useState('all');
+  const [technologyFilter, setTechnologyFilter] = useState('all');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const modalRef = useRef(null);
@@ -522,14 +623,24 @@ const Portfolio = () => {
       document.body.style.overflow = 'auto';
     };
   }, [modalVisible]);
+
+  // Ensure projects are immediately visible
+  useEffect(() => {
+    // Make projects immediately visible
+    const elements = document.querySelectorAll('.animate-on-scroll');
+    elements.forEach(el => {
+      el.classList.add('fade-in-animation-immediate');
+    });
+  }, [filter, industryFilter, technologyFilter]);
   
   const projects = [
     {
       id: 1,
       title: "E-Commerce Platform",
       category: "web",
-      image: "/images/portfolio/project1.jpg",
+      image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1470&auto=format&fit=crop",
       technologies: ["React", "Node.js", "MongoDB", "Express"],
+      industry: "Retail",
       client: "Fashion Retail Chain",
       completionDate: "January 2023",
       projectUrl: "#",
@@ -543,18 +654,24 @@ const Portfolio = () => {
         "Order tracking",
         "Admin dashboard"
       ],
+      results: [
+        "50% increase in conversion rate",
+        "35% reduction in cart abandonment",
+        "123% growth in mobile sales"
+      ],
       gallery: [
-        "/images/portfolio/project1-detail1.jpg",
-        "/images/portfolio/project1-detail2.jpg",
-        "/images/portfolio/project1-detail3.jpg"
+        "https://images.unsplash.com/photo-1563986768494-4dee09f74f5b?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1506104489822-562ca25152fe?q=80&w=1469&auto=format&fit=crop"
       ]
     },
     {
       id: 2,
       title: "Health & Fitness App",
       category: "mobile",
-      image: "/images/portfolio/project2.jpg",
+      image: "https://images.unsplash.com/photo-1461354464878-ad92f492a5a0?q=80&w=1470&auto=format&fit=crop",
       technologies: ["React Native", "Firebase", "Redux", "Node.js"],
+      industry: "Healthcare",
       client: "Fitness First Inc.",
       completionDate: "March 2023",
       projectUrl: "#",
@@ -568,18 +685,24 @@ const Portfolio = () => {
         "Integration with fitness wearables",
         "Customized workout recommendations"
       ],
+      results: [
+        "87% user retention after 3 months",
+        "42% increase in workout frequency",
+        "Over 4.8 star rating on app stores"
+      ],
       gallery: [
-        "/images/portfolio/project2-detail1.jpg",
-        "/images/portfolio/project2-detail2.jpg",
-        "/images/portfolio/project2-detail3.jpg"
+        "https://images.unsplash.com/photo-1598136490941-30d885318abd?q=80&w=1469&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1520&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1470&auto=format&fit=crop"
       ]
     },
     {
       id: 3,
       title: "Corporate Website Redesign",
       category: "ui",
-      image: "/images/portfolio/project3.jpg",
+      image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?q=80&w=1469&auto=format&fit=crop",
       technologies: ["HTML5", "CSS3", "JavaScript", "Figma", "WordPress"],
+      industry: "Professional Services",
       client: "Global Consulting Group",
       completionDate: "November 2022",
       projectUrl: "#",
@@ -593,18 +716,24 @@ const Portfolio = () => {
         "Contact forms with validation",
         "Custom WordPress theme"
       ],
+      results: [
+        "62% reduction in bounce rate",
+        "3.5x increase in contact form submissions",
+        "40% improvement in page load speed"
+      ],
       gallery: [
-        "/images/portfolio/project3-detail1.jpg",
-        "/images/portfolio/project3-detail2.jpg",
-        "/images/portfolio/project3-detail3.jpg"
+        "https://images.unsplash.com/photo-1553484771-ade415825e66?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1543286386-713bdd548da4?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1579403124614-197f69d8187b?q=80&w=1528&auto=format&fit=crop"
       ]
     },
     {
       id: 4,
       title: "Real Estate Management System",
       category: "web",
-      image: "/images/portfolio/project4.jpg",
+      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1473&auto=format&fit=crop",
       technologies: ["Angular", "Node.js", "MongoDB", "Express", "Socket.io"],
+      industry: "Real Estate",
       client: "Prestige Properties",
       completionDate: "July 2023",
       projectUrl: "#",
@@ -618,18 +747,24 @@ const Portfolio = () => {
         "Real-time messaging",
         "Financial reporting"
       ],
+      results: [
+        "75% reduction in administrative time",
+        "33% faster lease processing",
+        "89% tenant satisfaction rating"
+      ],
       gallery: [
-        "/images/portfolio/project4-detail1.jpg",
-        "/images/portfolio/project4-detail2.jpg",
-        "/images/portfolio/project4-detail3.jpg"
+        "https://images.unsplash.com/photo-1626178793926-22b28830aa30?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1558036117-15d82a90b9b1?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1602941525421-8f8b81d3edbb?q=80&w=1470&auto=format&fit=crop"
       ]
     },
     {
       id: 5,
       title: "Restaurant Ordering App",
       category: "mobile",
-      image: "/images/portfolio/project5.jpg",
+      image: "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?q=80&w=1470&auto=format&fit=crop",
       technologies: ["Flutter", "Firebase", "Stripe API", "Google Maps API"],
+      industry: "Food & Beverage",
       client: "Gourmet Restaurant Chain",
       completionDate: "April 2023",
       projectUrl: "#",
@@ -643,18 +778,24 @@ const Portfolio = () => {
         "Order tracking",
         "Restaurant locator"
       ],
+      results: [
+        "28% increase in average order value",
+        "15% growth in customer retention",
+        "45% of orders now coming through the app"
+      ],
       gallery: [
-        "/images/portfolio/project5-detail1.jpg",
-        "/images/portfolio/project5-detail2.jpg",
-        "/images/portfolio/project5-detail3.jpg"
+        "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?q=80&w=1632&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1564495528617-c0340948e651?q=80&w=1471&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1509315811345-672d83ef2fbc?q=80&w=1374&auto=format&fit=crop"
       ]
     },
     {
       id: 6,
       title: "Educational Platform UI/UX",
       category: "ui",
-      image: "/images/portfolio/project6.jpg",
+      image: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=1470&auto=format&fit=crop",
       technologies: ["Figma", "Adobe XD", "Adobe Photoshop", "HTML/CSS"],
+      industry: "Education",
       client: "Online Learning Academy",
       completionDate: "June 2023",
       projectUrl: "#",
@@ -668,17 +809,31 @@ const Portfolio = () => {
         "Accessibility compliance",
         "Cross-platform design system"
       ],
+      results: [
+        "53% improvement in course completion rates",
+        "42% reduction in support tickets",
+        "91% positive user feedback on new interface"
+      ],
       gallery: [
-        "/images/portfolio/project6-detail1.jpg",
-        "/images/portfolio/project6-detail2.jpg",
-        "/images/portfolio/project6-detail3.jpg"
+        "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1374&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1611926653458-09294b3142bf?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1494809610410-160faaed4de0?q=80&w=1470&auto=format&fit=crop"
       ]
     }
   ];
   
-  const filteredProjects = filter === 'all' 
-    ? projects 
-    : projects.filter(project => project.category === filter);
+  // Get unique industries and technologies for filters
+  const industries = ['all', ...new Set(projects.map(project => project.industry.toLowerCase()))];
+  const technologies = ['all', ...new Set(projects.flatMap(project => project.technologies.map(tech => tech.toLowerCase())))];
+  
+  // Filter projects based on multiple criteria
+  const filteredProjects = projects.filter(project => {
+    const categoryMatch = filter === 'all' || project.category === filter;
+    const industryMatch = industryFilter === 'all' || project.industry.toLowerCase() === industryFilter;
+    const techMatch = technologyFilter === 'all' || project.technologies.some(tech => tech.toLowerCase() === technologyFilter);
+    
+    return categoryMatch && industryMatch && techMatch;
+  });
   
   const openModal = (project) => {
     setSelectedProject(project);
@@ -689,8 +844,36 @@ const Portfolio = () => {
     setModalVisible(false);
   };
   
+  const navigateToDetail = (id) => {
+    window.location.href = `/portfolio/${id}`;
+  };
+  
   return (
-    <PortfolioPage ref={containerRef}>
+    <PortfolioPage>
+      <style>
+        {`
+          @keyframes fadeInAnimation {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          
+          .fade-in-animation {
+            animation: fadeInAnimation 0.6s ease forwards;
+          }
+
+          .fade-in-animation-immediate {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        `}
+      </style>
+      
       <HeroSection>
         <PageTitle>Our Portfolio</PageTitle>
         <PageSubtitle>Showcasing our best work and client success stories</PageSubtitle>
@@ -698,54 +881,137 @@ const Portfolio = () => {
       
       <PortfolioSection>
         <PortfolioContainer>
-          <FilterButtons className="animate-on-scroll">
-            <FilterButton 
-              active={filter === 'all'} 
-              onClick={() => setFilter('all')}
-            >
-              All Projects
-            </FilterButton>
-            <FilterButton 
-              active={filter === 'web'} 
-              onClick={() => setFilter('web')}
-            >
-              Web Development
-            </FilterButton>
-            <FilterButton 
-              active={filter === 'mobile'} 
-              onClick={() => setFilter('mobile')}
-            >
-              Mobile Apps
-            </FilterButton>
-            <FilterButton 
-              active={filter === 'ui'} 
-              onClick={() => setFilter('ui')}
-            >
-              UI/UX Design
-            </FilterButton>
-          </FilterButtons>
+          <SectionHeading>Our Project Showcase</SectionHeading>
+          
+          <div>
+            <FilterCategoryTitle>Project Type</FilterCategoryTitle>
+            <FilterButtons>
+              <FilterButton 
+                active={filter === 'all'} 
+                onClick={() => setFilter('all')}
+              >
+                All Projects
+              </FilterButton>
+              <FilterButton 
+                active={filter === 'web'} 
+                onClick={() => setFilter('web')}
+              >
+                Web Development
+              </FilterButton>
+              <FilterButton 
+                active={filter === 'mobile'} 
+                onClick={() => setFilter('mobile')}
+              >
+                Mobile Apps
+              </FilterButton>
+              <FilterButton 
+                active={filter === 'ui'} 
+                onClick={() => setFilter('ui')}
+              >
+                UI/UX Design
+              </FilterButton>
+            </FilterButtons>
+          </div>
+          
+          <div>
+            <FilterCategoryTitle>Industry</FilterCategoryTitle>
+            <FilterButtons>
+              <FilterButton 
+                active={industryFilter === 'all'} 
+                onClick={() => setIndustryFilter('all')}
+              >
+                All Industries
+              </FilterButton>
+              {industries.filter(i => i !== 'all').map((industry, index) => (
+                <FilterButton 
+                  key={index}
+                  active={industryFilter === industry} 
+                  onClick={() => setIndustryFilter(industry)}
+                >
+                  {industry.charAt(0).toUpperCase() + industry.slice(1)}
+                </FilterButton>
+              ))}
+            </FilterButtons>
+          </div>
+          
+          <div>
+            <FilterCategoryTitle>Technology</FilterCategoryTitle>
+            <FilterButtons>
+              <FilterButton 
+                active={technologyFilter === 'all'} 
+                onClick={() => setTechnologyFilter('all')}
+              >
+                All Technologies
+              </FilterButton>
+              {technologies.filter(t => t !== 'all').slice(0, 8).map((tech, index) => (
+                <FilterButton 
+                  key={index}
+                  active={technologyFilter === tech} 
+                  onClick={() => setTechnologyFilter(tech)}
+                >
+                  {tech}
+                </FilterButton>
+              ))}
+            </FilterButtons>
+          </div>
           
           <ProjectsGrid>
-            {filteredProjects.map((project, index) => (
-              <ProjectCard 
-                key={project.id} 
-                index={index}
-                onClick={() => openModal(project)}
-              >
-                <ProjectImage className="project-image">
-                  <img src={project.image} alt={project.title} />
-                </ProjectImage>
-                <ProjectOverlay className="project-overlay">
-                  <ProjectCategory>{project.category === 'web' ? 'Web Development' : project.category === 'mobile' ? 'Mobile App' : 'UI/UX Design'}</ProjectCategory>
-                  <ProjectTitle>{project.title}</ProjectTitle>
-                  <ProjectTech>
-                    {project.technologies.slice(0, 3).map((tech, idx) => (
-                      <TechTag key={idx}>{tech}</TechTag>
-                    ))}
-                  </ProjectTech>
-                </ProjectOverlay>
-              </ProjectCard>
-            ))}
+            {projects.length === 0 ? (
+              <div style={{ 
+                gridColumn: '1/-1', 
+                textAlign: 'center', 
+                padding: '3rem', 
+                color: 'var(--gray-text)'
+              }}>
+                Loading projects...
+              </div>
+            ) : filteredProjects.length > 0 ? (
+              filteredProjects.map((project, index) => (
+                <ProjectCard 
+                  key={project.id} 
+                  index={index}
+                  onClick={() => openModal(project)}
+                >
+                  <ProjectImage className="project-image">
+                    <img 
+                      src={project.image} 
+                      alt={project.title} 
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://via.placeholder.com/600x400?text=Project+Image";
+                      }}
+                    />
+                  </ProjectImage>
+                  <ProjectInfo>
+                    <div>
+                      <ProjectCategory>
+                        {project.category === 'web' ? 'Web Development' : 
+                         project.category === 'mobile' ? 'Mobile App' : 'UI/UX Design'}
+                      </ProjectCategory>
+                      <ProjectTitle>{project.title}</ProjectTitle>
+                    </div>
+                    <ProjectTech>
+                      {project.technologies.slice(0, 3).map((tech, idx) => (
+                        <TechTag key={idx}>{tech}</TechTag>
+                      ))}
+                    </ProjectTech>
+                  </ProjectInfo>
+                  
+                  <ProjectOverlay className="project-overlay">
+                    <ViewDetailsButton className="view-details">View Project</ViewDetailsButton>
+                  </ProjectOverlay>
+                </ProjectCard>
+              ))
+            ) : (
+              <div style={{ 
+                gridColumn: '1/-1', 
+                textAlign: 'center', 
+                padding: '3rem', 
+                color: 'var(--gray-text)'
+              }}>
+                No projects match your current filters. Please try different criteria.
+              </div>
+            )}
           </ProjectsGrid>
         </PortfolioContainer>
       </PortfolioSection>
@@ -757,7 +1023,14 @@ const Portfolio = () => {
               &times;
             </ModalCloseButton>
             <ModalImageGallery>
-              <ModalImage src={selectedProject.image} alt={selectedProject.title} />
+              <ModalImage 
+                src={selectedProject.image} 
+                alt={selectedProject.title} 
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "https://via.placeholder.com/900x500?text=Project+Image";
+                }}
+              />
             </ModalImageGallery>
             <ModalDetails>
               <ModalTitle>{selectedProject.title}</ModalTitle>
@@ -767,6 +1040,10 @@ const Portfolio = () => {
                 <ModalInfoItem>
                   <ModalInfoLabel>Client</ModalInfoLabel>
                   <ModalInfoValue>{selectedProject.client}</ModalInfoValue>
+                </ModalInfoItem>
+                <ModalInfoItem>
+                  <ModalInfoLabel>Industry</ModalInfoLabel>
+                  <ModalInfoValue>{selectedProject.industry}</ModalInfoValue>
                 </ModalInfoItem>
                 <ModalInfoItem>
                   <ModalInfoLabel>Category</ModalInfoLabel>
@@ -793,8 +1070,20 @@ const Portfolio = () => {
                 </ModalTechList>
               </ModalTechStack>
               
+              <ModalTechStack>
+                <ModalTechTitle>Key Results</ModalTechTitle>
+                <ul style={{ color: 'var(--gray-text)', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
+                  {selectedProject.results.map((result, idx) => (
+                    <li key={idx}>{result}</li>
+                  ))}
+                </ul>
+              </ModalTechStack>
+              
               <ModalActions>
-                <ModalButton href={selectedProject.projectUrl} target="_blank" rel="noopener noreferrer" primary>
+                <ModalButton onClick={() => navigateToDetail(selectedProject.id)} primary>
+                  View Case Study
+                </ModalButton>
+                <ModalButton href={selectedProject.projectUrl} target="_blank" rel="noopener noreferrer">
                   View Live Project
                 </ModalButton>
                 <ModalButton href="/contact">

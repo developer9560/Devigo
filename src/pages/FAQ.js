@@ -53,17 +53,24 @@ const HeroSection = styled.section`
 `;
 
 const PageTitle = styled.h1`
-  font-size: 3.8rem;
+  font-size: 3.5rem;
   margin-bottom: 1rem;
   background: linear-gradient(to right, #fff, #0A66C2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
   text-transform: uppercase;
   letter-spacing: 2px;
   animation: ${fadeIn} 1s ease forwards;
+  text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   
   @media (max-width: 768px) {
     font-size: 2.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 2rem;
   }
 `;
 
@@ -73,6 +80,12 @@ const PageSubtitle = styled.p`
   color: var(--gray-text);
   animation: ${fadeIn} 1s ease 0.3s forwards;
   opacity: 0;
+  margin: 0 auto;
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    max-width: 90%;
+  }
 `;
 
 const FAQSection = styled.section`
@@ -80,6 +93,16 @@ const FAQSection = styled.section`
   background-color: var(--primary-bg);
   position: relative;
   overflow: hidden;
+  
+  background-image: 
+    radial-gradient(rgba(10, 102, 194, 0.03) 1px, transparent 1px),
+    radial-gradient(rgba(10, 102, 194, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+  
+  @media (max-width: 768px) {
+    padding: 3rem 0;
+  }
   
   &::before {
     content: '';
@@ -109,9 +132,13 @@ const FAQSection = styled.section`
 const FAQContainer = styled.div`
   max-width: 1000px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 2rem;
   position: relative;
   z-index: 1;
+  background: rgba(30, 30, 30, 0.5);
+  backdrop-filter: blur(5px);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 `;
 
 const CategoryButtons = styled.div`
@@ -119,9 +146,10 @@ const CategoryButtons = styled.div`
   justify-content: center;
   margin-bottom: 3rem;
   flex-wrap: wrap;
-  opacity: 0;
+  opacity: 1;
   animation: ${fadeIn} 0.6s ease forwards;
-  animation-delay: 0.3s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1rem;
 `;
 
 const CategoryButton = styled.button`
@@ -139,11 +167,11 @@ const CategoryButton = styled.button`
   &::after {
     content: '';
     position: absolute;
-    bottom: 0;
+    bottom: -5px;
     left: 50%;
     transform: translateX(-50%) scaleX(${props => props.active ? 1 : 0});
-    width: 30px;
-    height: 2px;
+    width: 40px;
+    height: 3px;
     background-color: var(--primary-blue);
     transition: transform 0.3s ease;
   }
@@ -158,14 +186,13 @@ const CategoryButton = styled.button`
 `;
 
 const FAQList = styled.div`
-  opacity: 0;
-  animation: ${fadeIn} 0.6s ease forwards;
-  animation-delay: 0.6s;
+  opacity: 1;
+  min-height: 400px;
 `;
 
 const FAQItem = styled.div`
   margin-bottom: 1.5rem;
-  background: linear-gradient(145deg, #222, #2a2a2a);
+  background: linear-gradient(145deg, #1c1c1c, #2a2a2a);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -185,6 +212,8 @@ const FAQHeader = styled.div`
   padding: 1.5rem;
   cursor: pointer;
   border-bottom: ${props => props.active ? '1px solid rgba(255, 255, 255, 0.05)' : 'none'};
+  background-color: ${props => props.active ? 'rgba(10, 102, 194, 0.1)' : 'transparent'};
+  transition: background-color 0.3s ease;
 `;
 
 const FAQQuestion = styled.h3`
@@ -195,11 +224,12 @@ const FAQQuestion = styled.h3`
 `;
 
 const FAQToggle = styled.div`
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   position: relative;
   transition: transform 0.3s ease;
-  transform: ${props => props.active ? 'rotate(45deg)' : 'rotate(0)'};
+  transform: ${props => props.active ? 'rotate(135deg)' : 'rotate(0)'};
+  flex-shrink: 0;
   
   &::before, &::after {
     content: '';
@@ -212,38 +242,44 @@ const FAQToggle = styled.div`
     top: 50%;
     left: 0;
     width: 100%;
-    height: 2px;
+    height: 3px;
     transform: translateY(-50%);
+    border-radius: 3px;
   }
   
   &::after {
     top: 0;
     left: 50%;
     height: 100%;
-    width: 2px;
+    width: 3px;
     transform: translateX(-50%);
+    border-radius: 3px;
   }
 `;
 
 const FAQContent = styled.div`
   max-height: ${props => props.active ? '1000px' : '0'};
   overflow: hidden;
-  transition: max-height 0.5s ease;
+  transition: max-height 0.6s ease, opacity 0.3s ease;
+  opacity: ${props => props.active ? '1' : '0'};
+  background-color: rgba(0, 0, 0, 0.2);
 `;
 
 const FAQAnswer = styled.div`
-  padding: 0 1.5rem 1.5rem;
+  padding: 1.5rem;
   color: var(--gray-text);
   line-height: 1.8;
+  font-size: 1rem;
 `;
 
 const CTASection = styled.section`
   padding: 5rem 0;
-  background: linear-gradient(rgba(10, 102, 194, 0.9), rgba(0, 0, 0, 0.9)), 
+  background: linear-gradient(rgba(10, 102, 194, 0.9), rgba(6, 69, 132, 0.9)), 
               url('/images/cta-bg.jpg') no-repeat center center/cover;
   text-align: center;
   position: relative;
   overflow: hidden;
+  margin-top: 3rem;
   
   &::before {
     content: '';
@@ -263,20 +299,20 @@ const CTAContainer = styled.div`
   padding: 0 1.5rem;
   position: relative;
   z-index: 1;
-  opacity: 0;
-  animation: ${fadeIn} 0.6s ease forwards;
+  opacity: 1;
 `;
 
 const CTATitle = styled.h2`
   font-size: 2.5rem;
   margin-bottom: 1.5rem;
   color: var(--primary-white);
+  font-weight: 700;
 `;
 
 const CTAText = styled.p`
   font-size: 1.2rem;
   margin-bottom: 2.5rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   line-height: 1.8;
 `;
 
@@ -415,8 +451,23 @@ const FAQ = () => {
   
   const filteredFAQs = faqData[activeCategory] || [];
   
+  useEffect(() => {
+    if (activeIndex === null && filteredFAQs.length > 0) {
+      setActiveIndex(0);
+    }
+  }, [activeCategory, filteredFAQs.length, activeIndex]);
+  
   return (
     <FAQPage ref={containerRef}>
+      <style>
+        {`
+          .animate-on-scroll {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+          }
+        `}
+      </style>
+
       <HeroSection>
         <PageTitle>Frequently Asked Questions</PageTitle>
         <PageSubtitle>Find answers to common questions about our services</PageSubtitle>
@@ -451,7 +502,7 @@ const FAQ = () => {
             </CategoryButton>
           </CategoryButtons>
           
-          <FAQList className="animate-on-scroll">
+          <FAQList>
             {filteredFAQs.map((faq, index) => (
               <FAQItem key={index} className="animate-on-scroll">
                 <FAQHeader 
