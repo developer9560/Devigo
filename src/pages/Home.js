@@ -83,24 +83,24 @@ const Home = () => {
     {
       id: 1,
       text: "DEVIGO transformed our online presence completely. Their team delivered a website that exceeded our expectations and has significantly increased our conversions.",
-      author: "Sarah Johnson",
-      position: "CEO, Nexus Inc.",
+      author: "Pawan Singh",
+      position: "CEO, Devigo",
       avatar: "/images/testimonial1.jpg",
       stars: 5
     },
     {
       id: 2,
       text: "Working with DEVIGO was a game-changer for our business. Their attention to detail and technical expertise helped us launch our platform months ahead of schedule.",
-      author: "Michael Rodriguez",
-      position: "Founder, MediConnect",
+      author: "Suraj Roy",
+      position: "Founder, Devigo",
       avatar: "/images/testimonial2.jpg",
       stars: 5
     },
     {
       id: 3,
       text: "The team at DEVIGO doesn't just build websites, they build solutions. Their strategic approach to our project delivered exactly what we needed to succeed in our market.",
-      author: "Emily Chen",
-      position: "Marketing Director, Urban Housing",
+      author: "Prince Gupta",
+      position: "Marketing Director, Devigo",
       avatar: "/images/testimonial3.jpg",
       stars: 5
     }
@@ -108,9 +108,9 @@ const Home = () => {
 
   // Stats data
   const stats = [
-    { value: 450, label: "Projects Completed" },
+    { value: 90, label: "Projects Completed" },
     { value: 98, label: "Client Satisfaction" },
-    { value: 8, label: "Years of Experience" },
+    { value: 2, label: "Years of Experience" },
     { value: 24, label: "Support Available" }
   ];
 

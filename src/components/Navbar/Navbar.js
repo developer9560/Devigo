@@ -47,9 +47,9 @@ const Navbar = () => {
 
   const navigationLinks = [
     { path: '/', label: 'Home' },
-    { path: '/about', label: 'About' },
     { path: '/services', label: 'Services' },
     { path: '/portfolio', label: 'Portfolio' },
+    { path: '/about', label: 'About' },
     { path: '/faq', label: 'FAQ' },
     { path: '/contact', label: 'Contact' }
   ];
@@ -61,6 +61,7 @@ const Navbar = () => {
       <div className="max-w-7xl h-full mx-auto px-8 flex justify-between items-center">
         <Link to="/" className="flex items-center">
           <Logo size="medium" />
+
         </Link>
 
         {/* Mobile Menu Button */}

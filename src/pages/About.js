@@ -1132,33 +1132,33 @@ const About = () => {
   
   const timelineData = [
     {
-      year: "2015",
-      title: "Founded",
-      description: "DEVIGO was founded with the mission to provide innovative digital solutions for businesses of all sizes.",
-      position: "left"
-    },
-    {
-      year: "2017",
-      title: "First Major Client",
-      description: "Successfully completed our first enterprise-level project for a Fortune 500 company.",
-      position: "right"
-    },
-    {
-      year: "2019",
-      title: "Office Expansion",
-      description: "Expanded our operations with new offices and doubled our team size to meet growing client demands.",
-      position: "left"
-    },
-    {
-      year: "2021",
-      title: "International Growth",
-      description: "Established presence in multiple countries and formed strategic partnerships across various industries.",
-      position: "right"
-    },
-    {
       year: "2023",
-      title: "Innovation Focus",
-      description: "Launched our Research & Development division to focus on emerging technologies and innovative solutions.",
+      title: "The Foundation",
+      description: "Devigo was founded with a vision to provide top-notch web services, including website development, UI/UX design, and digital solutions. The initial phase involved market research, setting up a team, and acquiring the first set of clients through networking and referrals.",
+      position: "left"
+    },
+    {
+      year: "2024",
+      title: " Early Growth-Building Credibility",
+      description: "In 2024, Devigo expanded its client base by delivering high-quality projects and gaining positive testimonials. The agency refined its service offerings, adopted new technologies, and improved branding, leading to steady growth and recognition in the industry.",
+      position: "right"
+    },
+    {
+      year: "2025",
+      title: "Expansion - Scaling Up",
+      description: "With a solid portfolio and a growing reputation, Devigo focused on scaling operations. The team expanded, strategic partnerships were formed, and digital marketing efforts were intensified to attract more clients. The agency started offering additional services like SEO, e-commerce solutions, and AI-powered automation",
+      position: "left"
+    },
+    {
+      year: "2026",
+      title: "IIndustry Leadership – Becoming a Go-To Brand",
+      description: "By 2026, Devigo established itself as a trusted name in the web services industry. The agency started working with high-profile clients, developed innovative solutions, and possibly launched its own SaaS products. Thought leadership, speaking engagements, and case studies positioned Devigo as a leader in the field.",
+      position: "right"
+    },
+    {
+      year: "2027 & Beyond",
+      title: "Global Expansion – Aiming for Excellence",
+      description: "With a strong foundation, Devigo set its sights on international markets, expanding its services globally. The company focused on automation, AI-driven web solutions, and strategic investments to stay ahead of industry trends, ensuring long-term success and sustainability.",
       position: "left"
     }
   ];
@@ -1230,7 +1230,7 @@ const About = () => {
             <StoryContent className="animate-on-scroll">
               <h3>How It All Started</h3>
               <p>
-                DEVIGO was founded in 2015 by a team of passionate developers and designers who saw a gap in the market for truly integrated digital solutions. Our founders believed that successful digital products require both technical excellence and stunning design working in harmony.
+                DEVIGO was founded in 2023 by a team of passionate developers and designers who saw a gap in the market for truly integrated digital solutions. Our founders believed that successful digital products require both technical excellence and stunning design working in harmony.
               </p>
               <p>
                 What began as a small team working out of a co-working space has grown into a global agency with offices in multiple countries, serving clients from startups to Fortune 500 companies. Throughout our growth, we've maintained our commitment to quality, innovation, and client satisfaction.
@@ -1273,19 +1273,19 @@ const About = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="p-6">
-              <div className="text-5xl font-bold text-white mb-2 count-number" data-target="150">0</div>
+              <div className="text-5xl font-bold text-white mb-2 count-number" data-target="90">0</div>
               <div className="text-blue-200 uppercase tracking-wider text-sm">Projects Completed</div>
             </div>
             <div className="p-6">
-              <div className="text-5xl font-bold text-white mb-2 count-number" data-target="50">0</div>
+              <div className="text-5xl font-bold text-white mb-2 count-number" data-target="65">0</div>
               <div className="text-blue-200 uppercase tracking-wider text-sm">Happy Clients</div>
             </div>
             <div className="p-6">
-              <div className="text-5xl font-bold text-white mb-2 count-number" data-target="10">0</div>
+              <div className="text-5xl font-bold text-white mb-2 count-number" data-target="2">0</div>
               <div className="text-blue-200 uppercase tracking-wider text-sm">Years Experience</div>
             </div>
             <div className="p-6">
-              <div className="text-5xl font-bold text-white mb-2 count-number" data-target="25">0</div>
+              <div className="text-5xl font-bold text-white mb-2 count-number" data-target="15">0</div>
               <div className="text-blue-200 uppercase tracking-wider text-sm">Team Members</div>
             </div>
           </div>

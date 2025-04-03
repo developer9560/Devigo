@@ -786,7 +786,7 @@ const Contact = () => {
             </IconBox>
             <ContactDetail>
               <DetailTitle>Address</DetailTitle>
-              <DetailText>123 Tech Street, Suite 456<br />San Francisco, CA 94107</DetailText>
+              <DetailText>Hauz Khas, New Delhi,<br/>Delhi 110016</DetailText>
             </ContactDetail>
           </ContactMethod>
           
