@@ -5,7 +5,10 @@ import {
   faMapMarkerAlt, 
   faEnvelope, 
   faPhone, 
-  faPaperPlane
+  faPaperPlane,
+  faCheckCircle,
+  faExclamationTriangle,
+  faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   faTwitter, 
@@ -13,6 +16,11 @@ import {
   faFacebookF, 
   faInstagram 
 } from '@fortawesome/free-brands-svg-icons';
+import axios from 'axios';
+import { api, inquiriesApi, servicesApi } from '../utility/api';
+
+// Get the base API URL from environment variable or use a default
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
 
 // Define animations
 const fadeIn = keyframes`
@@ -57,6 +65,15 @@ const pulse = keyframes`
   }
   100% {
     box-shadow: 0 0 0 0 rgba(10, 102, 194, 0);
+  }
+`;
+
+const spin = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 `;
 
@@ -437,6 +454,33 @@ const SubmitButton = styled.button`
   }
 `;
 
+const MessageBox = styled.div`
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  animation: ${fadeIn} 0.5s ease forwards;
+  background-color: ${props => props.type === 'success' ? 'rgba(46, 125, 50, 0.1)' : 'rgba(211, 47, 47, 0.1)'};
+  color: ${props => props.type === 'success' ? '#2e7d32' : '#d32f2f'};
+  border: 1px solid ${props => props.type === 'success' ? 'rgba(46, 125, 50, 0.2)' : 'rgba(211, 47, 47, 0.2)'};
+`;
+
+const MessageIcon = styled.div`
+  margin-right: 1rem;
+  font-size: 1.2rem;
+`;
+
+const MessageText = styled.p`
+  margin: 0;
+  font-size: 1rem;
+`;
+
+const SpinnerIcon = styled(FontAwesomeIcon)`
+  animation: ${spin} 1s linear infinite;
+  margin-right: 0.5rem;
+`;
+
 // Animation hook for scroll reveal
 const useElementOnScreen = (options) => {
   const containerRef = useRef(null);
@@ -474,30 +518,243 @@ const Contact = () => {
     phone: '',
     company: '',
     service: '',
-    message: ''
+    message: '',
+    subject: '' // Default subject
   });
+
+  const [submitStatus, setSubmitStatus] = useState({
+    loading: false,
+    success: false,
+    error: null
+  });
+
+  const [services, setServices] = useState([]);
+  const [loadingServices, setLoadingServices] = useState(true);
+
+  // Fetch services from the backend
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setLoadingServices(true);
+        const response = await servicesApi.getAll();
+        if (response.data) {
+          // Handle the case where response.data might be an object with a nested data property
+          // This ensures services is always an array
+          const servicesArray = Array.isArray(response.data) ? response.data : 
+                               (response.data.data ? response.data.data : []);
+          setServices(servicesArray);
+          console.log('Services loaded:', servicesArray);
+        }
+      } catch (error) {
+        console.error('Error fetching services:', error);
+        // Fallback to direct axios call if the servicesApi fails
+        try {
+          const response = await axios.get(`${API_BASE_URL}/services/`);
+          if (response.data) {
+            // Same array handling for the direct axios call
+            const servicesArray = Array.isArray(response.data) ? response.data : 
+                                 (response.data.data ? response.data.data : []);
+            setServices(servicesArray);
+            console.log('Services loaded via fallback:', servicesArray);
+          }
+        } catch (axiosError) {
+          console.error('Error fetching services with direct axios:', axiosError);
+          // Set services to an empty array to prevent further errors
+          setServices([]);
+        }
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  // Debug useEffect to log the structure of services data
+  useEffect(() => {
+    if (services) {
+      console.log('Services state updated:', {
+        isArray: Array.isArray(services),
+        length: Array.isArray(services) ? services.length : 'not an array',
+        firstItem: Array.isArray(services) && services.length > 0 ? services[0] : 'no items' 
+      });
+    }
+  }, [services]);
+
+  const getServiceNameById = (serviceId) => {
+    if (!serviceId || !Array.isArray(services)) return '';
+    
+    console.log('Looking for service ID:', serviceId, 'in services:', services);
+    
+    // Try to find service by ID
+    const service = services.find(s => 
+      s && s.id && s.id.toString() === serviceId.toString()
+    );
+    
+    // If found, return the name
+    if (service && service.name) {
+      console.log('Found service:', service);
+      return service.name;
+    }
+    
+    // If not found by ID, check if any service name matches directly
+    // This is a fallback for when we're using the static options
+    for (const option of document.querySelectorAll('#service option')) {
+      if (option.value === serviceId) {
+        console.log('Found service by option value:', option.textContent);
+        return option.textContent;
+      }
+    }
+    
+    // Final fallback to the dropdown text itself
+    const serviceSelect = document.getElementById('service');
+    if (serviceSelect) {
+      const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+      if (selectedOption) {
+        console.log('Using selected option text:', selectedOption.textContent);
+        return selectedOption.textContent;
+      }
+    }
+    
+    return '';
+  };
+
+  const handleServiceChange = (e) => {
+    const selectedServiceId = e.target.value;
+    const selectedText = e.target.options[e.target.selectedIndex].text;
+    
+    console.log('Service selected:', {
+      id: selectedServiceId,
+      optionText: selectedText
+    });
+    
+    // First update the service field
+    setFormData(prev => ({
+      ...prev,
+      service: selectedServiceId
+    }));
+    
+    // Then update the subject based on the selected service
+    // First try to get name from services array
+    const serviceName = getServiceNameById(selectedServiceId);
+    
+    if (serviceName) {
+      console.log('Setting subject using service name:', serviceName);
+      setFormData(prev => ({
+        ...prev,
+        service: selectedServiceId,
+        subject: `${serviceName}`
+      }));
+    } else if (selectedText && selectedText !== 'Select a service') {
+      // If service name lookup failed, use the option text directly
+      console.log('Setting subject using option text:', selectedText);
+      setFormData(prev => ({
+        ...prev,
+        service: selectedServiceId,
+        subject: `${selectedText}`
+      }));
+    } else {
+      // Absolute fallback
+      console.log('Using fallback subject text');
+      setFormData(prev => ({
+        ...prev,
+        service: selectedServiceId,
+        subject: `Service Inquiry from Website`
+      }));
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Skip service field as it's handled by handleServiceChange
+    if (name === 'service') return;
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Add form submission logic here
-    alert('Message sent successfully!');
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      company: '',
-      service: '',
-      message: ''
+    
+    // Reset status
+    setSubmitStatus({
+      loading: true,
+      success: false,
+      error: null
     });
+    
+    try {
+      // Ensure subject is not empty
+      const subject = formData.subject || `Inquiry about ${getServiceNameById(formData.service)}` || 'Website Inquiry';
+      
+      // Map form data to match the backend API expectations
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || '',
+        company: formData.company || '',
+        subject: subject,
+        message: formData.message
+      };
+      
+      // Set service_id if a service is selected
+      if (formData.service) {
+        // Parse to integer if possible, otherwise leave as null
+        const serviceId = parseInt(formData.service, 10);
+        payload.service_id = !isNaN(serviceId) ? serviceId : null;
+      }
+      
+      console.log('Sending inquiry payload:', payload);
+      
+      // Try the inquiriesApi first
+      try {
+        // Make API call to backend using the inquiriesApi
+        const response = await inquiriesApi.create(payload);
+        console.log('Inquiry submitted successfully', response);
+      } catch (apiError) {
+        console.error('Error using inquiriesApi, trying direct axios call:', apiError);
+        
+        // Fallback to direct axios call with the full URL
+        await axios.post(`${API_BASE_URL}/inquiries/`, payload);
+      }
+      
+      // Handle success
+      setSubmitStatus({
+        loading: false,
+        success: true,
+        error: null
+      });
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        service: '',
+        message: '',
+        subject: ''
+      });
+      
+      // Scroll to top of form
+      window.scrollTo({
+        top: document.getElementById('contact-form').offsetTop - 100,
+        behavior: 'smooth'
+      });
+      
+    } catch (error) {
+      console.error('Contact form submission error:', error);
+      
+      // Handle error
+      setSubmitStatus({
+        loading: false,
+        success: false,
+        error: error.response?.data?.message || 'Something went wrong. Please try again.'
+      });
+    }
   };
 
   return (
@@ -576,8 +833,31 @@ const Contact = () => {
           </SocialSection>
         </InfoContainer>
         
-        <FormContainer>
+        <FormContainer id="contact-form">
           <FormTitle>Send Us a Message</FormTitle>
+          
+          {submitStatus.success && (
+            <MessageBox type="success">
+              <MessageIcon>
+                <FontAwesomeIcon icon={faCheckCircle} />
+              </MessageIcon>
+              <MessageText>
+                Thank you for your message! We'll get back to you shortly.
+              </MessageText>
+            </MessageBox>
+          )}
+          
+          {submitStatus.error && (
+            <MessageBox type="error">
+              <MessageIcon>
+                <FontAwesomeIcon icon={faExclamationTriangle} />
+              </MessageIcon>
+              <MessageText>
+                {submitStatus.error}
+              </MessageText>
+            </MessageBox>
+          )}
+          
           <Form onSubmit={handleSubmit}>
             <FormRow>
               <FormGroup>
@@ -592,6 +872,7 @@ const Contact = () => {
                   onChange={handleChange}
                   placeholder="Your name"
                   required
+                  disabled={submitStatus.loading}
                 />
               </FormGroup>
               <FormGroup>
@@ -606,6 +887,7 @@ const Contact = () => {
                   onChange={handleChange}
                   placeholder="Your email address"
                   required
+                  disabled={submitStatus.loading}
                 />
               </FormGroup>
             </FormRow>
@@ -620,6 +902,7 @@ const Contact = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="Your phone number (optional)"
+                  disabled={submitStatus.loading}
                 />
               </FormGroup>
               <FormGroup>
@@ -631,6 +914,7 @@ const Contact = () => {
                   value={formData.company}
                   onChange={handleChange}
                   placeholder="Your company name (optional)"
+                  disabled={submitStatus.loading}
                 />
               </FormGroup>
             </FormRow>
@@ -643,15 +927,30 @@ const Contact = () => {
                 id="service"
                 name="service"
                 value={formData.service}
-                onChange={handleChange}
+                onChange={handleServiceChange}
                 required
+                disabled={submitStatus.loading || loadingServices}
               >
                 <option value="" disabled>Select a service</option>
-                <option value="web-development">Web Development</option>
-                <option value="mobile-app">Mobile App Development</option>
-                <option value="ui-ux">UI/UX Design</option>
-                <option value="digital-marketing">Digital Marketing</option>
-                <option value="other">Other</option>
+                {services.length > 0 ? (
+                  services.map(service => (
+                    <option key={service.id} value={service.id}>
+                      {service.name}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="Web Design & Development">Web Design & Development</option>
+                    <option value="Full-Stack Development">Full-Stack Development</option>
+                    <option value="Mobile App Development">Mobile App Development</option>
+                    <option value="UI/UX Design">UI/UX Design</option>
+                    <option value="E-commerce Development">E-commerce Development</option>
+                    <option value="WordPress Development">WordPress Development</option>
+                    <option value="Custom Software Development">Custom Software Development</option>
+                    <option value="Website Maintenance & Optimization">Website Maintenance & Optimization</option>
+                    <option value="other">Other</option>
+                  </>
+                )}
               </FormSelect>
             </FormGroup>
             
@@ -667,12 +966,22 @@ const Contact = () => {
                 placeholder="Tell us about your project"
                 rows="5"
                 required
+                disabled={submitStatus.loading}
               ></FormTextarea>
             </FormGroup>
             
-            <SubmitButton type="submit">
-              <FontAwesomeIcon icon={faPaperPlane} />
-              Send Message
+            <SubmitButton type="submit" disabled={submitStatus.loading}>
+              {submitStatus.loading ? (
+                <>
+                  <SpinnerIcon icon={faSpinner} />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faPaperPlane} />
+                  Send Message
+                </>
+              )}
             </SubmitButton>
           </Form>
         </FormContainer>

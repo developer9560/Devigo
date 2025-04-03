@@ -14,93 +14,87 @@ import {
   faPaintBrush
 } from '@fortawesome/free-solid-svg-icons';
 import { motion } from 'framer-motion';
+import { servicesApi } from '../utility/api';
 
 const ServiceDetail = () => {
   const { serviceId } = useParams();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [relatedServices, setRelatedServices] = useState([]);
 
-  // Placeholder data for the service - In a real app, you would fetch this from your API
-  // using the serviceId from the URL params
+  // Icon mapping for any icons we need to display
+  const iconMapping = {
+    'laptop_code': faLaptopCode,
+    'mobile_screen': faMobileScreen,
+    'paint_brush': faPaintBrush
+  };
+
+  // Fetch service data from API
   useEffect(() => {
-    // Simulating API fetch with setTimeout
     const fetchService = async () => {
       try {
         setLoading(true);
-        // In a real app, replace with actual API call: 
-        // const response = await fetch(`/api/services/${serviceId}`);
-        // const data = await response.json();
         
-        // For demo, we're using static data that matches the model structure
-        setTimeout(() => {
-          // This is placeholder data that mimics what your backend might return
-          // based on the service.py model
-          const mockService = {
-            id: serviceId,
-            title: serviceId === 'web-dev' ? 'Web Development' : 
-                   serviceId === 'mobile-dev' ? 'Mobile App Development' : 
-                   serviceId === 'ui-ux' ? 'UI/UX Design' : 
-                   'Cloud Solutions', // Default fallback
-            slug: serviceId,
-            description: `Our ${serviceId === 'web-dev' ? 'web development' : 
-                           serviceId === 'mobile-dev' ? 'mobile app development' : 
-                           serviceId === 'ui-ux' ? 'UI/UX design' : 
-                           'cloud solution'} services provide cutting-edge solutions tailored to your specific business needs. We leverage the latest technologies and best practices to deliver high-quality, scalable, and maintainable solutions that drive business growth and enhance user experience.`,
-            excerpt: `Professional ${serviceId === 'web-dev' ? 'web development' : 
-                      serviceId === 'mobile-dev' ? 'mobile app development' : 
-                      serviceId === 'ui-ux' ? 'UI/UX design' : 
-                      'cloud solution'} services for businesses of all sizes.`,
-            icon: serviceId === 'web-dev' ? 'laptop_code' : 
-                  serviceId === 'mobile-dev' ? 'smartphone' : 
-                  serviceId === 'ui-ux' ? 'palette' : 
-                  'cloud',
-            image: `/images/services/${serviceId}.jpg`, // In a real app, this would be a Cloudinary URL
-            status: 'active',
-            featured: serviceId === 'web-dev' || serviceId === 'mobile-dev',
-            order: serviceId === 'web-dev' ? 1 : 
-                   serviceId === 'mobile-dev' ? 2 :
-                   serviceId === 'ui-ux' ? 3 : 4,
-            features: [
-              serviceId === 'web-dev' ? 'Custom website development' : 'Native app development',
-              serviceId === 'web-dev' ? 'E-commerce solutions' : 'Cross-platform development',
-              serviceId === 'web-dev' ? 'Web application development' : 'App testing and deployment',
-              serviceId === 'web-dev' ? 'CMS integration' : 'App store submission assistance',
-              serviceId === 'web-dev' ? 'Website maintenance and support' : 'App maintenance and updates',
-              serviceId === 'web-dev' ? 'Performance optimization' : 'API integration',
-              serviceId === 'web-dev' ? 'Responsive design' : 'Push notification setup',
-            ],
-            benefits: [
-              'Increased business efficiency',
-              'Enhanced user experience',
-              'Improved conversion rates',
-              'Scalable solutions for growth',
-              'Competitive advantage in the market',
-              'Reduced operational costs',
-              'Improved brand perception',
-            ],
-            technologies: {
-              'Frontend': [
-                'React', 'Angular', 'Vue.js', 'Next.js', 'Tailwind CSS'
-              ],
-              'Backend': [
-                'Node.js', 'Django', 'Laravel', 'Express.js', 'Ruby on Rails'
-              ],
-              'Database': [
-                'MongoDB', 'PostgreSQL', 'MySQL', 'Firebase', 'Redis'
-              ],
-              'DevOps': [
-                'AWS', 'Docker', 'Kubernetes', 'CI/CD', 'Azure'
-              ]
-            }
-          };
+        // Fetch the specific service by slug
+        const response = await servicesApi.getBySlug(serviceId);
+        
+        // Check if we got results and find the matching service
+        if (response.data) {
+          let serviceData;
           
-          setService(mockService);
-          setLoading(false);
-        }, 800); // Simulate network delay
-      } catch (err) {
+          // Handle both paginated and non-paginated responses
+          if (response.data.results && response.data.results.length > 0) {
+            // Paginated response
+            serviceData = response.data.results[0];
+          } else if (Array.isArray(response.data) && response.data.length > 0) {
+            // Non-paginated array response
+            serviceData = response.data[0];
+          } else {
+            throw new Error('Service not found');
+          }
+          
+          setService(serviceData);
+          
+          // After getting the service, fetch related services
+          if (serviceData && serviceData.id) {
+            fetchRelatedServices(serviceData.id);
+          }
+        } else {
+          throw new Error('Service not found');
+        }
+      } catch (error) {
+        console.error('Error fetching service details:', error);
         setError('Failed to load service details. Please try again later.');
+      } finally {
         setLoading(false);
+      }
+    };
+
+    // Fetch related services, excluding the current one
+    const fetchRelatedServices = async (currentServiceId) => {
+      try {
+        const response = await servicesApi.getAll({ 
+          status: 'active',
+          featured: true
+        });
+        
+        let services = [];
+        if (response.data && response.data.results) {
+          services = response.data.results;
+        } else if (Array.isArray(response.data)) {
+          services = response.data;
+        }
+        
+        // Filter out the current service and take up to 3
+        const related = services
+          .filter(s => s.id !== currentServiceId)
+          .slice(0, 3);
+          
+        setRelatedServices(related);
+      } catch (error) {
+        console.error('Error fetching related services:', error);
+        // We don't set the main error state as this is not critical
       }
     };
 
@@ -161,7 +155,7 @@ const ServiceDetail = () => {
 
   return (
     <div className="w-full bg-gray-900 text-white">
-      {/* Hero Section - Simplified */}
+      {/* Hero Section */}
       <section className="relative py-20 px-4 bg-gradient-to-r from-blue-700/90 to-black/80">
         <div className="relative z-10 max-w-7xl mx-auto">
           <div className="flex flex-col items-start">
@@ -225,7 +219,7 @@ const ServiceDetail = () => {
             >
               <h2 className="text-3xl font-bold mb-6 border-b border-gray-800 pb-3">Key Features</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {service.features.map((feature, index) => (
+                {service.features && service.features.map((feature, index) => (
                   <motion.div 
                     key={index} 
                     className="bg-gray-800/50 rounded-lg p-5 flex items-start border border-gray-700/50"
@@ -253,7 +247,7 @@ const ServiceDetail = () => {
             >
               <h2 className="text-3xl font-bold mb-6 border-b border-gray-800 pb-3">Benefits</h2>
               <div className="grid grid-cols-1 gap-4">
-                {service.benefits.map((benefit, index) => (
+                {service.benefits && service.benefits.map((benefit, index) => (
                   <motion.div 
                     key={index}
                     className="flex items-center p-4 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-colors duration-300"
@@ -271,7 +265,7 @@ const ServiceDetail = () => {
               </div>
             </motion.section>
             
-            {/* About This Service Section - Bottom section (yellow area in screenshot) */}
+            {/* About This Service Section */}
             <motion.section 
               className="mb-16"
               initial={{ opacity: 0, y: 20 }}
@@ -281,9 +275,7 @@ const ServiceDetail = () => {
             >
               <h2 className="text-3xl font-bold mb-6 border-b border-gray-800 pb-3">About This Service</h2>
               <div className="prose prose-lg prose-invert max-w-none">
-                <p className="text-gray-300 leading-relaxed">
-                  {service.description}
-                </p>
+                <div dangerouslySetInnerHTML={{ __html: service.description }} className="text-gray-300 leading-relaxed" />
                 
                 <div className="my-8 p-6 bg-gradient-to-r from-blue-900/40 to-blue-800/20 rounded-lg border border-blue-800/30">
                   <h3 className="text-xl font-semibold mb-3 text-blue-400">Why Choose Us?</h3>
@@ -350,7 +342,7 @@ const ServiceDetail = () => {
                   Technologies
                 </h3>
                 <div className="space-y-5">
-                  {Object.entries(service.technologies).map(([category, techs], catIndex) => (
+                  {service.technologies && Object.entries(service.technologies).map(([category, techs], catIndex) => (
                     <div key={category}>
                       <h4 className="text-md font-medium text-blue-400 mb-2">{category}</h4>
                       <div className="flex flex-wrap gap-2">
@@ -422,10 +414,10 @@ const ServiceDetail = () => {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold mb-12 text-center text-white">Related Services</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Show 3 related services, excluding the current one */}
-            {['web-dev', 'mobile-dev', 'ui-ux'].filter(id => id !== serviceId).slice(0, 3).map((id, index) => (
+            {/* Use the fetched related services instead of hardcoded ones */}
+            {relatedServices.map((relatedService, index) => (
               <motion.div 
-                key={id}
+                key={relatedService.id}
                 className="bg-gray-800 rounded-xl p-8 border border-gray-700/50 hover:border-blue-700/30 transition-all duration-300 hover:-translate-y-2 hover:shadow-lg hover:shadow-blue-900/20"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -437,25 +429,17 @@ const ServiceDetail = () => {
                   style={{ backgroundColor: '#0A66C2' }}
                 >
                   <FontAwesomeIcon 
-                    icon={
-                      id === 'web-dev' ? faLaptopCode : 
-                      id === 'mobile-dev' ? faMobileScreen : 
-                      faPaintBrush
-                    } 
+                    icon={iconMapping[relatedService.icon] || faLaptopCode} 
                   />
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-white">
-                  {id === 'web-dev' ? 'Web Development' : 
-                   id === 'mobile-dev' ? 'Mobile App Development' : 
-                   'UI/UX Design'}
+                  {relatedService.title}
                 </h3>
                 <p className="text-gray-400 mb-6">
-                  {id === 'web-dev' ? 'Custom websites and web applications with responsive design and seamless functionality.' : 
-                   id === 'mobile-dev' ? 'Native and cross-platform mobile apps with intuitive interfaces and powerful features.' : 
-                   'User-centered design that enhances usability while maintaining visual appeal and brand identity.'}
+                  {relatedService.excerpt}
                 </p>
                 <Link 
-                  to={`/services/${id}`} 
+                  to={`/services/${relatedService.slug}`} 
                   className="text-blue-500 font-medium hover:text-blue-400 inline-flex items-center"
                 >
                   Learn More

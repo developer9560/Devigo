@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -9,65 +9,44 @@ import {
   faSearch, 
   faChartLine, 
   faLongArrowAltRight, 
-  faStar, 
+  faStar,
   faQuoteRight,
   faLightbulb,
   faPaintBrush,
   faVial,
   faCog,
   faPenRuler,
-  faHeadset
+  faHeadset,
+  faExclamationTriangle,
+  faDatabase
 } from '@fortawesome/free-solid-svg-icons';
+import { servicesApi } from '../utility/api'; // Import the services API
+
+// Fallback images for projects
+const projectImages = {
+  fallback: '/images/fallback-project.jpg',
+  e_commerce: '/images/e-commerce.jpg',
+  healthcare: '/images/healthcare.jpg',
+  real_estate: '/images/real-estate.jpg'
+};
+
+// Service icons mapping
+const serviceIconMap = {
+  'Web Development': faCode,
+  'Mobile App Development': faMobileAlt,
+  'UI/UX Design': faPaintBrush,
+  'Digital Marketing': faChartLine,
+  'SEO Optimization': faSearch,
+  'Cloud Solutions': faDatabase,
+  'default': faCode // Default icon if no match
+};
 
 const Home = () => {
   const heroTitleRef = useRef(null);
+  const [services, setServices] = useState([]); // State to hold services data
+  const [loadingServices, setLoadingServices] = useState(true); // State for loading services status
+  const [serviceError, setServiceError] = useState(null); // Error state for services
   
-  // Services data
-  const services = [
-    {
-      id: 1,
-      icon: faDesktop,
-      title: "Web Design",
-      description: "Beautiful, responsive websites tailored to your brand identity and business goals.",
-      link: "/services#web-design"
-    },
-    {
-      id: 2,
-      icon: faCode,
-      title: "Web Development",
-      description: "Custom web applications built with modern technologies for optimal performance.",
-      link: "/services#web-development"
-    },
-    {
-      id: 3,
-      icon: faMobileAlt,
-      title: "Mobile Apps",
-      description: "Native and cross-platform mobile applications for iOS and Android.",
-      link: "/services#mobile-apps"
-    },
-    {
-      id: 4,
-      icon: faSearch,
-      title: "SEO Optimization",
-      description: "Boost your online visibility and drive organic traffic to your website.",
-      link: "/services#seo"
-    },
-    {
-      id: 5,
-      icon: faChartLine,
-      title: "Digital Marketing",
-      description: "Strategic campaigns to grow your audience and convert prospects into customers.",
-      link: "/services#digital-marketing"
-    },
-    {
-      id: 6,
-      icon: faRocket,
-      title: "Brand Strategy",
-      description: "Develop a compelling brand identity that resonates with your target audience.",
-      link: "/services#brand-strategy"
-    }
-  ];
-
   // Projects data
   const projects = [
     {
@@ -75,7 +54,7 @@ const Home = () => {
       title: "Nexus Marketplace",
       type: "E-commerce",
       description: "A comprehensive e-commerce platform with advanced filtering and payment gateways.",
-      image: "/images/project1.jpg",
+      image: projectImages.e_commerce || projectImages.fallback,
       result: "+200% Sales",
       link: "/portfolio/nexus-marketplace"
     },
@@ -84,7 +63,7 @@ const Home = () => {
       title: "MediConnect",
       type: "Healthcare",
       description: "A telemedicine platform connecting patients with healthcare providers remotely.",
-      image: "/images/project2.jpg",
+      image: projectImages.healthcare || projectImages.fallback,
       result: "5000+ Users",
       link: "/portfolio/mediconnect"
     },
@@ -93,7 +72,7 @@ const Home = () => {
       title: "Urban Planner",
       type: "Real Estate",
       description: "Interactive property listing and urban planning visualization tools for developers.",
-      image: "/images/project3.jpg",
+      image: projectImages.real_estate || projectImages.fallback,
       result: "$2M Funding",
       link: "/portfolio/urban-planner"
     }
@@ -136,7 +115,74 @@ const Home = () => {
   ];
 
   useEffect(() => {
-    // Animation for stats counting
+    const fetchServices = async () => {
+      try {
+        setLoadingServices(true);
+        setServiceError(null); // Reset error state
+        const response = await servicesApi.getAll({ featured: true }); // Fetch only featured services
+        if (response.data && response.data.results) {
+          // Limit to 6 services
+          const limitedServices = response.data.results.slice(0, 6).map(service => ({
+            ...service,
+            icon: serviceIconMap[service.title] || serviceIconMap.default, // Map title to icon or use default
+            excerpt: service.excerpt ? (service.excerpt.length > 100 ? `${service.excerpt.substring(0, 100)}...` : service.excerpt) : 'No description available', // Handle possible null excerpts
+            link: service.slug ? `/services/${service.slug}` : `/services/${service.id}` // Ensure link exists
+          }));
+          setServices(limitedServices);
+        }
+      } catch (error) {
+        console.error('Error fetching services:', error);
+        setServiceError('Error fetching services. Please try again later.');
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  useEffect(() => {
+    // Initialize process section as soon as component mounts
+    const initProcessSection = () => {
+      const processSection = document.getElementById('process-section');
+      if (!processSection) return;
+      
+      // Initialize the process line
+      const lineFill = document.getElementById('process-line-fill');
+      if (lineFill) {
+        setTimeout(() => {
+          lineFill.style.width = '100%';
+        }, 500);
+      }
+      
+      // Initialize the steps
+      const steps = document.querySelectorAll('.process-step');
+      steps.forEach((step, index) => {
+        setTimeout(() => {
+          step.classList.add('opacity-100');
+          step.classList.remove('opacity-0');
+          step.classList.add('translate-y-0');
+          step.classList.remove('translate-y-8');
+          
+          // Animate the icon
+          const icon = step.querySelector('.process-icon');
+          if (icon) {
+            setTimeout(() => {
+              icon.classList.add('bg-blue-600');
+              icon.classList.remove('bg-blue-600/20');
+              icon.classList.add('text-white');
+              icon.classList.remove('text-blue-600/60');
+              icon.classList.add('shadow-lg', 'shadow-blue-600/30');
+            }, 300);
+          }
+        }, 200 * index);
+      });
+    };
+    
+    // Call initialization with a slight delay to ensure DOM is ready
+    setTimeout(initProcessSection, 500);
+    
+    // Set up intersection observer for animations
     const animateValue = (obj, start, end, duration) => {
       let startTimestamp = null;
       const step = (timestamp) => {
@@ -150,8 +196,8 @@ const Home = () => {
       };
       window.requestAnimationFrame(step);
     };
-
-    // Intersection Observer for animations
+    
+    // Set up observer for stat animations
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -160,41 +206,6 @@ const Home = () => {
             const value = parseInt(entry.target.getAttribute('data-value'));
             animateValue(entry.target, 0, value, 2000);
           }
-          
-          // If process section, animate timeline
-          if (entry.target.id === 'process-section') {
-            // Animate the line
-            const lineFill = document.getElementById('process-line-fill');
-            if (lineFill) {
-              setTimeout(() => {
-                lineFill.style.width = '100%';
-              }, 300);
-            }
-
-            // Animate the steps
-            const steps = document.querySelectorAll('.process-step');
-            steps.forEach((step, index) => {
-              setTimeout(() => {
-                step.classList.add('opacity-100');
-                step.classList.remove('opacity-0');
-                step.classList.add('translate-y-0');
-                step.classList.remove('translate-y-8');
-                
-                // Animate the icon
-                const icon = step.querySelector('.process-icon');
-                if (icon) {
-                  setTimeout(() => {
-                    icon.classList.add('bg-blue-600');
-                    icon.classList.remove('bg-blue-600/20');
-                    icon.classList.add('text-white');
-                    icon.classList.remove('text-blue-600/60');
-                    icon.classList.add('shadow-lg', 'shadow-blue-600/30');
-                  }, 300);
-                }
-              }, 100 * index);
-            });
-          }
-          
           observer.unobserve(entry.target);
         }
       });
@@ -204,18 +215,89 @@ const Home = () => {
     document.querySelectorAll('.stat-number').forEach(el => {
       observer.observe(el);
     });
-
-    // Observe the process section
-    const processSection = document.getElementById('process-section');
-    if (processSection) {
-      observer.observe(processSection);
-    }
-
+    
     return () => {
       observer.disconnect();
     };
   }, []);
 
+  // Function to generate service skeleton loaders while loading
+  const renderServiceSkeletons = () => {
+    return Array(6).fill().map((_, index) => (
+      <div key={`skeleton-${index}`} className="bg-gray-800/50 p-8 rounded-xl border border-gray-700/50">
+        <div className="w-16 h-16 bg-gray-700 rounded-lg mb-6 animate-pulse"></div>
+        <div className="h-7 bg-gray-700 rounded w-3/4 mb-4 animate-pulse"></div>
+        <div className="h-4 bg-gray-700 rounded w-full mb-2 animate-pulse"></div>
+        <div className="h-4 bg-gray-700 rounded w-5/6 mb-2 animate-pulse"></div>
+        <div className="h-4 bg-gray-700 rounded w-4/6 mb-6 animate-pulse"></div>
+        <div className="h-5 bg-gray-700 rounded w-1/3 animate-pulse"></div>
+      </div>
+    ));
+  };
+
+  // Render services content with appropriate loading/error states
+  const renderServicesContent = () => {
+    if (loadingServices) {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {renderServiceSkeletons()}
+        </div>
+      );
+    }
+
+    if (serviceError) {
+      return (
+        <div className="bg-red-900/20 border border-red-700/50 rounded-lg p-8 text-center max-w-3xl mx-auto">
+          <FontAwesomeIcon icon={faExclamationTriangle} className="text-3xl text-red-500 mb-3" />
+          <h3 className="text-xl font-bold mb-2 text-white">Service Error</h3>
+          <p className="text-gray-400 mb-6">{serviceError}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-6 py-2 bg-red-700/30 hover:bg-red-700/50 text-white rounded-md transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      );
+    }
+
+    if (services.length === 0) {
+      return (
+        <div className="text-center py-10">
+          <p className="text-gray-400">No services available at the moment.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {services.map((service) => (
+          <div 
+            key={service.id} 
+            className="bg-gray-800/50 p-8 rounded-xl border border-gray-700/50 hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-300"
+          >
+            <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center text-white text-2xl mb-6 shadow-lg shadow-blue-600/30">
+              <FontAwesomeIcon icon={service.icon || faCode} />
+            </div>
+            <h3 className="text-xl font-bold mb-4 text-white">{service.title}</h3>
+            <p className="text-gray-400 mb-6 leading-relaxed">{service.excerpt}</p>
+            <Link 
+              to={service.link || `/services/${service.id}`} 
+              className="text-blue-500 font-semibold flex items-center group hover:text-blue-400 transition-colors duration-300"
+            >
+              Learn More 
+              <FontAwesomeIcon 
+                icon={faLongArrowAltRight} 
+                className="ml-2 group-hover:translate-x-1 transition-transform duration-300" 
+              />
+            </Link>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Remove top-level loading check so page content is always visible
   return (
     <div className="w-full bg-gray-900 text-white">
       {/* Hero Section */}
@@ -316,30 +398,7 @@ const Home = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service) => (
-              <div 
-                key={service.id} 
-                className="bg-gray-800/50 p-8 rounded-xl border border-gray-700/50 hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-300"
-              >
-                <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center text-white text-2xl mb-6 shadow-lg shadow-blue-600/30">
-                  <FontAwesomeIcon icon={service.icon} />
-                </div>
-                <h3 className="text-xl font-bold mb-4 text-white">{service.title}</h3>
-                <p className="text-gray-400 mb-6 leading-relaxed">{service.description}</p>
-                <Link 
-                  to={service.link} 
-                  className="text-blue-500 font-semibold flex items-center group hover:text-blue-400 transition-colors duration-300"
-                >
-                  Learn More 
-                  <FontAwesomeIcon 
-                    icon={faLongArrowAltRight} 
-                    className="ml-2 group-hover:translate-x-1 transition-transform duration-300" 
-                  />
-                </Link>
-              </div>
-            ))}
-          </div>
+          {renderServicesContent()}
           
           <div className="text-center mt-12">
             <Link 
@@ -373,9 +432,14 @@ const Home = () => {
               >
                 <div 
                   className="h-64 bg-cover bg-center relative" 
-                  style={{ backgroundImage: `url(${project.image})` }}
+                  style={{ 
+                    backgroundImage: `url(${project.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundColor: '#1f2937' // Fallback color
+                  }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/70 opacity-0 group-hover:opacity-100 flex items-end p-6 transition-opacity duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/70 flex items-end p-6">
                     <span className="bg-blue-600 text-white px-4 py-1 rounded-md text-sm font-semibold">
                       {project.result}
                     </span>
@@ -450,7 +514,7 @@ const Home = () => {
                 
                 <div className="flex items-center">
                   <div 
-                    className="w-12 h-12 rounded-full bg-cover bg-center mr-4" 
+                    className="w-12 h-12 rounded-full bg-cover bg-center mr-4 bg-gray-700" 
                     style={{ backgroundImage: `url(${testimonial.avatar})` }}
                   ></div>
                   <div>

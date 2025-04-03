@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -15,97 +15,52 @@ import {
   faCode,
   faVial,
   faRocket,
-  faCog
+  faCog,
+  faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { api, servicesApi } from '../utility/api';
 
 const Services = () => {
-  const serviceData = [
-    {
-      id: 'web-dev',
-      icon: faLaptopCode,
-      iconBg: '#0A66C2',
-      title: 'Web Development',
-      description: 'Custom websites and web applications that drive business growth with responsive design and seamless functionality.',
-      features: [
-        'Full-stack development',
-        'E-commerce websites',
-        'Progressive Web Apps (PWA)',
-        'Custom CMS integration'
-      ],
-      headerBg: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop'
-    },
-    {
-      id: 'mobile-dev',
-      icon: faMobileScreen,
-      iconBg: '#0A66C2',
-      title: 'Mobile App Development',
-      description: 'Native and cross-platform mobile applications with intuitive interfaces and powerful features.',
-      features: [
-        'iOS app development',
-        'Android app development',
-        'Cross-platform development',
-        'App maintenance and support'
-      ],
-      headerBg: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?q=80&w=1600&auto=format&fit=crop'
-    },
-    {
-      id: 'ui-ux',
-      icon: faPaintBrush,
-      iconBg: '#0A66C2',
-      title: 'UI/UX Design',
-      description: 'User-centered design that enhances usability while maintaining visual appeal and brand identity.',
-      features: [
-        'User research & personas',
-        'Wireframing & prototyping',
-        'Visual design & branding',
-        'User testing'
-      ],
-      headerBg: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=1600&auto=format&fit=crop'
-    },
-    {
-      id: 'digital-marketing',
-      icon: faChartLine,
-      iconBg: '#0A66C2',
-      title: 'Digital Marketing',
-      description: 'Data-driven marketing strategies that increase brand visibility and drive conversions.',
-      features: [
-        'SEO & content marketing',
-        'Social media management',
-        'PPC advertising',
-        'Marketing analytics'
-      ],
-      headerBg: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1600&auto=format&fit=crop'
-    },
-    {
-      id: 'cloud-solutions',
-      icon: faServer,
-      iconBg: '#0A66C2',
-      title: 'Cloud Solutions',
-      description: 'Scalable and secure cloud infrastructure solutions for improved performance and reduced costs.',
-      features: [
-        'Cloud migration',
-        'AWS & Azure solutions',
-        'Serverless architecture',
-        'DevOps implementation'
-      ],
-      headerBg: 'https://images.unsplash.com/photo-1535191042502-e6a9a3d407e7?q=80&w=1600&auto=format&fit=crop'
-    },
-    {
-      id: 'cybersecurity',
-      icon: faShieldHalved,
-      iconBg: '#0A66C2',
-      title: 'Cybersecurity',
-      description: 'Comprehensive security solutions to protect your digital assets and sensitive data.',
-      features: [
-        'Security audits',
-        'Penetration testing',
-        'Compliance management',
-        'Security training'
-      ],
-      headerBg: 'https://images.unsplash.com/photo-1562813733-b31f1c359713?q=80&w=1600&auto=format&fit=crop'
-    }
-  ];
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Icon mapping for service icons
+  const iconMapping = {
+    'laptop_code': faLaptopCode,
+    'mobile_screen': faMobileScreen,
+    'paint_brush': faPaintBrush,
+    'chart_line': faChartLine,
+    'server': faServer,
+    'shield_halved': faShieldHalved,
+    'code': faCode
+  };
+
+  // Fetch services from API
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setLoading(true);
+        const response = await servicesApi.getAll({ status: 'active' });
+        
+        if (response.data && (response.data.results || Array.isArray(response.data))) {
+          // Handle paginated response or array response
+          const servicesData = response.data.results || response.data;
+          setServices(servicesData);
+        } else {
+          throw new Error('Invalid response format');
+        }
+      } catch (error) {
+        console.error('Error fetching services:', error);
+        setError('Failed to load services. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
 
   // Technology stack data
   const techStack = [
@@ -256,6 +211,35 @@ const Services = () => {
     };
   }, [processIsInView]);
 
+  // If loading, show a loading indicator
+  if (loading) {
+    return (
+      <div className="w-full bg-gray-900 text-white min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <FontAwesomeIcon icon={faSpinner} spin className="text-blue-500 text-5xl mb-4" />
+          <p className="text-xl">Loading services...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If error, show error message
+  if (error) {
+    return (
+      <div className="w-full bg-gray-900 text-white min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-8 bg-gray-800 rounded-lg">
+          <p className="text-xl text-red-400">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full bg-gray-900 text-white">
       <style jsx>{`
@@ -282,7 +266,7 @@ const Services = () => {
 
       <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {serviceData.map((service) => (
+          {services.map((service) => (
             <div 
               className="bg-gray-800/50 rounded-xl overflow-hidden flex flex-col h-full shadow-lg hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-300" 
               key={service.id}
@@ -293,7 +277,7 @@ const Services = () => {
                 <div 
                   className="absolute inset-0 bg-cover bg-center" 
                   style={{ 
-                    backgroundImage: `url(${service.headerBg || ''})`,
+                    backgroundImage: `url(${service.image_url || ''})`,
                   }}
                 ></div>
                 
@@ -304,9 +288,9 @@ const Services = () => {
                 <div className="absolute top-6 left-6">
                   <div 
                     className="w-[70px] h-[70px] rounded-xl flex items-center justify-center text-3xl text-white shadow-lg shadow-blue-600/30" 
-                    style={{ backgroundColor: service.iconBg }}
+                    style={{ backgroundColor: '#0A66C2' }}
                   >
-                    <FontAwesomeIcon icon={service.icon} />
+                    <FontAwesomeIcon icon={iconMapping[service.icon] || faCode} />
                   </div>
                 </div>
               </div>
@@ -314,12 +298,12 @@ const Services = () => {
               {/* Content */}
               <div className="p-8">
                 <h2 className="text-2xl font-bold mb-4 text-white">{service.title}</h2>
-                <p className="text-gray-400 mb-6 leading-relaxed">{service.description}</p>
+                <p className="text-gray-400 mb-6 leading-relaxed">{service.excerpt}</p>
                 
                 <div className="mt-auto mb-6">
                   <h3 className="text-lg text-blue-500 font-semibold mb-4">Key Features:</h3>
                   <ul className="space-y-3">
-                    {service.features.map((feature, index) => (
+                    {service.features && service.features.slice(0, 4).map((feature, index) => (
                       <li key={index} className="flex items-start text-gray-400">
                         <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3 mt-1 flex-shrink-0" />
                         {feature}
@@ -329,7 +313,7 @@ const Services = () => {
                 </div>
                 
                 <Link 
-                  to={`/services/${service.id}`} 
+                  to={`/services/${service.slug}`} 
                   className="inline-flex items-center text-blue-500 font-semibold hover:text-blue-400 transition-colors duration-300"
                 >
                   Learn More 
