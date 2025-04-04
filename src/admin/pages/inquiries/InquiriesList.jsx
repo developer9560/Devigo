@@ -430,7 +430,9 @@ const InquiriesList = () => {
         email,
         subject: `Re: ${subject}`,
         message,
-        inquiry_id: inquiryId
+        inquiry_id: inquiryId,
+        from_email: 'contact@devigo.in',
+        from_name: 'Devigo Support'
       });
       
       return response.data;
@@ -613,7 +615,7 @@ const InquiriesList = () => {
   const openDefaultEmailClient = (email, subject, body) => {
     const encodedSubject = encodeURIComponent(subject);
     const encodedBody = encodeURIComponent(body);
-    window.open(`mailto:${email}?subject=${encodedSubject}&body=${encodedBody}`, '_blank');
+    window.open(`mailto:${email}?subject=${encodedSubject}&body=${encodedBody}&from=contact@devigo.in`, '_blank');
   };
 
   // Function to open Gmail compose
@@ -621,6 +623,13 @@ const InquiriesList = () => {
     const encodedSubject = encodeURIComponent(subject);
     const encodedBody = encodeURIComponent(body);
     window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodedSubject}&body=${encodedBody}`, '_blank');
+  };
+  
+  // Function to open Zoho Mail compose
+  const openZohoMailCompose = (email, subject, body) => {
+    const encodedSubject = encodeURIComponent(subject);
+    const encodedBody = encodeURIComponent(body);
+    window.open(`https://mail.zoho.in/zm/#mail/compose?to=${email}&subject=${encodedSubject}&body=${encodedBody}`, '_blank');
   };
 
   return (
@@ -1064,10 +1073,13 @@ const InquiriesList = () => {
         <DialogContent>
           <Box sx={{ mb: 2 }}>
             <Typography variant="body2" gutterBottom>
+              <strong>From:</strong> contact@devigo.in
+            </Typography>
+            <Typography variant="body2" gutterBottom>
               <strong>To:</strong> {getSelectedInquiry()?.name} ({getSelectedInquiry()?.email})
             </Typography>
             <Typography variant="body2" gutterBottom>
-              <strong>Subject:</strong> {getSelectedInquiry()?.subject}
+              <strong>Subject:</strong> Re: {getSelectedInquiry()?.subject}
             </Typography>
             <Typography variant="body2" gutterBottom>
               <strong>Original Message:</strong>
@@ -1114,7 +1126,7 @@ const InquiriesList = () => {
           )}
           
           <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-            This response will be sent to the customer's email address and will mark the inquiry as responded.
+            All email responses will be sent using your business email address (contact@devigo.in) to maintain professional communication with clients.
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -1158,6 +1170,25 @@ const InquiriesList = () => {
               sx={{ mr: 1 }}
             >
               Gmail
+            </Button>
+            
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                const inquiry = getSelectedInquiry();
+                if (inquiry?.email) {
+                  openZohoMailCompose(
+                    inquiry.email,
+                    `Re: ${inquiry.subject}`,
+                    responseText
+                  );
+                }
+              }}
+              startIcon={<img src="https://www.zohowebstatic.com/sites/default/files/styles/product-home-page/public/mail-icon.png" alt="Zoho" style={{ width: 16, height: 16 }} />}
+              sx={{ mr: 1 }}
+            >
+              Zoho Mail
             </Button>
           </Box>
           

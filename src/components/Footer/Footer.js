@@ -120,7 +120,7 @@ const Footer = () => {
                 </li>
                 <li className="flex mb-5">
                   <FontAwesomeIcon icon={faEnvelope} className="text-blue-600 mt-1 mr-4 text-lg" />
-                  <span>developer95608@gmail.com</span>
+                  <span>contact@devigo.in</span>
                 </li>
               </ul>
               

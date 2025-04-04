@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // API Configuration
 // Use environment variable or fallback to localhost for development
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://backend-django-pct4.onrender.com/api/v1';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://backend-django-pct4.onrender.com/api/v1' || 'http://localhost:8000/api/v1';
 
 // Log the API base URL to help with debugging (will be removed in production)
 console.log('API is configured with base URL:', API_BASE_URL);

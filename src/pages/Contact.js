@@ -797,7 +797,7 @@ const Contact = () => {
             <ContactDetail>
               <DetailTitle>Email</DetailTitle>
               <DetailText>
-                <ContactLink href="mailto:developer95608@gmail.com">developer95608@gmail.com</ContactLink>
+                <ContactLink href="mailto:contact@devigo.in">contact@devigo.in</ContactLink>
               </DetailText>
             </ContactDetail>
           </ContactMethod>
@@ -948,6 +948,7 @@ const Contact = () => {
                     <option value="WordPress Development">WordPress Development</option>
                     <option value="Custom Software Development">Custom Software Development</option>
                     <option value="Website Maintenance & Optimization">Website Maintenance & Optimization</option>
+                    <option value="Digital Marketing">Digital Marketing</option>
                     <option value="other">Other</option>
                   </>
                 )}
