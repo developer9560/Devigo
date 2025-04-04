@@ -74,9 +74,9 @@ const scaleIn = {
 // Fallback images for projects
 const projectImages = {
   fallback: '/images/fallback-project.jpg',
-  e_commerce: '/images/e-commerce.jpg',
-  healthcare: '/images/healthcare.jpg',
-  real_estate: '/images/real-estate.jpg'
+  e_commerce: '/images/nious.jpg',
+  healthcare: '/images/health.jpg',
+  real_estate: '/images/real-state.jpg'
 };
 
 // Service icons mapping
@@ -108,7 +108,7 @@ const Home = () => {
       description: "A comprehensive e-commerce platform with advanced filtering and payment gateways.",
       image: projectImages.e_commerce || projectImages.fallback,
       result: "+200% Sales",
-      link: "/portfolio/nexus-marketplace"
+      link: "/images/e-commerce.jpg"
     },
     {
       id: 2,
@@ -117,7 +117,7 @@ const Home = () => {
       description: "A telemedicine platform connecting patients with healthcare providers remotely.",
       image: projectImages.healthcare || projectImages.fallback,
       result: "5000+ Users",
-      link: "/portfolio/mediconnect"
+      link: "/images/health.jpg"
     },
     {
       id: 3,
@@ -125,8 +125,8 @@ const Home = () => {
       type: "Real Estate",
       description: "Interactive property listing and urban planning visualization tools for developers.",
       image: projectImages.real_estate || projectImages.fallback,
-      result: "$2M Funding",
-      link: "/portfolio/urban-planner"
+      result: "10+ Lakhs",
+      link: "/images/real-state.jpg"
     }
   ];
 
@@ -137,7 +137,7 @@ const Home = () => {
       text: "DEVIGO transformed our online presence completely. Their team delivered a website that exceeded our expectations and has significantly increased our conversions.",
       author: "Rajesh Kumar",
       position: "CEO, Tech Solutions",
-      avatar: "/images/testimonial1.jpg",
+      avatar: "/images/imag1.jpg",
       stars: 5
     },
     {
@@ -145,7 +145,7 @@ const Home = () => {
       text: "Working with DEVIGO was a game-changer for our business. Their attention to detail and technical expertise helped us launch our platform months ahead of schedule.",
       author: "Amit Singh",
       position: "Founder, Business Solutions",
-      avatar: "/images/testimonial2.jpg",
+      avatar: "/images/img2.jpg",
       stars: 5
     },
     {
@@ -153,7 +153,7 @@ const Home = () => {
       text: "The team at DEVIGO doesn't just build websites, they build solutions. Their strategic approach to our project delivered exactly what we needed to succeed in our market.",
       author: "Priyanka Patel",
       position: "Marketing Director, Smart Tech Solutions",
-      avatar: "/images/testimonial3.jpg",
+      avatar: "/images/img3.jpg",
       stars: 5
     }
   ];
