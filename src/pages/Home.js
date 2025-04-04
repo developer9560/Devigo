@@ -434,15 +434,15 @@ const Home = () => {
             that drive growth and deliver exceptional user experiences.
           </motion.p>
           
-          <motion.div className="flex flex-wrap gap-4" variants={staggerContainer}>
-            <motion.div variants={scaleIn}>
-              <Link to="/contact" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white font-semibold rounded-md shadow-lg shadow-blue-600/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-300">
+          <motion.div className="flex flex-col sm:flex-row gap-4 w-full" variants={staggerContainer}>
+            <motion.div variants={scaleIn} className="w-full sm:w-auto">
+              <Link to="/contact" className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white font-semibold rounded-md shadow-lg shadow-blue-600/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-300 block text-center">
                 Get Started
               </Link>
             </motion.div>
             
-            <motion.div variants={scaleIn}>
-              <Link to="/services" className="px-8 py-4 bg-transparent text-white font-semibold rounded-md border border-white/30 hover:bg-white/10 hover:border-white transition-all duration-300">
+            <motion.div variants={scaleIn} className="w-full sm:w-auto">
+              <Link to="/services" className="w-full sm:w-auto px-8 py-4 bg-transparent text-white font-semibold rounded-md border border-white/30 hover:bg-white/10 hover:border-white transition-all duration-300 block text-center">
                 Explore Services
               </Link>
             </motion.div>
