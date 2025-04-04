@@ -8,6 +8,23 @@
   }
 }
 
+/* Hide scrollbar for all elements while maintaining scroll functionality */
+/* For Chrome, Safari, and newer Edge */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: none;
+}
+
+/* For Internet Explorer and Edge */
+* {
+  -ms-overflow-style: none;
+}
+
 :root {
   --primary-bg: #1E1E1E;
   --secondary-bg: #2A2A2A;

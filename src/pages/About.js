@@ -687,46 +687,41 @@ const ValueExample = styled.div`
 // Testimonials Section
 const TestimonialsSection = styled.section`
   padding: 6rem 0;
-  background: linear-gradient(to bottom, #111, #121212);
+  background: #0C0C0C;
   position: relative;
   display: block;
   opacity: 1;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('https://www.transparenttextures.com/patterns/cubes.png');
-    opacity: 0.05;
-  }
 `;
 
 const TestimonialsSlider = styled.div`
   margin-top: 3rem;
-  padding: 2rem 0;
   position: relative;
   max-width: 900px;
   margin-left: auto;
   margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+  overflow: hidden;
+  border: 1px solid #222;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 `;
 
 const Testimonial = styled.div`
   padding: 2.5rem;
-  background: linear-gradient(145deg, rgba(42, 42, 42, 0.5), rgba(30, 30, 30, 0.5));
-  backdrop-filter: blur(10px);
-  border-radius: 15px;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  margin: 0 1rem;
+  background: #161616;
+  margin: 0;
   position: relative;
   display: block;
   opacity: 1;
+  border-bottom: 1px solid rgba(35, 35, 35, 0.7);
+  
+  &:last-child {
+    border-bottom: none;
+  }
   
   .quote-icon {
-    font-size: 2rem;
+    font-size: 3rem;
     color: rgba(10, 102, 194, 0.2);
     position: absolute;
     top: 20px;
@@ -734,12 +729,24 @@ const Testimonial = styled.div`
   }
   
   p {
-    color: var(--gray-text);
+    color: rgba(255, 255, 255, 0.8);
     line-height: 1.8;
     font-size: 1.1rem;
     position: relative;
     z-index: 2;
     margin-bottom: 1.5rem;
+    padding-left: 1rem;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background-color: #0A66C2;
+      border-radius: 3px;
+    }
   }
 `;
 
@@ -747,12 +754,14 @@ const TestimonialAuthor = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+  padding-left: 1rem;
   
   .author-image {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     overflow: hidden;
+    border: 3px solid rgba(10, 102, 194, 0.3);
     
     img {
       width: 100%;
@@ -763,15 +772,21 @@ const TestimonialAuthor = styled.div`
   
   .author-info {
     h4 {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
+      font-weight: 700;
       color: #fff;
       margin-bottom: 0.2rem;
     }
     
     p {
       font-size: 0.9rem;
-      color: var(--primary-blue);
+      color: #0A66C2;
       margin-bottom: 0;
+      padding-left: 0;
+      
+      &::before {
+        display: none;
+      }
     }
   }
 `;
@@ -1093,11 +1108,12 @@ const About = () => {
   
   const teamData = [
     {
-      name: "John Doe",
+      name: "Suraj Roy",
       role: "Founder & CEO",
-      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=500&q=80",
-      bio: "John is a visionary tech entrepreneur with over 15 years of experience in web development and digital marketing.",
-      skills: ["Web Development", "Business Strategy", "UX Design"],
+      // image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=500&q=80",
+      image: "/images/suraj.png",
+      bio: "Suraj is a visionary tech entrepreneur with over 10 years of experience in web development and digital marketing.",
+      skills: ["Full Stack Development", "Business Strategy", "UX Design" , "React Native Development"],
       social: {
         linkedin: "#",
         twitter: "#",
@@ -1105,7 +1121,7 @@ const About = () => {
       }
     },
     {
-      name: "Jane Smith",
+      name: "Pawan Singh",
       role: "CTO",
       image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=500&q=80",
       bio: "Jane leads our technical team with her extensive experience in software architecture and cloud infrastructure.",
@@ -1117,7 +1133,7 @@ const About = () => {
       }
     },
     {
-      name: "Mike Johnson",
+      name: "Prince Gupta",
       role: "Creative Director",
       image: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=500&q=80",
       bio: "Mike brings over a decade of design experience and ensures all our projects exceed visual expectations.",
@@ -1293,7 +1309,7 @@ const About = () => {
       </section>
       
       {/* Team Section */}
-      <TeamSection>
+      {/* <TeamSection>
         <SectionContainer>
           <SectionHeader>
             <SectionTitle style={{opacity: 1, display: 'block', visibility: 'visible'}}>Meet Our Team</SectionTitle>
@@ -1346,7 +1362,7 @@ const About = () => {
             ))}
           </TeamGrid>
         </SectionContainer>
-      </TeamSection>
+      </TeamSection> */}
       
       {/* Values Section */}
       <ValuesSection>

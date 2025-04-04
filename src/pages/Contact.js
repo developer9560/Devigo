@@ -797,7 +797,7 @@ const Contact = () => {
             <ContactDetail>
               <DetailTitle>Email</DetailTitle>
               <DetailText>
-                <ContactLink href="mailto:info@devigo.com">info@devigo.com</ContactLink>
+                <ContactLink href="mailto:developer95608@gmail.com">developer95608@gmail.com</ContactLink>
               </DetailText>
             </ContactDetail>
           </ContactMethod>
@@ -809,7 +809,7 @@ const Contact = () => {
             <ContactDetail>
               <DetailTitle>Phone</DetailTitle>
               <DetailText>
-                <ContactLink href="tel:+14155552671">+1 (415) 555-2671</ContactLink>
+                <ContactLink href="tel:+91 9560845683">+91 9560845683</ContactLink>
               </DetailText>
             </ContactDetail>
           </ContactMethod>
@@ -990,4 +990,4 @@ const Contact = () => {
   );
 };
 
-export default Contact; 
+export default Contact;

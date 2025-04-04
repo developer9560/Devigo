@@ -183,7 +183,7 @@ const AdminLayout = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', overflow: 'hidden' }}>
       <AppBar 
         position="fixed" 
         sx={{ 

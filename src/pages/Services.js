@@ -16,7 +16,18 @@ import {
   faVial,
   faRocket,
   faCog,
-  faSpinner
+  faSpinner,
+  faDesktop,
+  faShoppingCart,
+  faSearch,
+  faGlobe,
+  faDatabase,
+  faTools,
+  faBezierCurve,
+  faStore,
+  faCreditCard,
+  faMobile,
+  faTabletAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { api, servicesApi } from '../utility/api';
@@ -26,15 +37,60 @@ const Services = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Icon mapping for service icons
+  // Icon mapping for service icons - expanded with all Material icon equivalents
   const iconMapping = {
+    // Web Development
+    'code': faCode,
+    'web': faLaptopCode,
+    'integration_instructions': faCode,
+    'developer_mode': faCode,
+    'html': faCode,
     'laptop_code': faLaptopCode,
-    'mobile_screen': faMobileScreen,
+    
+    // Design
+    'design_services': faPaintBrush,
+    'palette': faPaintBrush,
+    'brush': faPaintBrush,
+    'format_paint': faPaintBrush,
+    'style': faPaintBrush,
     'paint_brush': faPaintBrush,
+    'bezier_curve': faBezierCurve,
+    
+    // Mobile
+    'smartphone': faMobileScreen,
+    'android': faMobileScreen,
+    'ios_share': faMobileScreen,
+    'phonelink': faMobileScreen,
+    'app_shortcut': faMobileScreen,
+    'mobile_screen': faMobileScreen,
+    'mobile': faMobile,
+    'tablet_alt': faTabletAlt,
+    
+    // Marketing
+    'trending_up': faChartLine,
+    'campaign': faChartLine,
+    'search': faSearch,
+    'public': faGlobe,
+    'ads_click': faChartLine,
     'chart_line': faChartLine,
-    'server': faServer,
+    
+    // Infrastructure 
+    'cloud': faServer,
+    'storage': faServer,
+    'dns': faServer,
+    'security': faShieldHalved,
+    'memory': faServer,
     'shield_halved': faShieldHalved,
-    'code': faCode
+    'server': faServer,
+    'database': faDatabase,
+    'tools': faTools,
+    
+    // Business
+    'shopping_cart': faShoppingCart,
+    'store': faStore,
+    'payments': faCreditCard,
+    'business': faDesktop,
+    'analytics': faChartLine
   };
 
   // Fetch services from API
@@ -298,11 +354,16 @@ const Services = () => {
               {/* Content */}
               <div className="p-8">
                 <h2 className="text-2xl font-bold mb-4 text-white">{service.title}</h2>
-                <p className="text-gray-400 mb-6 leading-relaxed">{service.excerpt}</p>
+                <p className="text-gray-400 mb-6 leading-relaxed">
+                  {service.excerpt && service.excerpt.length > 100 
+                    ? `${service.excerpt.substring(0, 100)}...` 
+                    : service.excerpt}
+                </p>
                 
-                <div className="mt-auto mb-6">
-                  <h3 className="text-lg text-blue-500 font-semibold mb-4">Key Features:</h3>
-                  <ul className="space-y-3">
+                {/* Key Features with reduced margin */}
+                <div className="mt-auto mb-3">
+                  <h3 className="text-lg text-blue-500 font-semibold mb-2">Key Features:</h3>
+                  <ul className="space-y-2">
                     {service.features && service.features.slice(0, 4).map((feature, index) => (
                       <li key={index} className="flex items-start text-gray-400">
                         <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3 mt-1 flex-shrink-0" />

@@ -162,15 +162,15 @@ const Footer = () => {
           <ColumnTitle>Contact Us</ColumnTitle>
           <ContactInfo>
             <span className="icon">📍</span>
-            <span>123 Web Dev Street, Digital City</span>
+            <span>Hauz Khas, New Delhi</span>
           </ContactInfo>
           <ContactInfo>
             <span className="icon">📧</span>
-            <span>info@devigo.com</span>
+            <span>developer95608@gmail.com</span>
           </ContactInfo>
           <ContactInfo>
             <span className="icon">📱</span>
-            <span>+1 (555) 123-4567</span>
+            <span>+91 9560845683</span>
           </ContactInfo>
         </FooterColumn>
       </FooterContent>

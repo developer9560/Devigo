@@ -110,17 +110,17 @@ const Footer = () => {
                 <li className="flex mb-5">
                   <FontAwesomeIcon icon={faMapMarkerAlt} className="text-blue-600 mt-1 mr-4 text-lg" />
                   <span>
-                    123 Tech Park Avenue, <br />
-                    Silicon Valley, CA 94088
+                    Hauz Khas, New Delhi, <br />
+                    Delhi 110016
                   </span>
                 </li>
                 <li className="flex mb-5">
                   <FontAwesomeIcon icon={faPhone} className="text-blue-600 mt-1 mr-4 text-lg" />
-                  <span>+1 (555) 123-4567</span>
+                  <span>+91 9560845683</span>
                 </li>
                 <li className="flex mb-5">
                   <FontAwesomeIcon icon={faEnvelope} className="text-blue-600 mt-1 mr-4 text-lg" />
-                  <span>info@devigo.com</span>
+                  <span>developer95608@gmail.com</span>
                 </li>
               </ul>
               

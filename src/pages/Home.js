@@ -20,7 +20,56 @@ import {
   faExclamationTriangle,
   faDatabase
 } from '@fortawesome/free-solid-svg-icons';
+import { motion, useInView, useScroll, useTransform, useAnimation, AnimatePresence } from 'framer-motion';
 import { servicesApi } from '../utility/api'; // Import the services API
+
+// Animation variants for different elements
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { 
+      duration: 0.8, 
+      ease: "easeOut"
+    }
+  }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.3,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const slideUp = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { 
+      duration: 0.8, 
+      ease: "easeOut" 
+    }
+  }
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { 
+    opacity: 1, 
+    scale: 1,
+    transition: { 
+      duration: 0.6, 
+      ease: [0.175, 0.885, 0.32, 1.275] 
+    }
+  }
+};
 
 // Fallback images for projects
 const projectImages = {
@@ -46,6 +95,9 @@ const Home = () => {
   const [services, setServices] = useState([]); // State to hold services data
   const [loadingServices, setLoadingServices] = useState(true); // State for loading services status
   const [serviceError, setServiceError] = useState(null); // Error state for services
+  
+  // Create controls for animations
+  const controls = useAnimation();
   
   // Projects data
   const projects = [
@@ -83,24 +135,24 @@ const Home = () => {
     {
       id: 1,
       text: "DEVIGO transformed our online presence completely. Their team delivered a website that exceeded our expectations and has significantly increased our conversions.",
-      author: "Pawan Singh",
-      position: "CEO, Devigo",
+      author: "Rajesh Kumar",
+      position: "CEO, Tech Solutions",
       avatar: "/images/testimonial1.jpg",
       stars: 5
     },
     {
       id: 2,
       text: "Working with DEVIGO was a game-changer for our business. Their attention to detail and technical expertise helped us launch our platform months ahead of schedule.",
-      author: "Suraj Roy",
-      position: "Founder, Devigo",
+      author: "Amit Singh",
+      position: "Founder, Business Solutions",
       avatar: "/images/testimonial2.jpg",
       stars: 5
     },
     {
       id: 3,
       text: "The team at DEVIGO doesn't just build websites, they build solutions. Their strategic approach to our project delivered exactly what we needed to succeed in our market.",
-      author: "Prince Gupta",
-      position: "Marketing Director, Devigo",
+      author: "Priyanka Patel",
+      position: "Marketing Director, Smart Tech Solutions",
       avatar: "/images/testimonial3.jpg",
       stars: 5
     }
@@ -115,6 +167,9 @@ const Home = () => {
   ];
 
   useEffect(() => {
+    // Start animations when component mounts
+    controls.start("visible");
+    
     const fetchServices = async () => {
       try {
         setLoadingServices(true);
@@ -139,7 +194,7 @@ const Home = () => {
     };
 
     fetchServices();
-  }, []);
+  }, [controls]);
 
   useEffect(() => {
     // Initialize process section as soon as component mounts
@@ -224,14 +279,21 @@ const Home = () => {
   // Function to generate service skeleton loaders while loading
   const renderServiceSkeletons = () => {
     return Array(6).fill().map((_, index) => (
-      <div key={`skeleton-${index}`} className="bg-gray-800/50 p-8 rounded-xl border border-gray-700/50">
+      <motion.div 
+        key={`skeleton-${index}`} 
+        className="bg-gray-800/50 p-8 rounded-xl border border-gray-700/50"
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: index * 0.1 }}
+      >
         <div className="w-16 h-16 bg-gray-700 rounded-lg mb-6 animate-pulse"></div>
         <div className="h-7 bg-gray-700 rounded w-3/4 mb-4 animate-pulse"></div>
         <div className="h-4 bg-gray-700 rounded w-full mb-2 animate-pulse"></div>
         <div className="h-4 bg-gray-700 rounded w-5/6 mb-2 animate-pulse"></div>
         <div className="h-4 bg-gray-700 rounded w-4/6 mb-6 animate-pulse"></div>
         <div className="h-5 bg-gray-700 rounded w-1/3 animate-pulse"></div>
-      </div>
+      </motion.div>
     ));
   };
 
@@ -239,61 +301,96 @@ const Home = () => {
   const renderServicesContent = () => {
     if (loadingServices) {
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
           {renderServiceSkeletons()}
-        </div>
+        </motion.div>
       );
     }
 
     if (serviceError) {
       return (
-        <div className="bg-red-900/20 border border-red-700/50 rounded-lg p-8 text-center max-w-3xl mx-auto">
+        <motion.div 
+          className="bg-red-900/20 border border-red-700/50 rounded-lg p-8 text-center max-w-3xl mx-auto"
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible"
+        >
           <FontAwesomeIcon icon={faExclamationTriangle} className="text-3xl text-red-500 mb-3" />
           <h3 className="text-xl font-bold mb-2 text-white">Service Error</h3>
           <p className="text-gray-400 mb-6">{serviceError}</p>
-          <button 
+          <motion.button 
             onClick={() => window.location.reload()} 
             className="px-6 py-2 bg-red-700/30 hover:bg-red-700/50 text-white rounded-md transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             Retry
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       );
     }
 
     if (services.length === 0) {
       return (
-        <div className="text-center py-10">
+        <motion.div 
+          className="text-center py-10"
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible"
+        >
           <p className="text-gray-400">No services available at the moment.</p>
-        </div>
+        </motion.div>
       );
     }
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {services.map((service) => (
-          <div 
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+      >
+        {services.map((service, index) => (
+          <motion.div 
             key={service.id} 
-            className="bg-gray-800/50 p-8 rounded-xl border border-gray-700/50 hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-300"
+            className="bg-gray-800/50 p-8 rounded-xl border border-gray-700/50 hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-500"
+            variants={scaleIn}
+            custom={index}
+            style={{ boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)' }}
           >
-            <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center text-white text-2xl mb-6 shadow-lg shadow-blue-600/30">
+            <motion.div 
+              className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center text-white text-2xl mb-6 shadow-lg shadow-blue-600/30"
+              whileHover={{ rotate: 5, scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
               <FontAwesomeIcon icon={service.icon || faCode} />
-            </div>
+            </motion.div>
             <h3 className="text-xl font-bold mb-4 text-white">{service.title}</h3>
             <p className="text-gray-400 mb-6 leading-relaxed">{service.excerpt}</p>
-            <Link 
-              to={service.link || `/services/${service.id}`} 
-              className="text-blue-500 font-semibold flex items-center group hover:text-blue-400 transition-colors duration-300"
+            <motion.div
+              whileHover={{ x: 5 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              Learn More 
-              <FontAwesomeIcon 
-                icon={faLongArrowAltRight} 
-                className="ml-2 group-hover:translate-x-1 transition-transform duration-300" 
-              />
-            </Link>
-          </div>
+              <Link 
+                to={service.link || `/services/${service.id}`} 
+                className="text-blue-500 font-semibold flex items-center group hover:text-blue-400 transition-colors duration-300"
+              >
+                Learn More 
+                <FontAwesomeIcon 
+                  icon={faLongArrowAltRight} 
+                  className="ml-2 group-hover:translate-x-1 transition-transform duration-300" 
+                />
+              </Link>
+            </motion.div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     );
   };
 
@@ -301,349 +398,993 @@ const Home = () => {
   return (
     <div className="w-full bg-gray-900 text-white">
       {/* Hero Section */}
-      <section className="flex flex-col lg:flex-row items-center justify-between min-h-screen p-8 bg-gradient-to-br from-black/90 to-blue-900/80 relative overflow-hidden">
-        <div className="absolute top-[-300px] right-[-300px] w-[600px] h-[600px] bg-radial-at-center from-blue-600/30 to-transparent rounded-full z-0"></div>
+      <motion.section 
+        className="flex flex-col lg:flex-row items-center justify-between min-h-screen p-8 bg-gradient-to-br from-black/90 to-blue-900/80 relative overflow-hidden"
+        initial="hidden"
+        animate="visible"
+        variants={staggerContainer}
+      >
+        <motion.div 
+          className="absolute top-[-300px] right-[-300px] w-[600px] h-[600px] bg-radial-at-center from-blue-600/30 to-transparent rounded-full z-0"
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.4, 0.3]
+          }}
+          transition={{ 
+            duration: 8, 
+            repeat: Infinity,
+            repeatType: "reverse" 
+          }}
+        ></motion.div>
         
-        <div className="max-w-2xl z-10">
-          <h1 
+        <motion.div className="max-w-2xl z-10" variants={staggerContainer}>
+          <motion.h1 
             className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-500 bg-clip-text text-transparent leading-tight"
+            variants={fadeIn}
+            ref={heroTitleRef}
           >
             We Build Digital Experiences That Transform Businesses
-          </h1>
-          <p className="text-lg text-gray-300 mb-8 leading-relaxed">
+          </motion.h1>
+          
+          <motion.p 
+            className="text-lg text-gray-300 mb-8 leading-relaxed"
+            variants={fadeIn}
+          >
             DEVIGO is a premier web agency specializing in crafting innovative digital solutions 
             that drive growth and deliver exceptional user experiences.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link to="/contact" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white font-semibold rounded-md shadow-lg shadow-blue-600/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-300">
-              Get Started
-            </Link>
-            <Link to="/services" className="px-8 py-4 bg-transparent text-white font-semibold rounded-md border border-white/30 hover:bg-white/10 hover:border-white transition-all duration-300">
-              Explore Services
-            </Link>
-          </div>
-        </div>
+          </motion.p>
+          
+          <motion.div className="flex flex-wrap gap-4" variants={staggerContainer}>
+            <motion.div variants={scaleIn}>
+              <Link to="/contact" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white font-semibold rounded-md shadow-lg shadow-blue-600/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-300">
+                Get Started
+              </Link>
+            </motion.div>
+            
+            <motion.div variants={scaleIn}>
+              <Link to="/services" className="px-8 py-4 bg-transparent text-white font-semibold rounded-md border border-white/30 hover:bg-white/10 hover:border-white transition-all duration-300">
+                Explore Services
+              </Link>
+            </motion.div>
+          </motion.div>
+        </motion.div>
         
-        <div className="mt-12 lg:mt-0 z-10">
+        <motion.div 
+          className="mt-12 lg:mt-0 z-10"
+          variants={slideUp}
+        >
           {/* Hero image placeholder */}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       {/* Feature Cards Section */}
-      <section className="py-16 px-8 bg-gray-900">
+      <motion.section 
+        className="py-16 px-8 bg-gray-900"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={staggerContainer}
+      >
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            variants={staggerContainer}
+          >
             {/* Fast Delivery Card */}
-            <div className="bg-gray-800/50 rounded-lg shadow-lg p-8 text-center transition-transform hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 duration-300 border border-gray-700/50">
+            <motion.div 
+              className="bg-gray-800/50 rounded-lg shadow-lg p-8 text-center transition-transform duration-300 border border-gray-700/50"
+              variants={scaleIn}
+              whileHover={{ 
+                y: -10, 
+                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+              }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            >
+              <motion.div
+                initial={{ scale: 1 }}
+                whileHover={{ scale: 1.15 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                className="flex justify-center mb-4"
+              >
+                <div className="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center">
+                  <FontAwesomeIcon icon={faRocket} className="text-blue-500 text-2xl" />
+                </div>
+              </motion.div>
               <h3 className="text-xl font-bold mb-4 text-blue-500">Fast Delivery</h3>
               <p className="text-gray-400">
                 Get your project done in record time without compromising quality.
               </p>
-            </div>
+            </motion.div>
 
             {/* Custom Solutions Card */}
-            <div className="bg-gray-800/50 rounded-lg shadow-lg p-8 text-center transition-transform hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 duration-300 border border-gray-700/50">
+            <motion.div 
+              className="bg-gray-800/50 rounded-lg shadow-lg p-8 text-center transition-transform duration-300 border border-gray-700/50"
+              variants={scaleIn}
+              whileHover={{ 
+                y: -10, 
+                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+              }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            >
+              <motion.div
+                initial={{ scale: 1 }}
+                whileHover={{ scale: 1.15 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                className="flex justify-center mb-4"
+              >
+                <div className="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center">
+                  <FontAwesomeIcon icon={faLightbulb} className="text-blue-500 text-2xl" />
+                </div>
+              </motion.div>
               <h3 className="text-xl font-bold mb-4 text-blue-500">Custom Solutions</h3>
               <p className="text-gray-400">
                 Fully personalized websites and apps that meet your specific requirements.
               </p>
-            </div>
+            </motion.div>
 
             {/* Affordable Pricing Card */}
-            <div className="bg-gray-800/50 rounded-lg shadow-lg p-8 text-center transition-transform hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 duration-300 border border-gray-700/50">
+            <motion.div 
+              className="bg-gray-800/50 rounded-lg shadow-lg p-8 text-center transition-transform duration-300 border border-gray-700/50"
+              variants={scaleIn}
+              whileHover={{ 
+                y: -10, 
+                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+              }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            >
+              <motion.div
+                initial={{ scale: 1 }}
+                whileHover={{ scale: 1.15 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                className="flex justify-center mb-4"
+              >
+                <div className="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center">
+                  <FontAwesomeIcon icon={faChartLine} className="text-blue-500 text-2xl" />
+                </div>
+              </motion.div>
               <h3 className="text-xl font-bold mb-4 text-blue-500">Affordable Pricing</h3>
               <p className="text-gray-400">
                 Enjoy top-notch services within your budget.
               </p>
-            </div>
+            </motion.div>
 
             {/* 24/7 Support Card */}
-            <div className="bg-gray-800/50 rounded-lg shadow-lg p-8 text-center transition-transform hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 duration-300 border border-gray-700/50">
+            <motion.div 
+              className="bg-gray-800/50 rounded-lg shadow-lg p-8 text-center transition-transform duration-300 border border-gray-700/50"
+              variants={scaleIn}
+              whileHover={{ 
+                y: -10, 
+                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+              }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            >
+              <motion.div
+                initial={{ scale: 1 }}
+                whileHover={{ scale: 1.15 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                className="flex justify-center mb-4"
+              >
+                <div className="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center">
+                  <FontAwesomeIcon icon={faHeadset} className="text-blue-500 text-2xl" />
+                </div>
+              </motion.div>
               <h3 className="text-xl font-bold mb-4 text-blue-500">24/7 Support</h3>
               <p className="text-gray-400">
                 Our team is always here to assist you at every step.
               </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-gray-800/90">
-        <div className="max-w-7xl mx-auto px-8 flex flex-wrap justify-around">
+      <motion.section 
+        className="py-12 bg-gray-800/90 relative overflow-hidden"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={fadeIn}
+      >
+        {/* Background Decoration */}
+        <motion.div 
+          className="absolute -top-20 -left-20 w-72 h-72 bg-blue-500/10 rounded-full mix-blend-multiply"
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{ 
+            duration: 12, 
+            repeat: Infinity,
+            repeatType: "reverse" 
+          }}
+        ></motion.div>
+        <motion.div 
+          className="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-500/10 rounded-full mix-blend-multiply"
+          animate={{ 
+            scale: [1.2, 1, 1.2],
+            opacity: [0.5, 0.3, 0.5]
+          }}
+          transition={{ 
+            duration: 12, 
+            repeat: Infinity,
+            repeatType: "reverse" 
+          }}
+        ></motion.div>
+        
+        <div className="max-w-7xl mx-auto px-8 flex flex-wrap justify-around relative z-10">
           {stats.map((stat, index) => (
-            <div key={index} className="text-center p-6 w-full sm:w-1/2 md:w-1/4">
-              <h2 
+            <motion.div 
+              key={index} 
+              className="text-center p-6 w-full sm:w-1/2 md:w-1/4"
+              variants={scaleIn}
+              custom={index}
+              whileHover={{ y: -5 }}
+            >
+              <motion.h2 
                 className="stat-number text-5xl font-bold mb-2 bg-gradient-to-r from-white to-blue-500 bg-clip-text text-transparent"
                 data-value={stat.value}
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 100, 
+                  delay: 0.1 * index,
+                  duration: 1 
+                }}
               >
                 {stat.value === 98 ? '98%' : stat.value === 24 ? '24/7' : stat.value}
-              </h2>
-              <p className="text-gray-400">{stat.label}</p>
-            </div>
+              </motion.h2>
+              <motion.p 
+                className="text-gray-400"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 + (0.1 * index) }}
+              >
+                {stat.label}
+              </motion.p>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Services Section */}
-      <section className="py-20 px-8 bg-gray-900">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 inline-block relative">
+      <motion.section 
+        className="py-20 px-8 bg-gray-900 relative overflow-hidden"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={fadeIn}
+      >
+        {/* Background Decoration */}
+        <motion.div 
+          className="absolute top-40 left-0 w-32 h-32 rounded-full bg-blue-500/10"
+          animate={{
+            x: [0, 50, 0],
+            y: [0, 30, 0],
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.3, 0.2],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-40 right-0 w-64 h-64 rounded-full bg-blue-500/5"
+          animate={{
+            x: [0, -30, 0],
+            y: [0, -50, 0],
+            scale: [1, 1.1, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+        />
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <motion.div 
+            className="text-center mb-16"
+            variants={fadeIn}
+          >
+            <motion.h2 
+              className="text-4xl font-bold mb-4 inline-block relative"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true, amount: 0.8 }}
+            >
               Our Services
-              <span className="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"></span>
-            </h2>
-            <p className="text-gray-400 max-w-3xl mx-auto mt-4">
+              <motion.span 
+                className="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"
+                initial={{ width: 0 }}
+                whileInView={{ width: "4rem" }}
+                transition={{ delay: 0.2, duration: 0.7 }}
+                viewport={{ once: true }}
+              ></motion.span>
+            </motion.h2>
+            <motion.p 
+              className="text-gray-400 max-w-3xl mx-auto mt-4"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.7 }}
+              viewport={{ once: true }}
+            >
               Comprehensive digital solutions to help your business thrive in the digital landscape
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
           
           {renderServicesContent()}
           
-          <div className="text-center mt-12">
-            <Link 
-              to="/services" 
-              className="px-8 py-3 border border-blue-600 text-blue-500 font-semibold rounded-md hover:bg-blue-600/10 transition-all duration-300"
+          <motion.div 
+            className="text-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.7 }}
+            viewport={{ once: true }}
+          >
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              View All Services
-            </Link>
-          </div>
+              <Link 
+                to="/services" 
+                className="px-8 py-3 border border-blue-600 text-blue-500 font-semibold rounded-md hover:bg-blue-600/10 transition-all duration-300"
+              >
+                View All Services
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Projects Section */}
-      <section className="py-20 px-8 bg-gray-800">
+      <motion.section 
+        className="py-20 px-8 bg-gray-800 relative overflow-hidden"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={fadeIn}
+      >
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
+        </div>
+        
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 inline-block relative">
+          <motion.div 
+            className="text-center mb-16"
+            variants={fadeIn}
+          >
+            <motion.h2 
+              className="text-4xl font-bold mb-4 inline-block relative"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true, amount: 0.8 }}
+            >
               Featured Projects
-              <span className="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"></span>
-            </h2>
-            <p className="text-gray-400 max-w-3xl mx-auto mt-4">
+              <motion.span 
+                className="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"
+                initial={{ width: 0 }}
+                whileInView={{ width: "4rem" }}
+                transition={{ delay: 0.2, duration: 0.7 }}
+                viewport={{ once: true }}
+              ></motion.span>
+            </motion.h2>
+            <motion.p 
+              className="text-gray-400 max-w-3xl mx-auto mt-4"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.7 }}
+              viewport={{ once: true }}
+            >
               Explore some of our recent work and the results we've achieved for our clients
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project) => (
-              <div 
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            {projects.map((project, index) => (
+              <motion.div 
                 key={project.id} 
-                className="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700/50 hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-300"
+                className="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700/50 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-300"
+                variants={scaleIn}
+                whileHover={{ 
+                  y: -10,
+                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 15 }}
               >
-                <div 
-                  className="h-64 bg-cover bg-center relative" 
+                <motion.div 
+                  className="h-64 bg-cover bg-center relative overflow-hidden" 
                   style={{ 
                     backgroundImage: `url(${project.image})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundColor: '#1f2937' // Fallback color
                   }}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.5 }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/70 flex items-end p-6">
-                    <span className="bg-blue-600 text-white px-4 py-1 rounded-md text-sm font-semibold">
+                    <motion.span 
+                      className="bg-blue-600 text-white px-4 py-1 rounded-md text-sm font-semibold"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 + index * 0.1 }}
+                      viewport={{ once: true }}
+                    >
                       {project.result}
-                    </span>
+                    </motion.span>
                   </div>
-                </div>
+                </motion.div>
                 
                 <div className="p-6">
-                  <span className="inline-block bg-blue-600/10 text-blue-500 px-3 py-1 rounded-full text-xs mb-2">
-                    {project.type}
-                  </span>
-                  <h3 className="text-xl font-bold mb-2 text-white">{project.title}</h3>
-                  <p className="text-gray-400 mb-4 leading-relaxed">{project.description}</p>
-                  <Link 
-                    to={project.link} 
-                    className="text-blue-500 font-semibold flex items-center group hover:text-blue-400 transition-colors duration-300"
+                  <motion.span 
+                    className="inline-block bg-blue-600/10 text-blue-500 px-3 py-1 rounded-full text-xs mb-2"
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 + index * 0.1 }}
+                    viewport={{ once: true }}
                   >
-                    View Case Study 
-                    <FontAwesomeIcon 
-                      icon={faLongArrowAltRight} 
-                      className="ml-2 group-hover:translate-x-1 transition-transform duration-300" 
-                    />
-                  </Link>
+                    {project.type}
+                  </motion.span>
+                  <motion.h3 
+                    className="text-xl font-bold mb-2 text-white"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ delay: 0.4 + index * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    {project.title}
+                  </motion.h3>
+                  <motion.p 
+                    className="text-gray-400 mb-4 leading-relaxed"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ delay: 0.5 + index * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    {project.description}
+                  </motion.p>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ delay: 0.6 + index * 0.1 }}
+                    viewport={{ once: true }}
+                    whileHover={{ x: 5 }}
+                  >
+                    <Link 
+                      to={project.link} 
+                      className="text-blue-500 font-semibold flex items-center group hover:text-blue-400 transition-colors duration-300"
+                    >
+                      View Case Study 
+                      <FontAwesomeIcon 
+                        icon={faLongArrowAltRight} 
+                        className="ml-2 group-hover:translate-x-1 transition-transform duration-300" 
+                      />
+                    </Link>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
           
-          <div className="text-center mt-12">
-            <Link 
-              to="/portfolio" 
-              className="px-8 py-3 border border-blue-600 text-blue-500 font-semibold rounded-md hover:bg-blue-600/10 transition-all duration-300"
+          <motion.div 
+            className="text-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.7 }}
+            viewport={{ once: true }}
+          >
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              View All Projects
-            </Link>
-          </div>
+              <Link 
+                to="/portfolio" 
+                className="px-8 py-3 border border-blue-600 text-blue-500 font-semibold rounded-md hover:bg-blue-600/10 transition-all duration-300"
+              >
+                View All Projects
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Testimonials Section */}
-      <section className="py-20 px-8 bg-gray-900">
+      <motion.section 
+        className="py-20 px-8 bg-gray-900 relative overflow-hidden"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={fadeIn}
+      >
+        {/* Background Elements */}
+        <motion.div
+          className="absolute top-20 right-20 text-9xl opacity-5 text-blue-500"
+          animate={{ 
+            y: [0, -20, 0],
+            opacity: [0.05, 0.08, 0.05]
+          }}
+          transition={{ 
+            duration: 8,
+            repeat: Infinity,
+            repeatType: "reverse" 
+          }}
+        >
+          <FontAwesomeIcon icon={faQuoteRight} />
+        </motion.div>
+        
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 inline-block relative">
+          <motion.div 
+            className="text-center mb-16"
+            variants={fadeIn}
+          >
+            <motion.h2 
+              className="text-4xl font-bold mb-4 inline-block relative"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true }}
+            >
               Client Testimonials
-              <span className="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"></span>
-            </h2>
-            <p className="text-gray-400 max-w-3xl mx-auto mt-4">
+              <motion.span 
+                className="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"
+                initial={{ width: 0 }}
+                whileInView={{ width: "4rem" }}
+                transition={{ delay: 0.2, duration: 0.7 }}
+                viewport={{ once: true }}
+              ></motion.span>
+            </motion.h2>
+            <motion.p 
+              className="text-gray-400 max-w-3xl mx-auto mt-4"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.7 }}
+              viewport={{ once: true }}
+            >
               Hear what our clients have to say about their experience working with us
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial) => (
-              <div 
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            variants={staggerContainer}
+          >
+            {testimonials.map((testimonial, index) => (
+              <motion.div 
                 key={testimonial.id} 
-                className="bg-gray-800/50 p-8 rounded-xl border border-gray-700/50 hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-300 relative"
+                className="bg-gray-800/50 p-8 rounded-xl border border-gray-700/50 transition-all duration-300 relative"
+                variants={scaleIn}
+                whileHover={{ 
+                  y: -10,
+                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 15 }}
               >
-                <FontAwesomeIcon 
-                  icon={faQuoteRight} 
-                  className="absolute top-8 left-8 text-2xl text-blue-600 opacity-20" 
-                />
+                <motion.div
+                  className="absolute top-8 left-8 text-2xl text-blue-600 opacity-20"
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1, rotate: 0 }}
+                  transition={{ 
+                    delay: 0.2, 
+                    duration: 0.5,
+                    type: "spring" 
+                  }}
+                  animate={{ 
+                    rotate: [0, 12, 0, -12, 0], 
+                    transition: { 
+                      rotate: { 
+                        repeat: Infinity, 
+                        repeatType: "loop", 
+                        duration: 5,
+                        ease: "easeInOut",
+                        times: [0, 0.25, 0.5, 0.75, 1],
+                        type: "tween" 
+                      }
+                    }
+                  }}
+                  viewport={{ once: true }}
+                >
+                  <FontAwesomeIcon icon={faQuoteRight} />
+                </motion.div>
                 
-                <div className="flex gap-1 mb-6">
+                <motion.div 
+                  className="flex gap-1 mb-6"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  viewport={{ once: true }}
+                >
                   {[...Array(testimonial.stars)].map((_, i) => (
                     <FontAwesomeIcon key={i} icon={faStar} className="text-yellow-500" />
                   ))}
-                </div>
+                </motion.div>
                 
-                <p className="text-gray-400 italic mb-8 leading-relaxed">
+                <motion.p 
+                  className="text-gray-400 italic mb-8 leading-relaxed"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  viewport={{ once: true }}
+                >
                   "{testimonial.text}"
-                </p>
+                </motion.p>
                 
-                <div className="flex items-center">
-                  <div 
+                <motion.div 
+                  className="flex items-center"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                  viewport={{ once: true }}
+                >
+                  <motion.div 
                     className="w-12 h-12 rounded-full bg-cover bg-center mr-4 bg-gray-700" 
                     style={{ backgroundImage: `url(${testimonial.avatar})` }}
-                  ></div>
+                    whileHover={{ scale: 1.1 }}
+                    initial={{ scale: 0.8 }}
+                    whileInView={{ scale: 1 }}
+                    transition={{ delay: 0.6, type: "spring" }}
+                    viewport={{ once: true }}
+                  ></motion.div>
                   <div>
                     <h4 className="font-bold text-white">{testimonial.author}</h4>
                     <p className="text-gray-500 text-sm">{testimonial.position}</p>
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Development Process Section */}
-      <section className="py-20 bg-gray-900" id="process-section">
+      <motion.section 
+        className="py-20 bg-gray-900" 
+        id="process-section"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={fadeIn}
+      >
         <div className="container mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Our Development Process</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">Our streamlined approach ensures quality results on time and within budget</p>
-          </div>
+          <motion.div 
+            className="text-center mb-14"
+            variants={fadeIn}
+          >
+            <motion.h2 
+              className="text-3xl md:text-4xl font-bold text-white mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true }}
+            >
+              Our Development Process
+            </motion.h2>
+            <motion.p 
+              className="text-gray-400 max-w-2xl mx-auto"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.7 }}
+              viewport={{ once: true }}
+            >
+              Our streamlined approach ensures quality results on time and within budget
+            </motion.p>
+          </motion.div>
           
           <div className="relative mx-auto max-w-5xl px-5">
             {/* Timeline line */}
-            <div className="absolute top-[60px] left-0 right-0 h-1 bg-gray-700/50">
+            <motion.div 
+              className="absolute top-[60px] left-0 right-0 h-1 bg-gray-700/50"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+            >
               {/* Animated fill line */}
-              <div id="process-line-fill" className="h-full bg-blue-600 w-0 transition-all duration-2000 ease-out"></div>
-            </div>
+              <motion.div 
+                id="process-line-fill" 
+                className="h-full bg-blue-600 w-0"
+                initial={{ width: 0 }}
+                whileInView={{ width: "100%" }}
+                transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
+                viewport={{ once: true }}
+              ></motion.div>
+            </motion.div>
             
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <motion.div 
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6"
+              variants={staggerContainer}
+            >
               {/* Discovery */}
-              <div className="process-step opacity-0 translate-y-8 transition-all duration-700 flex flex-col items-center">
-                <div className="process-icon w-16 h-16 rounded-full bg-blue-600/20 text-blue-600/60 flex items-center justify-center text-2xl mb-5 z-10 transition-all duration-500">
+              <motion.div 
+                className="process-step flex flex-col items-center"
+                variants={fadeIn}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                viewport={{ once: true }}
+              >
+                <motion.div 
+                  className="process-icon w-16 h-16 rounded-full bg-blue-600/20 text-blue-600/60 flex items-center justify-center text-2xl mb-5 z-10"
+                  whileHover={{ scale: 1.1, backgroundColor: "#0A66C2", color: "#ffffff" }}
+                  transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                >
                   <FontAwesomeIcon icon={faSearch} />
-                </div>
+                </motion.div>
                 <h3 className="font-semibold text-white text-lg mb-2">Discovery</h3>
                 <p className="text-gray-400 text-center text-sm">Understand your needs and gather requirements</p>
-              </div>
+              </motion.div>
               
               {/* Design */}
-              <div className="process-step opacity-0 translate-y-8 transition-all duration-700 flex flex-col items-center">
-                <div className="process-icon w-16 h-16 rounded-full bg-blue-600/20 text-blue-600/60 flex items-center justify-center text-2xl mb-5 z-10 transition-all duration-500">
+              <motion.div 
+                className="process-step flex flex-col items-center"
+                variants={fadeIn}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                viewport={{ once: true }}
+              >
+                <motion.div 
+                  className="process-icon w-16 h-16 rounded-full bg-blue-600/20 text-blue-600/60 flex items-center justify-center text-2xl mb-5 z-10"
+                  whileHover={{ scale: 1.1, backgroundColor: "#0A66C2", color: "#ffffff" }}
+                  transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                >
                   <FontAwesomeIcon icon={faPenRuler} />
-                </div>
+                </motion.div>
                 <h3 className="font-semibold text-white text-lg mb-2">Design</h3>
                 <p className="text-gray-400 text-center text-sm">Create wireframes and visual layouts</p>
-              </div>
+              </motion.div>
               
               {/* Development */}
-              <div className="process-step opacity-0 translate-y-8 transition-all duration-700 flex flex-col items-center">
-                <div className="process-icon w-16 h-16 rounded-full bg-blue-600/20 text-blue-600/60 flex items-center justify-center text-2xl mb-5 z-10 transition-all duration-500">
+              <motion.div 
+                className="process-step flex flex-col items-center"
+                variants={fadeIn}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                viewport={{ once: true }}
+              >
+                <motion.div 
+                  className="process-icon w-16 h-16 rounded-full bg-blue-600/20 text-blue-600/60 flex items-center justify-center text-2xl mb-5 z-10"
+                  whileHover={{ scale: 1.1, backgroundColor: "#0A66C2", color: "#ffffff" }}
+                  transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                >
                   <FontAwesomeIcon icon={faCode} />
-                </div>
+                </motion.div>
                 <h3 className="font-semibold text-white text-lg mb-2">Development</h3>
                 <p className="text-gray-400 text-center text-sm">Build with clean, efficient code</p>
-              </div>
+              </motion.div>
               
               {/* Testing */}
-              <div className="process-step opacity-0 translate-y-8 transition-all duration-700 flex flex-col items-center">
-                <div className="process-icon w-16 h-16 rounded-full bg-blue-600/20 text-blue-600/60 flex items-center justify-center text-2xl mb-5 z-10 transition-all duration-500">
+              <motion.div 
+                className="process-step flex flex-col items-center"
+                variants={fadeIn}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                viewport={{ once: true }}
+              >
+                <motion.div 
+                  className="process-icon w-16 h-16 rounded-full bg-blue-600/20 text-blue-600/60 flex items-center justify-center text-2xl mb-5 z-10"
+                  whileHover={{ scale: 1.1, backgroundColor: "#0A66C2", color: "#ffffff" }}
+                  transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                >
                   <FontAwesomeIcon icon={faVial} />
-                </div>
+                </motion.div>
                 <h3 className="font-semibold text-white text-lg mb-2">Testing</h3>
                 <p className="text-gray-400 text-center text-sm">Rigorous QA to ensure perfection</p>
-              </div>
+              </motion.div>
               
               {/* Launch */}
-              <div className="process-step opacity-0 translate-y-8 transition-all duration-700 flex flex-col items-center">
-                <div className="process-icon w-16 h-16 rounded-full bg-blue-600/20 text-blue-600/60 flex items-center justify-center text-2xl mb-5 z-10 transition-all duration-500">
+              <motion.div 
+                className="process-step flex flex-col items-center"
+                variants={fadeIn}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                viewport={{ once: true }}
+              >
+                <motion.div 
+                  className="process-icon w-16 h-16 rounded-full bg-blue-600/20 text-blue-600/60 flex items-center justify-center text-2xl mb-5 z-10"
+                  whileHover={{ scale: 1.1, backgroundColor: "#0A66C2", color: "#ffffff" }}
+                  transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                >
                   <FontAwesomeIcon icon={faRocket} />
-                </div>
+                </motion.div>
                 <h3 className="font-semibold text-white text-lg mb-2">Launch</h3>
                 <p className="text-gray-400 text-center text-sm">Deploy and go live with confidence</p>
-              </div>
+              </motion.div>
               
               {/* Support */}
-              <div className="process-step opacity-0 translate-y-8 transition-all duration-700 flex flex-col items-center">
-                <div className="process-icon w-16 h-16 rounded-full bg-blue-600/20 text-blue-600/60 flex items-center justify-center text-2xl mb-5 z-10 transition-all duration-500">
+              <motion.div 
+                className="process-step flex flex-col items-center"
+                variants={fadeIn}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <motion.div 
+                  className="process-icon w-16 h-16 rounded-full bg-blue-600/20 text-blue-600/60 flex items-center justify-center text-2xl mb-5 z-10"
+                  whileHover={{ scale: 1.1, backgroundColor: "#0A66C2", color: "#ffffff" }}
+                  transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                >
                   <FontAwesomeIcon icon={faHeadset} />
-                </div>
+                </motion.div>
                 <h3 className="font-semibold text-white text-lg mb-2">Support</h3>
                 <p className="text-gray-400 text-center text-sm">Ongoing maintenance and updates</p>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* CTA Section */}
-      <section className="py-20 px-8 bg-gradient-to-r from-blue-900/90 to-blue-700/90 relative">
-        <div className="absolute inset-0 bg-pattern opacity-5"></div>
+      <motion.section 
+        className="py-20 px-8 bg-gradient-to-r from-blue-900/90 to-blue-700/90 relative overflow-hidden"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={fadeIn}
+      >
+        {/* Animated Background */}
+        <motion.div 
+          className="absolute inset-0 bg-pattern opacity-5"
+          animate={{
+            backgroundPosition: ["0% 0%", "100% 100%"],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+        ></motion.div>
+        
+        {/* Light Beams */}
+        <motion.div 
+          className="absolute -top-20 -left-20 w-40 h-40 bg-blue-400/10 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.1, 0.3, 0.1],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+        ></motion.div>
+        
+        <motion.div 
+          className="absolute -bottom-20 -right-20 w-60 h-60 bg-blue-400/20 rounded-full blur-3xl"
+          animate={{
+            scale: [1.2, 1, 1.2],
+            opacity: [0.2, 0.1, 0.2],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+        ></motion.div>
+        
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 className="text-4xl font-bold mb-6 text-white">Ready to Start Your Project?</h2>
-          <p className="text-xl text-blue-100 mb-10 leading-relaxed">
-            Let's discuss how we can help you achieve your business goals with our tailored digital solutions.
-          </p>
-          <Link 
-            to="/contact" 
-            className="px-10 py-4 bg-white text-blue-700 font-semibold rounded-md shadow-lg shadow-blue-900/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/40 transition-all duration-300"
+          <motion.h2 
+            className="text-4xl font-bold mb-6 text-white"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
           >
-            Contact Us Today
-          </Link>
+            Ready to Start Your Project?
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-blue-100 mb-10 leading-relaxed"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.7 }}
+            viewport={{ once: true }}
+          >
+            Let's discuss how we can help you achieve your business goals with our tailored digital solutions.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.7 }}
+            viewport={{ once: true }}
+          >
+            <motion.div
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <Link 
+                to="/contact" 
+                className="px-10 py-4 bg-white text-blue-700 font-semibold rounded-md shadow-lg shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-900/40 transition-all duration-300"
+              >
+                Contact Us Today
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Clients Section */}
-      <section className="py-16 px-8 bg-gray-800">
+      <motion.section 
+        className="py-16 px-8 bg-gray-800"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={fadeIn}
+      >
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 inline-block relative">
+          <motion.div 
+            className="text-center mb-12"
+            variants={fadeIn}
+          >
+            <motion.h2 
+              className="text-4xl font-bold mb-4 inline-block relative"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true }}
+            >
               Trusted By
-              <span className="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"></span>
-            </h2>
-            <p className="text-gray-400 max-w-3xl mx-auto mt-4">
+              <motion.span 
+                className="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"
+                initial={{ width: 0 }}
+                whileInView={{ width: "4rem" }}
+                transition={{ delay: 0.2, duration: 0.7 }}
+                viewport={{ once: true }}
+              ></motion.span>
+            </motion.h2>
+            <motion.p 
+              className="text-gray-400 max-w-3xl mx-auto mt-4"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.7 }}
+              viewport={{ once: true }}
+            >
               Join our growing list of satisfied clients from various industries
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
           
-          <div className="flex flex-wrap justify-center items-center gap-12">
+          <motion.div 
+            className="flex flex-wrap justify-center items-center gap-12"
+            variants={staggerContainer}
+          >
             {[1, 2, 3, 4, 5].map((index) => (
-              <div 
+              <motion.div 
                 key={index} 
-                className="h-[70px] flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-110 transition-all duration-300"
+                className="h-[70px] flex items-center justify-center opacity-70 hover:opacity-100 transition-all duration-300"
+                variants={scaleIn}
+                whileHover={{ 
+                  scale: 1.1,
+                  opacity: 1
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 10 }}
               >
                 <img src={`/images/client${index}.png`} alt={`Client Logo ${index}`} className="max-h-full" />
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 };

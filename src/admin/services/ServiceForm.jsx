@@ -28,7 +28,9 @@ import {
   ArrowBack as ArrowBackIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
-  CloudUpload as CloudUploadIcon
+  CloudUpload as CloudUploadIcon,
+  Code as CodeIcon,
+  Info as InfoIcon 
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useFormik } from 'formik';
@@ -72,6 +74,16 @@ const ImagePreview = styled('img')({
   objectFit: 'contain',
   marginTop: 16,
 });
+
+// Material Icon suggestions organized by category
+const materialIconSuggestions = {
+  "Web Development": ["code", "web", "integration_instructions", "developer_mode", "html"],
+  "Design": ["design_services", "palette", "brush", "format_paint", "style"],
+  "Mobile": ["smartphone", "android", "ios_share", "phonelink", "app_shortcut"],
+  "Marketing": ["trending_up", "campaign", "search", "public", "ads_click"],
+  "Infrastructure": ["cloud", "storage", "dns", "security", "memory"],
+  "Business": ["shopping_cart", "store", "payments", "business", "analytics"]
+};
 
 const ServiceForm = () => {
   const { id } = useParams();
@@ -524,6 +536,33 @@ const ServiceForm = () => {
                   helperText="Enter a Material icon name (e.g., 'code', 'web', 'design')"
                   margin="normal"
                 />
+                <Box sx={{ mt: 1, mb: 2 }}>
+                  <Typography variant="caption" display="flex" alignItems="center" color="text.secondary" gutterBottom>
+                    <InfoIcon fontSize="small" sx={{ mr: 0.5 }} /> 
+                    Suggested Material Icon Names:
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
+                    {Object.entries(materialIconSuggestions).map(([category, icons]) => (
+                      <Box key={category} sx={{ mb: 1.5, width: '100%' }}>
+                        <Typography variant="caption" fontWeight="bold" color="primary">
+                          {category}:
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+                          {icons.map(icon => (
+                            <Chip 
+                              key={icon} 
+                              label={icon} 
+                              size="small" 
+                              onClick={() => formik.setFieldValue('icon', icon)} 
+                              color={formik.values.icon === icon ? "primary" : "default"}
+                              sx={{ mb: 0.5, cursor: 'pointer' }}
+                            />
+                          ))}
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
               </Grid>
               
               <Grid item xs={12} md={6}>
@@ -570,12 +609,20 @@ const ServiceForm = () => {
                   helperText={
                     formik.touched.excerpt && formik.errors.excerpt ? 
                     formik.errors.excerpt : 
-                    'A short summary of the service (max 255 characters)'
+                    `A short summary of the service (${formik.values.excerpt?.length || 0}/100 chars recommended, will be truncated on display)`
                   }
                   margin="normal"
                   multiline
                   rows={2}
                 />
+                {formik.values.excerpt?.length > 100 && (
+                  <Alert severity="info" sx={{ mt: 1 }}>
+                    Your excerpt is longer than 100 characters. It will be displayed as: 
+                    <Box component="span" sx={{ fontStyle: 'italic', display: 'block', mt: 1 }}>
+                      "{formik.values.excerpt.substring(0, 100)}..."
+                    </Box>
+                  </Alert>
+                )}
               </Grid>
             </Grid>
           )}
