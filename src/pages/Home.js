@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -22,6 +22,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { motion, useInView, useScroll, useTransform, useAnimation, AnimatePresence } from 'framer-motion';
 import { servicesApi } from '../utility/api'; // Import the services API
+import Lottie from 'lottie-react';
+import axios from 'axios';
 
 // Animation variants for different elements
 const fadeIn = {
@@ -90,11 +92,22 @@ const serviceIconMap = {
   'default': faCode // Default icon if no match
 };
 
+// Lazy load the animation data
+const animationPath = '/animations/Animation-1743907876911.json';
+
 const Home = () => {
   const heroTitleRef = useRef(null);
   const [services, setServices] = useState([]); // State to hold services data
   const [loadingServices, setLoadingServices] = useState(true); // State for loading services status
   const [serviceError, setServiceError] = useState(null); // Error state for services
+  const [currentHeadingIndex, setCurrentHeadingIndex] = useState(0);
+  const headings = [
+    "Transform Your Ideas into Powerful Digital Products",
+    "Building Tomorrow's Digital Solutions Today",
+    "Innovative Web Solutions for Modern Businesses",
+    "Turn Your Vision into Digital Reality",
+    "Custom Software That Drives Business Growth"
+  ];
   
   // Create controls for animations
   const controls = useAnimation();
@@ -276,6 +289,14 @@ const Home = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHeadingIndex((prevIndex) => (prevIndex + 1) % headings.length);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [headings.length]);
+
   // Function to generate service skeleton loaders while loading
   const renderServiceSkeletons = () => {
     return Array(6).fill().map((_, index) => (
@@ -394,67 +415,195 @@ const Home = () => {
     );
   };
 
+  // Hero Animation Component with error handling
+  const HeroAnimation = () => {
+    const [animationData, setAnimationData] = useState(null);
+    const [loadError, setLoadError] = useState(false);
+
+    useEffect(() => {
+      // Try to load the animation data
+      fetch(animationPath)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Animation not found');
+          }
+          return response.json();
+        })
+        .then(data => {
+          setAnimationData(data);
+          setLoadError(false);
+        })
+        .catch(error => {
+          console.error('Error loading animation:', error);
+          setLoadError(true);
+        });
+    }, []);
+
+    if (loadError) {
+      // Fallback to a placeholder or icon if animation can't be loaded
+      return (
+        <div className="w-full h-full flex items-center justify-center text-blue-500">
+          <FontAwesomeIcon 
+            icon={faCode} 
+            className="text-9xl animate-pulse" 
+            style={{ filter: "drop-shadow(0 0 30px rgba(10, 102, 194, 0.5))" }}
+          />
+        </div>
+      );
+    }
+
+    if (!animationData) {
+      // Loading state
+      return (
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      );
+    }
+
+    // Render the animation when data is available
+    return (
+      <Lottie
+        animationData={animationData}
+        loop={true}
+        autoplay={true}
+        className="w-full h-full"
+        style={{ filter: "drop-shadow(0 0 30px rgba(10, 102, 194, 0.5))" }}
+        rendererSettings={{
+          preserveAspectRatio: "xMidYMid slice"
+        }}
+      />
+    );
+  };
+
   // Remove top-level loading check so page content is always visible
   return (
     <div className="w-full bg-gray-900 text-white">
       {/* Hero Section */}
-      <motion.section 
-        className="flex flex-col lg:flex-row items-center justify-between min-h-screen p-8 bg-gradient-to-br from-black/90 to-blue-900/80 relative overflow-hidden"
-        initial="hidden"
-        animate="visible"
-        variants={staggerContainer}
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        className="relative min-h-[90vh] flex items-center overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(10, 102, 194, 0.8))",
+        }}
       >
-        <motion.div 
-          className="absolute top-[-300px] right-[-300px] w-[600px] h-[600px] bg-radial-at-center from-blue-600/30 to-transparent rounded-full z-0"
-          animate={{ 
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.4, 0.3]
-          }}
-          transition={{ 
-            duration: 8, 
-            repeat: Infinity,
-            repeatType: "reverse" 
-          }}
-        ></motion.div>
-        
-        <motion.div className="max-w-2xl z-10" variants={staggerContainer}>
-          <motion.h1 
-            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-500 bg-clip-text text-transparent leading-tight"
-            variants={fadeIn}
-            ref={heroTitleRef}
+        {/* Background decorations */}
+        <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
+          <motion.div
+            className="absolute top-[-300px] right-[-300px] w-[600px] h-[600px] bg-radial-at-center from-blue-600/30 to-transparent rounded-full z-0"
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.4, 0.3]
+            }}
+            transition={{ 
+              duration: 8, 
+              repeat: Infinity,
+              repeatType: "reverse" 
+            }}
+          ></motion.div>
+          <div
+            className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full opacity-20"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(10,102,194,0.8) 0%, rgba(6,69,132,0.3) 70%, rgba(6,69,132,0) 100%)",
+              filter: "blur(60px)",
+            }}
+          ></div>
+          <div
+            className="absolute bottom-[-30%] right-[-15%] w-[60%] h-[60%] rounded-full opacity-10"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(10,102,194,0.8) 0%, rgba(6,69,132,0.3) 70%, rgba(6,69,132,0) 100%)",
+              filter: "blur(80px)",
+            }}
+          ></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10 flex flex-col lg:flex-row items-center">
+          {/* Text Content */}
+          <motion.div 
+            className="lg:w-1/2 text-center lg:text-left mb-12 lg:mb-0"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
           >
-            We Build Digital Experiences That Transform Businesses
-          </motion.h1>
-          
-          <motion.p 
-            className="text-lg text-gray-300 mb-8 leading-relaxed"
-            variants={fadeIn}
-          >
-            DEVIGO is a premier web agency specializing in crafting innovative digital solutions 
-            that drive growth and deliver exceptional user experiences.
-          </motion.p>
-          
-          <motion.div className="flex flex-col sm:flex-row gap-4 w-full" variants={staggerContainer}>
-            <motion.div variants={scaleIn} className="w-full sm:w-auto">
-              <Link to="/contact" className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white font-semibold rounded-md shadow-lg shadow-blue-600/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-300 block text-center">
-                Get Started
-              </Link>
-            </motion.div>
+            <AnimatePresence mode="wait">
+              <motion.h1 
+                key={currentHeadingIndex}
+                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-500 bg-clip-text text-transparent leading-tight whitespace-pre-wrap"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -30 }}
+                transition={{ 
+                  duration: 0.8,
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 15
+                }}
+              >
+                {headings[currentHeadingIndex].split(' ').map((word, index) => (
+                  <motion.span
+                    key={`${currentHeadingIndex}-word-${index}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.2,
+                      delay: 0.1 * index,
+                      ease: "easeOut"
+                    }}
+                    style={{ display: 'inline-block', whiteSpace: 'nowrap', marginRight: '0.3em' }}
+                  >
+                    {word}
+                  </motion.span>
+                ))}
+              </motion.h1>
+            </AnimatePresence>
             
-            <motion.div variants={scaleIn} className="w-full sm:w-auto">
-              <Link to="/services" className="w-full sm:w-auto px-8 py-4 bg-transparent text-white font-semibold rounded-md border border-white/30 hover:bg-white/10 hover:border-white transition-all duration-300 block text-center">
-                Explore Services
-              </Link>
+            <motion.p 
+              className="text-lg md:text-xl text-gray-300 mb-8 max-w-lg mx-auto lg:mx-0"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              We build custom web and mobile applications that bring your vision to life with modern technology and stunning design.
+            </motion.p>
+            <motion.div 
+              className="flex flex-wrap gap-4 justify-center lg:justify-start"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+            >
+              <a href="/contact" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white font-semibold rounded-md shadow-lg shadow-blue-600/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-300">
+                Let's Build Your Project
+              </a>
+              <a href="/services" className="px-8 py-4 bg-transparent text-white font-semibold rounded-md border border-white/30 hover:bg-white/10 hover:border-white transition-all duration-300">
+                View Our Services
+              </a>
             </motion.div>
           </motion.div>
-        </motion.div>
-        
-        <motion.div 
-          className="mt-12 lg:mt-0 z-10"
-          variants={slideUp}
-        >
-          {/* Hero image placeholder */}
-        </motion.div>
+
+          {/* Animation */}
+          <motion.div 
+            className="lg:w-1/2 flex justify-center items-center relative"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            {/* Glow effect behind animation */}
+            <div className="absolute w-full h-full max-w-md max-h-md rounded-full" style={{
+              background: "radial-gradient(circle, rgba(10,102,194,0.3) 0%, rgba(6,69,132,0.1) 50%, rgba(0,0,0,0) 70%)",
+              filter: "blur(40px)",
+              transform: "translate(-50%, -50%)",
+              top: "50%",
+              left: "50%",
+              zIndex: -1
+            }}></div>
+            
+            <HeroAnimation />
+          </motion.div>
+        </div>
       </motion.section>
 
       {/* Feature Cards Section */}

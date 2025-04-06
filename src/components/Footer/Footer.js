@@ -86,12 +86,14 @@ const Footer = () => {
               <h3 className="text-white text-xl font-bold mb-6 pb-2 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-12 after:h-1 after:bg-blue-600 after:rounded-md">Our Services</h3>
               <ul>
                 {[
-                  { to: "/services#web-design", label: "Web Design" },
-                  { to: "/services#web-development", label: "Web Development" },
-                  { to: "/services#mobile-apps", label: "Mobile Apps" },
-                  { to: "/services#seo", label: "SEO Optimization" },
-                  { to: "/services#digital-marketing", label: "Digital Marketing" },
-                  { to: "/services#brand-strategy", label: "Brand Strategy" }
+                  { to: "/services/full-stack-development", label: "Full Stack Development" },
+                  { to: "/services/web-design-development", label: "Web Design & Development" },
+                  { to: "/services/uiux-design", label: "UI/UX Design" },
+                  { to: "/services/website-maintenance-optimization", label: "Website Maintenance & Optimization" },
+                  { to: "/services/custom-software-development", label: "Custom Software Development" },
+                  { to: "/services/mobile-app-development", label: "Mobile App Development" },
+                  { to: "/services/digital-marketing", label: "Digital Marketing" },
+                  { to: "/services/wordpress-development", label: "WordPress Development" }
                 ].map((service, index) => (
                   <li key={index} className="mb-4">
                     <Link to={service.to} className="text-gray-400 hover:text-white flex items-center transform hover:translate-x-1 transition-transform duration-300">
