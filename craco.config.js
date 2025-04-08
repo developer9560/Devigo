@@ -26,9 +26,16 @@ module.exports = {
               reuseExistingChunk: true,
               name(module) {
                 // Get the name. E.g. node_modules/packageName/sub/path
-                const packageName = module.context.match(
+                const match = module.context.match(
                   /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-                )[1];
+                );
+                
+                // If no match found, return a default vendor name
+                if (!match || !match[1]) {
+                  return 'vendor';
+                }
+                
+                const packageName = match[1];
                 // Return meaningful name if it's a major package
                 if (
                   ['react', 'react-dom', 'react-router-dom', 'lottie-react', '@mui'].includes(
