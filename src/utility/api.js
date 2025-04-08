@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // API Configuration
 // Use environment variable or fallback to localhost for development
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://backend-django-pct4.onrender.com/api/v1' || 'http://localhost:8000/api/v1';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://backend-django-pct4.onrender.com/api/v1'|| 'http://localhost:8000/api/v1' || 'http://127.0.0.1:8000/api/v1';
 
 // Log the API base URL to help with debugging (will be removed in production)
 console.log('API is configured with base URL:', API_BASE_URL);
@@ -13,6 +13,14 @@ const USER_DATA_KEY = 'devigo_user_data';
 
 // Create axios instance with default config
 const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Create a separate axios instance for public endpoints that don't require authentication
+const publicApi = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -247,13 +255,15 @@ const inquiriesApi = {
   },
   
   getDetail(endpoint) {
-    return api.get(`/inquiries/${endpoint}`);
+    return api.get(`/inquiries/${endpoint}/`);
   },
   
+  // Use publicApi for creating new inquiries since this is a public endpoint
   create(data) {
-    return api.post('/inquiries/', data);
+    return publicApi.post('/inquiries/', data);
   },
   
+  // Admin-only operations use the authenticated api instance
   update(id, data) {
     return api.put(`/inquiries/${id}/`, data);
   },
@@ -262,25 +272,20 @@ const inquiriesApi = {
     return api.delete(`/inquiries/${id}/`);
   },
   
-  // Custom action methods
   markAsRead(id) {
-    return api.patch(`/inquiries/${id}/mark_read/`, {});
+    return api.post(`/inquiries/${id}/mark-read/`);
   },
   
   markInProgress(id) {
-    return api.patch(`/inquiries/${id}/`, { status: 'in_progress' });
+    return api.post(`/inquiries/${id}/mark-in-progress/`);
   },
   
   markAsResponded(id, responseText) {
-    return api.patch(`/inquiries/${id}/`, { 
-      status: 'responded',
-      is_responded: true,
-      response_text: responseText
-    });
+    return api.post(`/inquiries/${id}/mark-responded/`, { response: responseText });
   },
   
   markAsClosed(id) {
-    return api.patch(`/inquiries/${id}/`, { status: 'closed' });
+    return api.post(`/inquiries/${id}/mark-closed/`);
   }
 };
 

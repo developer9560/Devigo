@@ -1,3 +1,16 @@
 # https://www.robotstxt.org/robotstxt.html
+# Allow all web crawlers (like Googlebot) to access all content
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.devigo.in/sitemap.xml
+Sitemap: https://devigo.in/sitemap.xml
+
+# Disallow crawling of admin or non-relevant pages
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login
+Disallow: /logout
+Disallow: */preview*
+Disallow: */temp*
