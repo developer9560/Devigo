@@ -4,7 +4,6 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://www.devigo.in/sitemap.xml
 Sitemap: https://devigo.in/sitemap.xml
 
 # Disallow crawling of admin or non-relevant pages

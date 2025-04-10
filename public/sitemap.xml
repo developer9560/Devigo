@@ -1,103 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Homepage -->
   <url>
     <loc>https://devigo.in/</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
+    <priority>1</priority>
   </url>
-  
-  <!-- Main Pages -->
   <url>
     <loc>https://devigo.in/about</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>https://devigo.in/services</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
-  
   <url>
     <loc>https://devigo.in/portfolio</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>https://devigo.in/contact</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>https://devigo.in/faq</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-  
-  <!-- Service Pages -->
   <url>
     <loc>https://devigo.in/services/web-development</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>https://devigo.in/services/mobile-app-development</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>https://devigo.in/services/ui-ux-design</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>https://devigo.in/services/digital-marketing</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>https://devigo.in/services/seo-optimization</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  
-  <!-- Portfolio Items -->
   <url>
     <loc>https://devigo.in/portfolio/nexus-marketplace</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>https://devigo.in/portfolio/mediconnect</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>https://devigo.in/portfolio/urban-planner</loc>
-    <lastmod>2023-04-06</lastmod>
+    <lastmod>2025-04-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
