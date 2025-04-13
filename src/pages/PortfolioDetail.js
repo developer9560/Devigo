@@ -1127,13 +1127,13 @@ const PortfolioDetail = () => {
               }}
             />
             <HeroContent>
-              <BreadcrumbsContainer>
+              {/* <BreadcrumbsContainer>
                 <BreadcrumbLink to="/">Home</BreadcrumbLink>
                 <span> / </span>
                 <BreadcrumbLink to="/portfolio">Portfolio</BreadcrumbLink>
                 <span> / </span>
                 <BreadcrumbCurrent>{project.title}</BreadcrumbCurrent>
-              </BreadcrumbsContainer>
+              </BreadcrumbsContainer> */}
 
               <HeroTitle>{project.title}</HeroTitle>
               <HeroSubtitle>{project.short_description || project.description?.substring(0, 120)}</HeroSubtitle>
