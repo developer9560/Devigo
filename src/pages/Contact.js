@@ -820,13 +820,13 @@ const Contact = () => {
               <SocialIcon href="#" aria-label="Twitter">
                 <FontAwesomeIcon icon={faTwitter} />
               </SocialIcon>
-              <SocialIcon href="#" aria-label="LinkedIn">
+              <SocialIcon href="https://www.linkedin.com/company/devigoagency/" aria-label="LinkedIn">
                 <FontAwesomeIcon icon={faLinkedinIn} />
               </SocialIcon>
               <SocialIcon href="#" aria-label="Facebook">
                 <FontAwesomeIcon icon={faFacebookF} />
               </SocialIcon>
-              <SocialIcon href="#" aria-label="Instagram">
+              <SocialIcon href="https://www.instagram.com/devigo.in/" aria-label="Instagram">
                 <FontAwesomeIcon icon={faInstagram} />
               </SocialIcon>
             </SocialIcons>

@@ -42,8 +42,8 @@ const Footer = () => {
                 {[
                   { icon: faFacebookF, href: "https://facebook.com" },
                   { icon: faTwitter, href: "https://twitter.com" },
-                  { icon: faInstagram, href: "https://instagram.com" },
-                  { icon: faLinkedinIn, href: "https://linkedin.com" },
+                  { icon: faInstagram, href: "https://www.instagram.com/devigo.in/" },
+                  { icon: faLinkedinIn, href: "https://www.linkedin.com/company/devigoagency/" },
                   { icon: faGithub, href: "https://github.com" }
                 ].map((social, index) => (
                   <a 

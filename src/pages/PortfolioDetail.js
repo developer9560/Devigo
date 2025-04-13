@@ -2,12 +2,12 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faArrowLeft, 
-  faLink, 
-  faCalendarAlt, 
-  faBuilding, 
-  faUsers, 
+import {
+  faArrowLeft,
+  faLink,
+  faCalendarAlt,
+  faBuilding,
+  faUsers,
   faCode,
   faChevronLeft,
   faChevronRight,
@@ -19,7 +19,7 @@ import {
   faTrophy,
   faEnvelope
 } from '@fortawesome/free-solid-svg-icons';
-import { 
+import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, Legend
 } from 'recharts';
@@ -76,12 +76,14 @@ const DetailPageContainer = styled.div`
   background-color: #121212;
   color: #fff;
   overflow-x: hidden; /* Prevent horizontal scrollbar */
-  padding-top: 60px; /* Reduce padding to remove extra space */
+  padding-top: 50px; /* Reduce padding to remove extra space */
+  height: 100%;
 `;
 
 const HeroSection = styled.section`
   position: relative;
-  height: 50vh; /* Reduce height to remove empty space */
+  height: 100%; /* Reduce height to remove empty space */
+  background-color: #0A66C2;
   min-height: 400px; /* Decrease minimum height */
   overflow: hidden;
   margin-top: 0; /* Remove top margin */
@@ -999,7 +1001,7 @@ const StatusBadge = styled.span`
   font-size: 0.9rem;
   font-weight: 600;
   background-color: ${props => {
-    switch(props.status) {
+    switch (props.status) {
       case 'completed': return 'rgba(46, 204, 113, 0.2)';
       case 'in_progress': return 'rgba(52, 152, 219, 0.2)';
       case 'planning': return 'rgba(241, 196, 15, 0.2)';
@@ -1008,7 +1010,7 @@ const StatusBadge = styled.span`
     }
   }};
   color: ${props => {
-    switch(props.status) {
+    switch (props.status) {
       case 'completed': return '#2ecc71';
       case 'in_progress': return '#3498db';
       case 'planning': return '#f1c40f';
@@ -1059,10 +1061,10 @@ const PortfolioDetail = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // API base URL - same as in projectService.js
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
-  
+
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
@@ -1070,7 +1072,7 @@ const PortfolioDetail = () => {
         console.log(`Fetching project with ID: ${id}`);
         const response = await axios.get(`${API_BASE_URL}/projects/${id}`);
         console.log('Project data from API:', response.data);
-        
+
         // Handle different response formats
         let projectData;
         if (response.data && typeof response.data === 'object') {
@@ -1078,33 +1080,33 @@ const PortfolioDetail = () => {
         } else {
           throw new Error('Invalid project data format received');
         }
-        
+
         setProject(projectData);
-      setLoading(false);
+        setLoading(false);
       } catch (err) {
         console.error('Error fetching project details:', err);
         setError('Failed to load project details. Please try again later.');
         setLoading(false);
       }
     };
-    
+
     if (id) {
       fetchProjectDetails();
     }
   }, [id, API_BASE_URL]);
-  
+
   const handleGoBack = () => {
     navigate('/portfolio');
   };
-  
+
   if (loading) {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#121212', color: 'white' }}>Loading...</div>;
   }
-  
+
   if (!project) {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#121212', color: 'white' }}>Project not found</div>;
   }
-  
+
   return (
     <DetailPageContainer>
       {loading ? (
@@ -1117,14 +1119,14 @@ const PortfolioDetail = () => {
         </div>
       ) : project ? (
         <>
-      <HeroSection>
-            <HeroBackground 
-              style={{ 
+          <HeroSection>
+            <HeroBackground
+              style={{
                 backgroundImage: `url(${project.image_url || project.image})`,
                 opacity: 0.2
-              }} 
+              }}
             />
-        <HeroContent>
+            <HeroContent>
               <BreadcrumbsContainer>
                 <BreadcrumbLink to="/">Home</BreadcrumbLink>
                 <span> / </span>
@@ -1132,10 +1134,10 @@ const PortfolioDetail = () => {
                 <span> / </span>
                 <BreadcrumbCurrent>{project.title}</BreadcrumbCurrent>
               </BreadcrumbsContainer>
-              
+
               <HeroTitle>{project.title}</HeroTitle>
               <HeroSubtitle>{project.short_description || project.description?.substring(0, 120)}</HeroSubtitle>
-              
+
               <MetadataContainer>
                 <MetadataItem>
                   <MetadataLabel>Client</MetadataLabel>
@@ -1154,47 +1156,47 @@ const PortfolioDetail = () => {
                   <MetadataValue>{project.completion_date || new Date().getFullYear()}</MetadataValue>
                 </MetadataItem>
               </MetadataContainer>
-        </HeroContent>
-      </HeroSection>
-      
+            </HeroContent>
+          </HeroSection>
+
           <DetailContent>
             <MainImageContainer>
-              <MainImage 
-                src={project.image_url || project.image} 
+              <MainImage
+                src={project.image_url || project.image}
                 alt={project.title}
               />
             </MainImageContainer>
-            
+
             <SectionWithPadding>
               <SectionTitle>Overview</SectionTitle>
               <Description>{project.description}</Description>
-              
+
               <MetadataContainer style={{ marginTop: '2rem' }}>
                 <MetadataItem>
                   <MetadataLabel>Status</MetadataLabel>
                   <MetadataValue>
                     <StatusBadge status={project.status || 'completed'}>
-                      {project.status === 'in_progress' ? 'In Progress' : 
-                       project.status === 'planning' ? 'Planning' :
-                       project.status === 'archived' ? 'Archived' : 'Completed'}
+                      {project.status === 'in_progress' ? 'In Progress' :
+                        project.status === 'planning' ? 'Planning' :
+                          project.status === 'archived' ? 'Archived' : 'Completed'}
                     </StatusBadge>
                   </MetadataValue>
                 </MetadataItem>
-                
+
                 {project.start_date && (
                   <MetadataItem>
                     <MetadataLabel>Started</MetadataLabel>
                     <MetadataValue>{new Date(project.start_date).toLocaleDateString()}</MetadataValue>
                   </MetadataItem>
                 )}
-                
+
                 {project.completion_date && (
                   <MetadataItem>
                     <MetadataLabel>Completed</MetadataLabel>
                     <MetadataValue>{new Date(project.completion_date).toLocaleDateString()}</MetadataValue>
                   </MetadataItem>
                 )}
-                
+
                 {project.team_size && (
                   <MetadataItem>
                     <MetadataLabel>Team Size</MetadataLabel>
@@ -1202,7 +1204,7 @@ const PortfolioDetail = () => {
                   </MetadataItem>
                 )}
               </MetadataContainer>
-              
+
               {project.website_url && (
                 <div style={{ marginTop: '1.5rem' }}>
                   <CTAButton href={project.website_url} target="_blank" rel="noopener noreferrer">
@@ -1210,20 +1212,20 @@ const PortfolioDetail = () => {
                   </CTAButton>
                 </div>
               )}
-              
+
               <TechnologySection>
                 <SectionSubtitle>Technologies & Tools Used</SectionSubtitle>
                 <TechList>
-                  {project.technologies && typeof project.technologies === 'object' && !Array.isArray(project.technologies) ? 
+                  {project.technologies && typeof project.technologies === 'object' && !Array.isArray(project.technologies) ?
                     Object.keys(project.technologies).map((tech, index) => (
                       <TechItem key={index}>{tech}</TechItem>
                     ))
-                    : 
+                    :
                     Array.isArray(project.technologies) && project.technologies.map((tech, index) => (
                       <TechItem key={index}>{typeof tech === 'object' ? tech.name : tech}</TechItem>
                     ))}
                 </TechList>
-                
+
                 {project.services && project.services.length > 0 && (
                   <>
                     <SectionSubtitle style={{ marginTop: '1.5rem' }}>Services Provided</SectionSubtitle>
@@ -1238,29 +1240,29 @@ const PortfolioDetail = () => {
                 )}
               </TechnologySection>
             </SectionWithPadding>
-            
+
             {/* Challenge and Solution Section */}
             {(project.challenge_description || (project.challenges && project.challenges.length > 0)) && (
               <SectionWithPadding style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
                 <SectionTitle>Challenge</SectionTitle>
                 <Description>
-                  {project.challenge_description || 
-                    (typeof project.challenges === 'string' ? project.challenges : 
-                      project.challenges && project.challenges.length > 0 ? 
-                        typeof project.challenges[0] === 'object' ? 
-                          project.challenges[0].description : project.challenges[0] 
+                  {project.challenge_description ||
+                    (typeof project.challenges === 'string' ? project.challenges :
+                      project.challenges && project.challenges.length > 0 ?
+                        typeof project.challenges[0] === 'object' ?
+                          project.challenges[0].description : project.challenges[0]
                         : 'No challenge description available')}
                 </Description>
               </SectionWithPadding>
             )}
-            
+
             {project.solution_description && (
               <SectionWithPadding>
                 <SectionTitle>Our Approach & Solution</SectionTitle>
                 <Description>{project.solution_description}</Description>
               </SectionWithPadding>
             )}
-            
+
             {project.challenges && project.challenges.length > 0 && (
               <SectionWithPadding bgColor="#f7f9fc">
                 <SectionTitle>Challenges</SectionTitle>
@@ -1286,7 +1288,7 @@ const PortfolioDetail = () => {
                 )}
               </SectionWithPadding>
             )}
-            
+
             {project.approach && (
               <SectionWithPadding>
                 <SectionTitle>Our Approach</SectionTitle>
@@ -1311,60 +1313,60 @@ const PortfolioDetail = () => {
                 ) : null}
               </SectionWithPadding>
             )}
-            
+
             {project.gallery && project.gallery.length > 0 && (
               <SectionWithPadding bgColor="#f7f9fc">
                 <SectionTitle>Gallery</SectionTitle>
-        <GalleryGrid>
+                <GalleryGrid>
                   {project.gallery.map((galleryItem, index) => {
-                    const imgSrc = typeof galleryItem === 'object' ? 
-                      (galleryItem.image_url || galleryItem.url || galleryItem.src) : 
+                    const imgSrc = typeof galleryItem === 'object' ?
+                      (galleryItem.image_url || galleryItem.url || galleryItem.src) :
                       galleryItem;
-                    
+
                     return (
                       <GalleryItem key={index}>
-                        <GalleryImage 
-                          src={imgSrc} 
+                        <GalleryImage
+                          src={imgSrc}
                           alt={`Project gallery ${index + 1}`}
-              />
-            </GalleryItem>
+                        />
+                      </GalleryItem>
                     );
                   })}
-        </GalleryGrid>
+                </GalleryGrid>
               </SectionWithPadding>
             )}
-      
+
             {project.results && (project.results.length > 0 || typeof project.results === 'string') && (
               <SectionWithPadding>
-        <SectionTitle>Results & Impact</SectionTitle>
+                <SectionTitle>Results & Impact</SectionTitle>
                 {typeof project.results === 'string' ? (
                   <Description>{project.results}</Description>
                 ) : (
                   <ResultsContainer>
-              {project.results.map((result, index) => (
+                    {project.results.map((result, index) => (
                       <ResultItem key={index}>
                         <ResultIcon>
                           <FontAwesomeIcon icon={
-                            index === 0 ? faTrophy : 
-                            index === 1 ? faChartLine : 
-                            index === 2 ? faUsers : faLightbulb
+                            index === 0 ? faTrophy :
+                              index === 1 ? faChartLine :
+                                index === 2 ? faUsers : faLightbulb
                           } />
                         </ResultIcon>
-                  <div>
+                        <div>
                           <ResultTitle>
                             {typeof result === 'object' ? result.title : `Result ${index + 1}`}
                           </ResultTitle>
                           <ResultDescription>
                             {typeof result === 'object' ? result.description : result}
                           </ResultDescription>
-                  </div>
+                        </div>
                       </ResultItem>
                     ))}
                   </ResultsContainer>
                 )}
               </SectionWithPadding>
             )}
-            
+
             {/* Testimonial Section */}
             {project.testimonial_quote && (
               <SectionWithPadding style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
@@ -1374,12 +1376,12 @@ const PortfolioDetail = () => {
                     <FontAwesomeIcon icon={faQuoteLeft} />
                   </TestimonialQuoteMark>
                   <TestimonialText>"{project.testimonial_quote}"</TestimonialText>
-                  
+
                   <TestimonialInfo>
                     {project.testimonial_image_url && (
-                      <TestimonialImage 
-                        src={project.testimonial_image_url} 
-                        alt={project.testimonial_author || 'Client'} 
+                      <TestimonialImage
+                        src={project.testimonial_image_url}
+                        alt={project.testimonial_author || 'Client'}
                       />
                     )}
                     <TestimonialAuthorInfo>
@@ -1396,30 +1398,30 @@ const PortfolioDetail = () => {
                 </TestimonialContainer>
               </SectionWithPadding>
             )}
-      
-      <CTASection>
+
+            <CTASection>
               <CTAContent>
                 <CTATitle>Interested in a similar solution?</CTATitle>
                 <CTADescription>
                   Let's discuss how we can help you achieve your business goals with a custom technology solution.
                 </CTADescription>
-        <CTAButtons>
+                <CTAButtons>
                   <CTAButton primary to="/contact">Contact Us</CTAButton>
                   {project.project_url && (
                     <CTAButton href={project.project_url} target="_blank" rel="noopener noreferrer">
                       Visit Live Project
-          </CTAButton>
+                    </CTAButton>
                   )}
-        </CTAButtons>
+                </CTAButtons>
               </CTAContent>
-      </CTASection>
-            
+            </CTASection>
+
             <SectionWithPadding>
               <SectionTitle>More Projects</SectionTitle>
               <RelatedProjects />
             </SectionWithPadding>
           </DetailContent>
-          
+
           {/* CTA Section */}
           <SectionWithPadding style={{ textAlign: 'center', backgroundColor: 'rgba(10, 102, 194, 0.1)' }}>
             <SectionTitle>Interested in a similar solution?</SectionTitle>

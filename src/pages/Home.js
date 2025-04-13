@@ -41,6 +41,26 @@ const fadeIn = {
   }
 };
 
+// Add CSS style preloading to avoid blinking
+const preloadStyles = `
+  /* Optimize loading of process steps */
+  #process-line-fill {
+    width: 0;
+    transition: width 1.5s ease-out;
+  }
+  
+  /* Use passive IntersectionObserver for better scroll performance */
+  .process-icon {
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  /* Optimize animation performance with hardware acceleration */
+  .animation-container {
+    transform: translateZ(0);
+    will-change: opacity;
+  }
+`;
+
 const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
@@ -118,6 +138,19 @@ const Home = () => {
   const [projects, setProjects] = useState([]); // State to hold projects data
   const [loadingProjects, setLoadingProjects] = useState(true); // State for loading projects status
   const [projectError, setProjectError] = useState(null); // Error state for projects
+
+  // Inject performance optimization styles
+  useEffect(() => {
+    // Create style element
+    const style = document.createElement('style');
+    style.innerHTML = preloadStyles;
+    document.head.appendChild(style);
+    
+    // Cleanup
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   // Testimonials data
   const testimonials = [
@@ -504,64 +537,107 @@ const Home = () => {
     );
   };
 
-  // Hero Animation Component with error handling
+  // Optimized Hero Animation Component with proper loading, caching and error handling
   const HeroAnimation = () => {
     const [animationData, setAnimationData] = useState(null);
-    const [loadError, setLoadError] = useState(false);
-
+    const [isLoaded, setIsLoaded] = useState(false);
+    const containerRef = useRef(null);
+    const animationRef = useRef(null);
+    
+    // Preload animation data on component mount
     useEffect(() => {
-      // Try to load the animation data
-      fetch(animationPath)
+      let isMounted = true;
+      
+      // Try to get cached animation first
+      const cachedAnimation = localStorage.getItem('devigo-hero-animation');
+      if (cachedAnimation) {
+        try {
+          const parsedAnimation = JSON.parse(cachedAnimation);
+          if (parsedAnimation && isMounted) {
+            setAnimationData(parsedAnimation);
+            setIsLoaded(true);
+          }
+        } catch (e) {
+          console.log('Could not parse cached animation');
+        }
+      }
+      
+      // Always fetch fresh animation data
+      const controller = new AbortController();
+      const signal = controller.signal;
+      
+      fetch(animationPath, { signal })
         .then(response => {
           if (!response.ok) {
-            throw new Error('Animation not found');
+            throw new Error('Failed to load animation');
           }
           return response.json();
         })
         .then(data => {
-          setAnimationData(data);
-          setLoadError(false);
+          if (isMounted) {
+            setAnimationData(data);
+            setIsLoaded(true);
+            
+            // Cache animation for faster loads
+            try {
+              localStorage.setItem('devigo-hero-animation', JSON.stringify(data));
+            } catch (e) {
+              console.log('Could not cache animation data');
+            }
+          }
         })
         .catch(error => {
-          console.error('Error loading animation:', error);
-          setLoadError(true);
+          if (error.name !== 'AbortError') {
+            console.error('Error loading animation:', error);
+          }
         });
+        
+      return () => {
+        isMounted = false;
+        controller.abort();
+      };
     }, []);
-
-    if (loadError) {
-      // Fallback to a placeholder or icon if animation can't be loaded
-      return (
-        <div className="w-full h-full flex items-center justify-center text-blue-500">
-          <FontAwesomeIcon 
-            icon={faCode} 
-            className="text-9xl animate-pulse" 
-            style={{ filter: "drop-shadow(0 0 30px rgba(10, 102, 194, 0.5))" }}
-          />
-          </div>
-      );
-    }
-
-    if (!animationData) {
-      // Loading state
-      return (
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      );
-    }
-
-    // Render the animation when data is available
+    
+    // Ensure consistent DOM structure to prevent layout shifts
     return (
-      <Lottie
-        animationData={animationData}
-        loop={true}
-        autoplay={true}
-        className="w-full h-full"
-        style={{ filter: "drop-shadow(0 0 30px rgba(10, 102, 194, 0.5))" }}
-        rendererSettings={{
-          preserveAspectRatio: "xMidYMid slice"
-        }}
-      />
+      <div ref={containerRef} className="w-full h-full relative">
+        {/* Always render the Lottie component with controlled visibility */}
+        {animationData && (
+          <Lottie
+            lottieRef={animationRef}
+            animationData={animationData}
+            loop={true}
+            autoplay={true}
+            className="w-full h-full"
+            style={{ 
+              filter: "drop-shadow(0 0 30px rgba(10, 102, 194, 0.5))",
+              opacity: isLoaded ? 1 : 0,
+              transition: 'opacity 0.3s ease-in'
+            }}
+            rendererSettings={{
+              preserveAspectRatio: "xMidYMid slice"
+            }}
+            onDOMLoaded={() => {
+              // This ensures the animation is displayed only when fully loaded
+              setIsLoaded(true);
+            }}
+          />
+        )}
+        
+        {/* Static placeholder shown only while loading */}
+        {!isLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-32 h-32 flex items-center justify-center relative">
+              <div className="absolute w-20 h-20 border-2 border-white transform rotate-45"></div>
+              <FontAwesomeIcon 
+                icon={faCode} 
+                className="text-6xl text-blue-500" 
+                style={{ filter: "drop-shadow(0 0 20px rgba(10, 102, 194, 0.5))" }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -778,7 +854,7 @@ const Home = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
-          className="relative min-h-[90vh] flex items-center overflow-hidden"
+          className="relative min-h-[90vh] flex items-center overflow-hidden animation-container"
           style={{
             background: "linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(10, 102, 194, 0.8))",
           }}
@@ -879,12 +955,7 @@ const Home = () => {
             </motion.div>
 
             {/* Animation */}
-            <motion.div 
-              className="lg:w-1/2 flex justify-center items-center relative"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-            >
+            <div className="lg:w-1/2 flex justify-center items-center relative">
               {/* Glow effect behind animation */}
               <div className="absolute w-full h-full max-w-md max-h-md rounded-full" style={{
                 background: "radial-gradient(circle, rgba(10,102,194,0.3) 0%, rgba(6,69,132,0.1) 50%, rgba(0,0,0,0) 70%)",
@@ -896,7 +967,7 @@ const Home = () => {
               }}></div>
               
               <HeroAnimation />
-            </motion.div>
+            </div>
         </div>
         </motion.section>
 
@@ -1075,7 +1146,7 @@ const Home = () => {
                     delay: 0.1 * index,
                     duration: 1 
                   }}
-              >
+                >
                 {stat.value === 98 ? '98%' : stat.value === 24 ? '24/7' : stat.value}
                 </motion.h2>
                 <motion.p 
