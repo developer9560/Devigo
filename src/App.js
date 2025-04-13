@@ -10,6 +10,7 @@ import Footer from './components/Footer/Footer';
 
 // Admin Context & Components
 import { AuthProvider } from './admin/context/AuthContext';
+import { ServicesProvider } from './admin/context/ServicesContext';
 import ProtectedRoute from './admin/components/ProtectedRoute';
 import AdminLayout from './admin/layouts/AdminLayout';
 
@@ -35,11 +36,18 @@ const ResetPassword = lazy(() => import('./admin/pages/auth/ResetPassword'));
 // Admin Pages with lazy loading
 const Dashboard = lazy(() => import('./admin/pages/Dashboard'));
 const TeamList = lazy(() => import('./admin/pages/team/TeamList'));
+const TeamMembersList = lazy(() => import('./admin/pages/team/TeamMembersList'));
+const TeamMemberForm = lazy(() => import('./admin/pages/team/TeamMemberForm'));
 const InquiriesList = lazy(() => import('./admin/pages/inquiries/InquiriesList'));
+const ProjectList = lazy(()=>import('./admin/pages/projects/ProjectsList'))
 
 // Admin Services Pages with lazy loading
 const ServicesList = lazy(() => import('./admin/services/ServicesList'));
 const ServiceForm = lazy(() => import('./admin/services/ServiceForm'));
+
+// Admin Projects Pages with lazy loading
+const ProjectsList = lazy(() => import('./admin/pages/projects/ProjectsList'));
+const ProjectForm = lazy(() => import('./admin/pages/projects/ProjectForm'));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -144,10 +152,20 @@ const App = () => {
                       </Suspense>
                     } />
                     
-                    {/* Team routes - partial implementation */}
+                    {/* Team routes */}
                     <Route path="team" element={
                       <Suspense fallback={<LoadingFallback />}>
-                        <TeamList />
+                        <TeamMembersList />
+                      </Suspense>
+                    } />
+                    <Route path="team/new" element={
+                      <Suspense fallback={<LoadingFallback />}>
+                        <TeamMemberForm />
+                      </Suspense>
+                    } />
+                    <Route path="team/:id" element={
+                      <Suspense fallback={<LoadingFallback />}>
+                        <TeamMemberForm />
                       </Suspense>
                     } />
                     
@@ -172,6 +190,27 @@ const App = () => {
                     <Route path="services/:id" element={
                       <Suspense fallback={<LoadingFallback />}>
                         <ServiceForm />
+                      </Suspense>
+                    } />
+
+                    {/* Projects management */}
+                    <Route path="projects" element={
+                      <Suspense fallback={<LoadingFallback />}>
+                        <ProjectsList />
+                      </Suspense>
+                    } />
+                    <Route path="projects/create" element={
+                      <Suspense fallback={<LoadingFallback />}>
+                        <ServicesProvider>
+                          <ProjectForm />
+                        </ServicesProvider>
+                      </Suspense>
+                    } />
+                    <Route path="projects/edit/:id" element={
+                      <Suspense fallback={<LoadingFallback />}>
+                        <ServicesProvider>
+                          <ProjectForm />
+                        </ServicesProvider>
                       </Suspense>
                     } />
                   </Route>

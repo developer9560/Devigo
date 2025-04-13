@@ -115,36 +115,9 @@ const Home = () => {
   // Create controls for animations
   const controls = useAnimation();
   
-  // Projects data
-  const projects = [
-    {
-      id: 1,
-      title: "Nexus Marketplace",
-      type: "E-commerce",
-      description: "A comprehensive e-commerce platform with advanced filtering and payment gateways.",
-      image: projectImages.e_commerce || projectImages.fallback,
-      result: "+200% Sales",
-      link: "/images/e-commerce.jpg"
-    },
-    {
-      id: 2,
-      title: "MediConnect",
-      type: "Healthcare",
-      description: "A telemedicine platform connecting patients with healthcare providers remotely.",
-      image: projectImages.healthcare || projectImages.fallback,
-      result: "5000+ Users",
-      link: "/images/health.jpg"
-    },
-    {
-      id: 3,
-      title: "Urban Planner",
-      type: "Real Estate",
-      description: "Interactive property listing and urban planning visualization tools for developers.",
-      image: projectImages.real_estate || projectImages.fallback,
-      result: "10+ Lakhs",
-      link: "/images/real-state.jpg"
-    }
-  ];
+  const [projects, setProjects] = useState([]); // State to hold projects data
+  const [loadingProjects, setLoadingProjects] = useState(true); // State for loading projects status
+  const [projectError, setProjectError] = useState(null); // Error state for projects
 
   // Testimonials data
   const testimonials = [
@@ -182,6 +155,65 @@ const Home = () => {
     { value: 24, label: "Support Available" }
   ];
 
+  const clientlogo =[
+    {
+      id: 1,
+      image: "/clientsImage/client1.jpg",
+      link: "https://www.google.com"
+    },
+    {
+      id: 2,
+      image: "/clientsImage/client2.jpg",
+      link: "https://www.google.com"
+    },
+    {
+      id: 3,  
+      image: "/clientsImage/client3.jpg",
+      link: "https://www.google.com"
+    },
+    {
+      id: 4,
+      image: "/clientsImage/client4.avif",
+      link: "https://www.google.com"  
+    },
+    {
+      id: 5,
+      image: "/clientsImage/client5.jpg",
+      link: "https://www.google.com"
+    }
+  ]
+
+  // API base URL - using same URL as the projectService.js
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://backend-django-pct4.onrender.com/api/v1' || 'http://localhost:8000/api/v1' || 'http://127.0.0.1:8000/api/v1';
+  
+  // Fallback projects in case API fails
+  const fallbackProjects = [
+    {
+      id: 1,
+      title: "Nexus Marketplace",
+      type: "E-commerce",
+      description: "A comprehensive e-commerce platform with advanced filtering and payment gateways.",
+      image: projectImages.e_commerce || projectImages.fallback,
+      link: "/portfolio/nexus-marketplace"
+    },
+    {
+      id: 2,
+      title: "MediConnect",
+      type: "Healthcare",
+      description: "A telemedicine platform connecting patients with healthcare providers remotely.",
+      image: projectImages.healthcare || projectImages.fallback,
+      link: "/portfolio/mediconnect"
+    },
+    {
+      id: 3,
+      title: "Urban Planner",
+      type: "Real Estate",
+      description: "Interactive property listing and urban planning visualization tools for developers.",
+      image: projectImages.real_estate || projectImages.fallback,
+      link: "/portfolio/urban-planner"
+    }
+  ];
+
   useEffect(() => {
     // Start animations when component mounts
     controls.start("visible");
@@ -209,8 +241,62 @@ const Home = () => {
       }
     };
 
+    const fetchProjects = async () => {
+      try {
+        setLoadingProjects(true);
+        setProjectError(null); // Reset error state
+        console.log('Fetching featured projects from:', `${API_BASE_URL}/projects/?featured=true&limit=3`);
+        
+        const response = await axios.get(`${API_BASE_URL}/projects/?featured=true&limit=3`);
+        console.log('Featured projects API response:', response.data);
+        
+        let fetchedProjects = [];
+        
+        // Handle different response formats
+        if (Array.isArray(response.data)) {
+          fetchedProjects = response.data;
+        } else if (response.data && typeof response.data === 'object') {
+          fetchedProjects = response.data.results || response.data.projects || response.data.data || [];
+        }
+        
+        if (fetchedProjects.length > 0) {
+          // Format projects to match the expected format
+          const formattedProjects = fetchedProjects.map(project => {
+            // Determine project type from category or industry
+            let type = project.category || project.industry || "Web Development";
+            
+            // Capitalize the type
+            type = type.charAt(0).toUpperCase() + type.slice(1);
+            
+            return {
+              id: project._id || project.id,
+              title: project.title,
+              type: type,
+              description: project.description || project.excerpt || "A comprehensive solution designed for exceptional results.",
+              image: project.image_url || project.image || projectImages.fallback,
+              link: `/portfolio/${project._id || project.id}`
+            };
+          });
+          
+          console.log('Formatted projects:', formattedProjects);
+          setProjects(formattedProjects);
+        } else {
+          console.log('No projects found, using fallback projects');
+          setProjects(fallbackProjects);
+        }
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+        console.log('Using fallback projects due to error');
+        setProjectError('Error fetching projects. Using default showcase.');
+        setProjects(fallbackProjects);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+
     fetchServices();
-  }, [controls]);
+    fetchProjects();
+  }, [controls, API_BASE_URL]);
 
   useEffect(() => {
     // Initialize process section as soon as component mounts
@@ -530,6 +616,150 @@ const Home = () => {
     }
   };
 
+  // Render projects content with appropriate loading/error states
+  const renderProjectsContent = () => {
+    if (loadingProjects) {
+      return (
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          {Array(3).fill().map((_, index) => (
+            <motion.div 
+              key={`skeleton-${index}`} 
+              className="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700/50"
+              variants={scaleIn}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: index * 0.1 }}
+            >
+              <div className="h-64 bg-gray-700 animate-pulse"></div>
+              <div className="p-6">
+                <div className="h-4 w-24 bg-gray-700 rounded animate-pulse mb-2"></div>
+                <div className="h-6 w-3/4 bg-gray-700 rounded animate-pulse mb-3"></div>
+                <div className="h-4 w-full bg-gray-700 rounded animate-pulse mb-2"></div>
+                <div className="h-4 w-5/6 bg-gray-700 rounded animate-pulse mb-4"></div>
+                <div className="h-5 w-32 bg-gray-700 rounded animate-pulse"></div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      );
+    }
+
+    if (projectError && projects.length === 0) {
+      return (
+        <motion.div 
+          className="bg-red-900/20 border border-red-700/50 rounded-lg p-8 text-center max-w-3xl mx-auto"
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible"
+        >
+          <FontAwesomeIcon icon={faExclamationTriangle} className="text-3xl text-red-500 mb-3" />
+          <h3 className="text-xl font-bold mb-2 text-white">Projects Error</h3>
+          <p className="text-gray-400 mb-6">{projectError}</p>
+          <motion.button 
+            onClick={() => window.location.reload()} 
+            className="px-6 py-2 bg-red-700/30 hover:bg-red-700/50 text-white rounded-md transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Retry
+          </motion.button>
+        </motion.div>
+      );
+    }
+
+    return (
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+      >
+        {projects.map((project, index) => (
+          <motion.div 
+            key={project.id} 
+            className="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700/50 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-300"
+            variants={scaleIn}
+            whileHover={{ 
+              y: -10,
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          >
+            <motion.div 
+              className="h-64 bg-cover bg-center relative overflow-hidden" 
+              style={{ 
+                backgroundImage: `url(${project.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundColor: '#1f2937' // Fallback color
+              }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/70 flex items-end p-6">
+                {/* Result badge removed as requested */}
+              </div>
+            </motion.div>
+            
+            <div className="p-6">
+              <motion.span 
+                className="inline-block bg-blue-600/10 text-blue-500 px-3 py-1 rounded-full text-xs mb-2"
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 + index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                {project.type}
+              </motion.span>
+              <motion.h3 
+                className="text-xl font-bold mb-2 text-white"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.4 + index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                {project.title}
+              </motion.h3>
+              <motion.p 
+                className="text-gray-400 mb-4 leading-relaxed"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.5 + index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                {project.description}
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.6 + index * 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ x: 5 }}
+              >
+                <Link 
+                  to={project.link} 
+                  className="text-blue-500 font-semibold flex items-center group hover:text-blue-400 transition-colors duration-300"
+                >
+                  View All Detail 
+                  <FontAwesomeIcon 
+                    icon={faLongArrowAltRight} 
+                    className="ml-2 group-hover:translate-x-1 transition-transform duration-300" 
+                  />
+            </Link>
+              </motion.div>
+          </div>
+          </motion.div>
+        ))}
+      </motion.div>
+    );
+  };
+
   // Remove top-level loading check so page content is always visible
   return (
     <>
@@ -584,7 +814,7 @@ const Home = () => {
               }}
             ></div>
         </div>
-
+        
           <div className="container mx-auto px-4 relative z-10 flex flex-col lg:flex-row items-center">
             {/* Text Content */}
             <motion.div 
@@ -667,7 +897,7 @@ const Home = () => {
               
               <HeroAnimation />
             </motion.div>
-          </div>
+        </div>
         </motion.section>
 
       {/* Feature Cards Section */}
@@ -981,7 +1211,7 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7 }}
-                viewport={{ once: true, amount: 0.8 }}
+                viewport={{ once: true }}
               >
               Featured Projects
                 <motion.span 
@@ -1003,98 +1233,7 @@ const Home = () => {
               </motion.p>
             </motion.div>
             
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.1 }}
-            >
-              {projects.map((project, index) => (
-                <motion.div 
-                key={project.id} 
-                  className="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700/50 hover:shadow-xl hover:shadow-blue-900/20 transition-all duration-300"
-                  variants={scaleIn}
-                  whileHover={{ 
-                    y: -10,
-                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                >
-                  <motion.div 
-                    className="h-64 bg-cover bg-center relative overflow-hidden" 
-                    style={{ 
-                      backgroundImage: `url(${project.image})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      backgroundColor: '#1f2937' // Fallback color
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/70 flex items-end p-6">
-                      <motion.span 
-                        className="bg-blue-600 text-white px-4 py-1 rounded-md text-sm font-semibold"
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 + index * 0.1 }}
-                        viewport={{ once: true }}
-                      >
-                      {project.result}
-                      </motion.span>
-                  </div>
-                  </motion.div>
-                
-                <div className="p-6">
-                    <motion.span 
-                      className="inline-block bg-blue-600/10 text-blue-500 px-3 py-1 rounded-full text-xs mb-2"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.3 + index * 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                    {project.type}
-                    </motion.span>
-                    <motion.h3 
-                      className="text-xl font-bold mb-2 text-white"
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      transition={{ delay: 0.4 + index * 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      {project.title}
-                    </motion.h3>
-                    <motion.p 
-                      className="text-gray-400 mb-4 leading-relaxed"
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      transition={{ delay: 0.5 + index * 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      {project.description}
-                    </motion.p>
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      transition={{ delay: 0.6 + index * 0.1 }}
-                      viewport={{ once: true }}
-                      whileHover={{ x: 5 }}
-                    >
-                  <Link 
-                    to={project.link} 
-                    className="text-blue-500 font-semibold flex items-center group hover:text-blue-400 transition-colors duration-300"
-                  >
-                    View Case Study 
-                    <FontAwesomeIcon 
-                      icon={faLongArrowAltRight} 
-                      className="ml-2 group-hover:translate-x-1 transition-transform duration-300" 
-                    />
-                  </Link>
-                    </motion.div>
-                </div>
-                </motion.div>
-              ))}
-            </motion.div>
+            {renderProjectsContent()}
             
             <motion.div 
               className="text-center mt-12"
@@ -1581,9 +1720,9 @@ const Home = () => {
               className="flex flex-wrap justify-center items-center gap-12"
               variants={staggerContainer}
             >
-            {[1, 2, 3, 4, 5].map((index) => (
+            {clientlogo.map((client ) => (
                 <motion.div 
-                key={index} 
+                key={client.id} 
                   className="h-[70px] flex items-center justify-center opacity-70 hover:opacity-100 transition-all duration-300"
                   variants={scaleIn}
                   whileHover={{ 
@@ -1592,7 +1731,7 @@ const Home = () => {
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 10 }}
               >
-                <img src={`/images/client${index}.png`} alt={`Client Logo ${index}`} className="max-h-full" />
+                <img src={`${client.image}`} alt={`${client.id}`} className="max-h-full w-auto border-2 border-gray-700 rounded-md" />
                 </motion.div>
             ))}
             </motion.div>

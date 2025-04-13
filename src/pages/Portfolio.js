@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import styled, { keyframes, css } from 'styled-components';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 // Define the keyframe animations
 const fadeIn = keyframes`
@@ -575,7 +577,78 @@ const Portfolio = () => {
   const [technologyFilter, setTechnologyFilter] = useState('all');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const modalRef = useRef(null);
+  
+  // API base URL - same as in projectService.js
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://backend-django-pct4.onrender.com/api/v1' || 'http://localhost:8000/api/v1' || 'http://127.0.0.1:8000/api/v1';
+  
+  // Fetch projects from API
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        console.log('Fetching projects from:', `${API_BASE_URL}/projects/`);
+        const response = await axios.get(`${API_BASE_URL}/projects/`);
+        console.log('Projects API response:', response);
+        console.log('Projects from API:', response.data);
+        
+        // Handle different response formats
+        let projectsData;
+        if (Array.isArray(response.data)) {
+          console.log('Response is an array with', response.data.length, 'projects');
+          projectsData = response.data;
+        } else if (response.data && typeof response.data === 'object') {
+          if (response.data.results) {
+            console.log('Found results array with', response.data.results.length, 'projects');
+            projectsData = response.data.results;
+          } else if (response.data.projects) {
+            console.log('Found projects array with', response.data.projects.length, 'projects');
+            projectsData = response.data.projects;
+          } else if (response.data.data) {
+            console.log('Found data array with', response.data.data.length, 'projects');
+            projectsData = response.data.data;
+          } else if (Array.isArray(Object.values(response.data)[0])) {
+            // Sometimes the API returns the array in the first property
+            const firstArrayProp = Object.keys(response.data).find(key => Array.isArray(response.data[key]));
+            if (firstArrayProp) {
+              console.log(`Found array in property '${firstArrayProp}' with`, response.data[firstArrayProp].length, 'projects');
+              projectsData = response.data[firstArrayProp];
+            } else {
+              projectsData = [];
+            }
+          } else {
+            // Check if the response object itself contains projects (with id properties)
+            const possibleProjects = Object.values(response.data).filter(item => 
+              item && typeof item === 'object' && (item.id || item._id)
+            );
+            
+            if (possibleProjects.length > 0) {
+              console.log('Found', possibleProjects.length, 'projects in object format');
+              projectsData = possibleProjects;
+            } else {
+              projectsData = [];
+            }
+          }
+        } else {
+          projectsData = [];
+        }
+        
+        console.log('Processed projects data:', projectsData, 'Count:', projectsData.length);
+        setProjects(projectsData);
+      } catch (err) {
+        console.error('Error fetching projects:', err);
+        const errorMessage = err.response?.data?.message || err.message || 'Failed to load projects. Please try again later.';
+        setError(`Error loading projects: ${errorMessage}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProjects();
+  }, [API_BASE_URL]);
   
   // Close modal when clicking outside
   useEffect(() => {
@@ -633,207 +706,78 @@ const Portfolio = () => {
     });
   }, [filter, industryFilter, technologyFilter]);
   
-  const projects = [
-    {
-      id: 1,
-      title: "E-Commerce Platform",
-      category: "web",
-      image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1470&auto=format&fit=crop",
-      technologies: ["React", "Node.js", "MongoDB", "Express"],
-      industry: "Retail",
-      client: "Fashion Retail Chain",
-      completionDate: "January 2023",
-      projectUrl: "#",
-      description: "A modern e-commerce platform with seamless user experience, advanced filtering, secure payments integration, and comprehensive admin dashboard for inventory management.",
-      features: [
-        "Responsive design for all devices",
-        "User authentication and profiles",
-        "Product search and filtering",
-        "Shopping cart and checkout",
-        "Payment processing",
-        "Order tracking",
-        "Admin dashboard"
-      ],
-      results: [
-        "50% increase in conversion rate",
-        "35% reduction in cart abandonment",
-        "123% growth in mobile sales"
-      ],
-      gallery: [
-        "https://images.unsplash.com/photo-1563986768494-4dee09f74f5b?q=80&w=1470&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1470&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1506104489822-562ca25152fe?q=80&w=1469&auto=format&fit=crop"
-      ]
-    },
-    {
-      id: 2,
-      title: "Health & Fitness App",
-      category: "mobile",
-      image: "https://images.unsplash.com/photo-1461354464878-ad92f492a5a0?q=80&w=1470&auto=format&fit=crop",
-      technologies: ["React Native", "Firebase", "Redux", "Node.js"],
-      industry: "Healthcare",
-      client: "Fitness First Inc.",
-      completionDate: "March 2023",
-      projectUrl: "#",
-      description: "A comprehensive fitness application that allows users to track workouts, set goals, monitor nutrition, and connect with personal trainers for a personalized fitness journey.",
-      features: [
-        "Workout tracking and planning",
-        "Nutrition log and calorie counter",
-        "Progress visualization with charts",
-        "Personal trainer messaging",
-        "Community challenges and leaderboards",
-        "Integration with fitness wearables",
-        "Customized workout recommendations"
-      ],
-      results: [
-        "87% user retention after 3 months",
-        "42% increase in workout frequency",
-        "Over 4.8 star rating on app stores"
-      ],
-      gallery: [
-        "https://images.unsplash.com/photo-1598136490941-30d885318abd?q=80&w=1469&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1520&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1470&auto=format&fit=crop"
-      ]
-    },
-    {
-      id: 3,
-      title: "Corporate Website Redesign",
-      category: "ui",
-      image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?q=80&w=1469&auto=format&fit=crop",
-      technologies: ["HTML5", "CSS3", "JavaScript", "Figma", "WordPress"],
-      industry: "Professional Services",
-      client: "Global Consulting Group",
-      completionDate: "November 2022",
-      projectUrl: "#",
-      description: "A complete redesign of a corporate website for a consulting firm, focusing on modern aesthetics, improved user experience, and better content organization to highlight services and case studies.",
-      features: [
-        "Responsive, mobile-first design",
-        "Interactive service showcase",
-        "Case study portfolio",
-        "Team member profiles",
-        "Integrated blog platform",
-        "Contact forms with validation",
-        "Custom WordPress theme"
-      ],
-      results: [
-        "62% reduction in bounce rate",
-        "3.5x increase in contact form submissions",
-        "40% improvement in page load speed"
-      ],
-      gallery: [
-        "https://images.unsplash.com/photo-1553484771-ade415825e66?q=80&w=1470&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1543286386-713bdd548da4?q=80&w=1470&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1579403124614-197f69d8187b?q=80&w=1528&auto=format&fit=crop"
-      ]
-    },
-    {
-      id: 4,
-      title: "Real Estate Management System",
-      category: "web",
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1473&auto=format&fit=crop",
-      technologies: ["Angular", "Node.js", "MongoDB", "Express", "Socket.io"],
-      industry: "Real Estate",
-      client: "Prestige Properties",
-      completionDate: "July 2023",
-      projectUrl: "#",
-      description: "A comprehensive real estate management system that allows property managers to list properties, track applications, manage leases, and communicate with tenants through a unified platform.",
-      features: [
-        "Property listing and management",
-        "Tenant application processing",
-        "Lease generation and tracking",
-        "Maintenance request system",
-        "Tenant portal for payments",
-        "Real-time messaging",
-        "Financial reporting"
-      ],
-      results: [
-        "75% reduction in administrative time",
-        "33% faster lease processing",
-        "89% tenant satisfaction rating"
-      ],
-      gallery: [
-        "https://images.unsplash.com/photo-1626178793926-22b28830aa30?q=80&w=1470&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1558036117-15d82a90b9b1?q=80&w=1470&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1602941525421-8f8b81d3edbb?q=80&w=1470&auto=format&fit=crop"
-      ]
-    },
-    {
-      id: 5,
-      title: "Restaurant Ordering App",
-      category: "mobile",
-      image: "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?q=80&w=1470&auto=format&fit=crop",
-      technologies: ["Flutter", "Firebase", "Stripe API", "Google Maps API"],
-      industry: "Food & Beverage",
-      client: "Gourmet Restaurant Chain",
-      completionDate: "April 2023",
-      projectUrl: "#",
-      description: "A feature-rich mobile application for a restaurant chain that allows customers to browse menus, place orders, make reservations, and participate in a loyalty program.",
-      features: [
-        "Digital menu with visual gallery",
-        "Online ordering and payment",
-        "Table reservations",
-        "Loyalty points system",
-        "Push notifications for offers",
-        "Order tracking",
-        "Restaurant locator"
-      ],
-      results: [
-        "28% increase in average order value",
-        "15% growth in customer retention",
-        "45% of orders now coming through the app"
-      ],
-      gallery: [
-        "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?q=80&w=1632&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1564495528617-c0340948e651?q=80&w=1471&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1509315811345-672d83ef2fbc?q=80&w=1374&auto=format&fit=crop"
-      ]
-    },
-    {
-      id: 6,
-      title: "Educational Platform UI/UX",
-      category: "ui",
-      image: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=1470&auto=format&fit=crop",
-      technologies: ["Figma", "Adobe XD", "Adobe Photoshop", "HTML/CSS"],
-      industry: "Education",
-      client: "Online Learning Academy",
-      completionDate: "June 2023",
-      projectUrl: "#",
-      description: "A comprehensive UI/UX design project for an educational platform, focusing on creating an intuitive, engaging, and accessible learning experience for students of all ages.",
-      features: [
-        "User research and persona development",
-        "Information architecture",
-        "Wireframing and prototyping",
-        "Interactive learning modules",
-        "Gamification elements",
-        "Accessibility compliance",
-        "Cross-platform design system"
-      ],
-      results: [
-        "53% improvement in course completion rates",
-        "42% reduction in support tickets",
-        "91% positive user feedback on new interface"
-      ],
-      gallery: [
-        "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1374&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1611926653458-09294b3142bf?q=80&w=1470&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1494809610410-160faaed4de0?q=80&w=1470&auto=format&fit=crop"
-      ]
-    }
-  ];
+  // Extract unique industries and technologies from actual project data
+  const industries = useMemo(() => {
+    if (!projects.length) return ['all'];
+    const uniqueIndustries = [...new Set(projects.map(project => 
+      (project.industry || '').toLowerCase())
+    )].filter(i => i);
+    return ['all', ...uniqueIndustries];
+  }, [projects]);
   
-  // Get unique industries and technologies for filters
-  const industries = ['all', ...new Set(projects.map(project => project.industry.toLowerCase()))];
-  const technologies = ['all', ...new Set(projects.flatMap(project => project.technologies.map(tech => tech.toLowerCase())))];
+  const technologies = useMemo(() => {
+    if (!projects.length) return ['all'];
+    const techArray = projects.flatMap(project => {
+      // Handle both technologies array and service_ids
+      let techs = [];
+      
+      // Handle technologies that come as an object
+      if (project.technologies && typeof project.technologies === 'object' && !Array.isArray(project.technologies)) {
+        techs = Object.keys(project.technologies);
+      } 
+      // Handle technologies that come as an array
+      else if (Array.isArray(project.technologies)) {
+        techs = project.technologies.map(tech => typeof tech === 'object' ? tech.name : tech);
+      }
+      
+      const services = project.services || [];
+      return [...techs, ...services.map(s => s.title || s.name || '')];
+    });
+    
+    const uniqueTechs = [...new Set(techArray.map(tech => 
+      (typeof tech === 'string' ? tech.toLowerCase() : '')
+    ))].filter(t => t);
+    
+    return ['all', ...uniqueTechs];
+  }, [projects]);
   
   // Filter projects based on multiple criteria
-  const filteredProjects = projects.filter(project => {
-    const categoryMatch = filter === 'all' || project.category === filter;
-    const industryMatch = industryFilter === 'all' || project.industry.toLowerCase() === industryFilter;
-    const techMatch = technologyFilter === 'all' || project.technologies.some(tech => tech.toLowerCase() === technologyFilter);
+  const filteredProjects = useMemo(() => {
+    return projects.filter(project => {
+      const categoryMatch = filter === 'all' || 
+                          (project.category || '').toLowerCase() === filter;
+      
+      const industryMatch = industryFilter === 'all' || 
+                          (project.industry || '').toLowerCase() === industryFilter;
+      
+      let techMatch = technologyFilter === 'all';
+      
+      if (!techMatch) {
+        // Check technologies in object format
+        if (project.technologies && typeof project.technologies === 'object' && !Array.isArray(project.technologies)) {
+          techMatch = Object.keys(project.technologies).some(tech => 
+            tech.toLowerCase() === technologyFilter
+          );
+        }
+        // Check technologies in array format
+        else if (Array.isArray(project.technologies)) {
+          techMatch = project.technologies.some(tech => 
+            (typeof tech === 'string' && tech.toLowerCase() === technologyFilter) ||
+            (typeof tech === 'object' && tech.name && tech.name.toLowerCase() === technologyFilter)
+          );
+        }
+      }
+      
+      // If still no match, check services
+      if (!techMatch && project.services) {
+        techMatch = project.services.some(service => 
+          ((service.title || service.name || '').toLowerCase() === technologyFilter)
+        );
+      }
     
     return categoryMatch && industryMatch && techMatch;
   });
+  }, [projects, filter, industryFilter, technologyFilter]);
   
   const openModal = (project) => {
     setSelectedProject(project);
@@ -845,7 +789,30 @@ const Portfolio = () => {
   };
   
   const navigateToDetail = (id) => {
+    if (!id) {
+      console.error('Cannot navigate to detail - no project ID provided');
+      return;
+    }
+    console.log('Navigating to project detail:', id);
     window.location.href = `/portfolio/${id}`;
+  };
+
+  // Helper function to determine category label
+  const getCategoryLabel = (category) => {
+    if (!category) return 'Web Development';
+    
+    switch(category.toLowerCase()) {
+      case 'web':
+        return 'Web Development';
+      case 'mobile':
+        return 'Mobile App';
+      case 'ui':
+      case 'ux':
+      case 'design':
+        return 'UI/UX Design';
+      default:
+        return 'Web Development';
+    }
   };
   
   return (
@@ -876,21 +843,23 @@ const Portfolio = () => {
       
       <HeroSection>
         <PageTitle>Our Portfolio</PageTitle>
-        <PageSubtitle>Showcasing our best work and client success stories</PageSubtitle>
+        <PageSubtitle>
+          Explore our latest projects and see how we've helped our clients achieve their goals
+        </PageSubtitle>
       </HeroSection>
       
       <PortfolioSection>
         <PortfolioContainer>
-          <SectionHeading>Our Project Showcase</SectionHeading>
+          <SectionHeading>Explore Our Work</SectionHeading>
           
-          <div>
-            <FilterCategoryTitle>Project Type</FilterCategoryTitle>
+          <FilterCategory>
+            <FilterCategoryTitle>Category</FilterCategoryTitle>
             <FilterButtons>
               <FilterButton 
                 active={filter === 'all'} 
                 onClick={() => setFilter('all')}
               >
-                All Projects
+                All
               </FilterButton>
               <FilterButton 
                 active={filter === 'web'} 
@@ -905,195 +874,206 @@ const Portfolio = () => {
                 Mobile Apps
               </FilterButton>
               <FilterButton 
-                active={filter === 'ui'} 
-                onClick={() => setFilter('ui')}
+                active={filter === 'design'} 
+                onClick={() => setFilter('design')}
               >
                 UI/UX Design
               </FilterButton>
+              <FilterButton 
+                active={filter === 'ecommerce'} 
+                onClick={() => setFilter('ecommerce')}
+              >
+                E-Commerce
+              </FilterButton>
             </FilterButtons>
-          </div>
+          </FilterCategory>
           
-          <div>
+          {industries.length > 1 && (
+            <FilterCategory>
             <FilterCategoryTitle>Industry</FilterCategoryTitle>
             <FilterButtons>
+                {industries.map(industry => (
               <FilterButton 
-                active={industryFilter === 'all'} 
-                onClick={() => setIndustryFilter('all')}
-              >
-                All Industries
-              </FilterButton>
-              {industries.filter(i => i !== 'all').map((industry, index) => (
-                <FilterButton 
-                  key={index}
+                    key={industry}
                   active={industryFilter === industry} 
                   onClick={() => setIndustryFilter(industry)}
                 >
-                  {industry.charAt(0).toUpperCase() + industry.slice(1)}
+                    {industry === 'all' ? 'All Industries' : industry.charAt(0).toUpperCase() + industry.slice(1)}
                 </FilterButton>
               ))}
             </FilterButtons>
-          </div>
+            </FilterCategory>
+          )}
           
-          <div>
+          {technologies.length > 1 && (
+            <FilterCategory>
             <FilterCategoryTitle>Technology</FilterCategoryTitle>
             <FilterButtons>
+                {technologies.map(tech => (
               <FilterButton 
-                active={technologyFilter === 'all'} 
-                onClick={() => setTechnologyFilter('all')}
-              >
-                All Technologies
-              </FilterButton>
-              {technologies.filter(t => t !== 'all').slice(0, 8).map((tech, index) => (
-                <FilterButton 
-                  key={index}
+                    key={tech}
                   active={technologyFilter === tech} 
                   onClick={() => setTechnologyFilter(tech)}
                 >
-                  {tech}
+                    {tech === 'all' ? 'All Technologies' : tech.charAt(0).toUpperCase() + tech.slice(1)}
                 </FilterButton>
               ))}
             </FilterButtons>
-          </div>
+            </FilterCategory>
+          )}
           
-          <ProjectsGrid>
-            {projects.length === 0 ? (
-              <div style={{ 
-                gridColumn: '1/-1', 
-                textAlign: 'center', 
-                padding: '3rem', 
-                color: 'var(--gray-text)'
-              }}>
-                Loading projects...
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '3rem 0' }}>
+              <p>Loading projects...</p>
               </div>
-            ) : filteredProjects.length > 0 ? (
-              filteredProjects.map((project, index) => (
+          ) : error ? (
+            <div style={{ textAlign: 'center', padding: '3rem 0', color: 'red' }}>
+              <p>{error}</p>
+            </div>
+          ) : filteredProjects.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '3rem 0' }}>
+              <p>No projects match your selected filters. Try different criteria or <button 
+                onClick={() => {
+                  setFilter('all');
+                  setIndustryFilter('all');
+                  setTechnologyFilter('all');
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#0A66C2',
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                  fontSize: '1rem'
+                }}
+              >reset all filters</button></p>
+            </div>
+          ) : (
+            <ProjectsGrid>
+              {console.log('Rendering', filteredProjects.length, 'projects in grid')}
+              {filteredProjects.map(project => (
                 <ProjectCard 
-                  key={project.id} 
-                  index={index}
-                  onClick={() => openModal(project)}
+                  key={project._id || project.id || Math.random().toString(36).substring(7)} 
+                  className="animate-on-scroll"
+                  onClick={() => project._id ? navigateToDetail(project._id) : navigateToDetail(project.id)}
                 >
                   <ProjectImage className="project-image">
                     <img 
-                      src={project.image} 
+                      src={project.image_url || project.image} 
                       alt={project.title} 
                       onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "https://via.placeholder.com/600x400?text=Project+Image";
+                        console.log('Image failed to load:', project.title);
+                        e.target.src = "https://via.placeholder.com/400x250?text=Project+Image";
                       }}
                     />
                   </ProjectImage>
                   <ProjectInfo>
                     <div>
                       <ProjectCategory>
-                        {project.category === 'web' ? 'Web Development' : 
-                         project.category === 'mobile' ? 'Mobile App' : 'UI/UX Design'}
+                        {getCategoryLabel(project.category)}
                       </ProjectCategory>
                       <ProjectTitle>{project.title}</ProjectTitle>
                     </div>
                     <ProjectTech>
-                      {project.technologies.slice(0, 3).map((tech, idx) => (
-                        <TechTag key={idx}>{tech}</TechTag>
+                      {project.technologies && typeof project.technologies === 'object' && !Array.isArray(project.technologies) ? 
+                        Object.keys(project.technologies).slice(0, 3).map((tech, index) => (
+                          <TechTag key={`tech-${index}`}>{tech}</TechTag>
+                        ))
+                        : 
+                        Array.isArray(project.technologies) && project.technologies.slice(0, 3).map((tech, index) => (
+                          <TechTag key={`tech-${index}`}>{typeof tech === 'object' ? tech.name : tech}</TechTag>
+                        ))}
+                      {project.services && project.services.slice(0, 3).map((service, index) => (
+                        <TechTag key={`service-${index}`}>
+                          {service.title || service.name || (typeof service === 'string' ? service : '')}
+                        </TechTag>
                       ))}
                     </ProjectTech>
                   </ProjectInfo>
-                  
-                  <ProjectOverlay className="project-overlay">
-                    <ViewDetailsButton className="view-details">View Project</ViewDetailsButton>
-                  </ProjectOverlay>
+                  <ViewDetailsButton className="view-details">
+                    View Details
+                  </ViewDetailsButton>
                 </ProjectCard>
-              ))
-            ) : (
-              <div style={{ 
-                gridColumn: '1/-1', 
-                textAlign: 'center', 
-                padding: '3rem', 
-                color: 'var(--gray-text)'
-              }}>
-                No projects match your current filters. Please try different criteria.
-              </div>
-            )}
+              ))}
           </ProjectsGrid>
+          )}
         </PortfolioContainer>
       </PortfolioSection>
       
-      <ModalOverlay visible={modalVisible}>
         {selectedProject && (
-          <ModalContent ref={modalRef} visible={modalVisible}>
-            <ModalCloseButton onClick={closeModal}>
-              &times;
-            </ModalCloseButton>
+        <ModalOverlay visible={modalVisible} onClick={closeModal}>
+          <ModalContent visible={modalVisible} ref={modalRef} onClick={e => e.stopPropagation()}>
+            <ModalCloseButton onClick={closeModal}>×</ModalCloseButton>
             <ModalImageGallery>
               <ModalImage 
-                src={selectedProject.image} 
+                src={selectedProject.image_url || selectedProject.image} 
                 alt={selectedProject.title} 
                 onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "https://via.placeholder.com/900x500?text=Project+Image";
+                  e.target.src = "https://via.placeholder.com/900x400?text=Project+Image";
                 }}
               />
             </ModalImageGallery>
             <ModalDetails>
               <ModalTitle>{selectedProject.title}</ModalTitle>
-              <ModalDescription>{selectedProject.description}</ModalDescription>
+              <ModalDescription>
+                {selectedProject.description || "A comprehensive solution designed for exceptional results."}
+              </ModalDescription>
               
               <ModalInfoGrid>
                 <ModalInfoItem>
                   <ModalInfoLabel>Client</ModalInfoLabel>
-                  <ModalInfoValue>{selectedProject.client}</ModalInfoValue>
+                  <ModalInfoValue>{selectedProject.client || "Enterprise Client"}</ModalInfoValue>
                 </ModalInfoItem>
                 <ModalInfoItem>
                   <ModalInfoLabel>Industry</ModalInfoLabel>
-                  <ModalInfoValue>{selectedProject.industry}</ModalInfoValue>
-                </ModalInfoItem>
-                <ModalInfoItem>
-                  <ModalInfoLabel>Category</ModalInfoLabel>
                   <ModalInfoValue>
-                    {selectedProject.category === 'web' 
-                      ? 'Web Development' 
-                      : selectedProject.category === 'mobile' 
-                        ? 'Mobile App Development' 
-                        : 'UI/UX Design'}
+                    {selectedProject.industry || "Technology"}
                   </ModalInfoValue>
                 </ModalInfoItem>
                 <ModalInfoItem>
-                  <ModalInfoLabel>Completion Date</ModalInfoLabel>
-                  <ModalInfoValue>{selectedProject.completionDate}</ModalInfoValue>
+                  <ModalInfoLabel>Completed</ModalInfoLabel>
+                  <ModalInfoValue>
+                    {selectedProject.completion_date || "2023"}
+                  </ModalInfoValue>
                 </ModalInfoItem>
               </ModalInfoGrid>
               
               <ModalTechStack>
-                <ModalTechTitle>Technologies Used</ModalTechTitle>
+                <ModalTechTitle>Technologies & Services</ModalTechTitle>
                 <ModalTechList>
-                  {selectedProject.technologies.map((tech, idx) => (
-                    <ModalTechItem key={idx}>{tech}</ModalTechItem>
+                  {selectedProject.technologies && typeof selectedProject.technologies === 'object' && !Array.isArray(selectedProject.technologies) ? 
+                    Object.keys(selectedProject.technologies).map((tech, index) => (
+                      <ModalTechItem key={`tech-${index}`}>{tech}</ModalTechItem>
+                    ))
+                    : 
+                    Array.isArray(selectedProject.technologies) && selectedProject.technologies.map((tech, index) => (
+                      <ModalTechItem key={`tech-${index}`}>{typeof tech === 'object' ? tech.name : tech}</ModalTechItem>
+                    ))}
+                  {selectedProject.services && selectedProject.services.map((service, index) => (
+                    <ModalTechItem key={`service-${index}`}>
+                      {service.title || service.name || (typeof service === 'string' ? service : '')}
+                    </ModalTechItem>
                   ))}
                 </ModalTechList>
               </ModalTechStack>
               
-              <ModalTechStack>
-                <ModalTechTitle>Key Results</ModalTechTitle>
-                <ul style={{ color: 'var(--gray-text)', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
-                  {selectedProject.results.map((result, idx) => (
-                    <li key={idx}>{result}</li>
-                  ))}
-                </ul>
-              </ModalTechStack>
-              
               <ModalActions>
-                <ModalButton onClick={() => navigateToDetail(selectedProject.id)} primary>
+                <ModalButton 
+                  primary
+                  href={`/portfolio/${selectedProject._id || selectedProject.id}`}
+                >
                   View Case Study
                 </ModalButton>
-                <ModalButton href={selectedProject.projectUrl} target="_blank" rel="noopener noreferrer">
-                  View Live Project
+                {selectedProject.project_url && (
+                  <ModalButton href={selectedProject.project_url} target="_blank" rel="noopener noreferrer">
+                    Visit Project
                 </ModalButton>
-                <ModalButton href="/contact">
-                  Discuss Similar Project
-                </ModalButton>
+                )}
               </ModalActions>
             </ModalDetails>
           </ModalContent>
-        )}
       </ModalOverlay>
+      )}
     </PortfolioPage>
   );
 };

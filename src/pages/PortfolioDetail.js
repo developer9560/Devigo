@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -16,12 +16,14 @@ import {
   faChartLine,
   faLightbulb,
   faPuzzlePiece,
-  faTrophy
+  faTrophy,
+  faEnvelope
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, Legend
 } from 'recharts';
+import axios from 'axios';
 
 // Animation keyframes
 const fadeIn = keyframes`
@@ -69,18 +71,20 @@ const scaleIn = keyframes`
 `;
 
 // Styled Components
-const DetailPage = styled.div`
+const DetailPageContainer = styled.div`
   width: 100%;
   background-color: #121212;
   color: #fff;
   overflow-x: hidden; /* Prevent horizontal scrollbar */
+  padding-top: 60px; /* Reduce padding to remove extra space */
 `;
 
 const HeroSection = styled.section`
   position: relative;
-  height: 70vh;
-  min-height: 500px;
+  height: 50vh; /* Reduce height to remove empty space */
+  min-height: 400px; /* Decrease minimum height */
   overflow: hidden;
+  margin-top: 0; /* Remove top margin */
   
   &::after {
     content: '';
@@ -95,7 +99,8 @@ const HeroSection = styled.section`
   
   @media (max-width: 768px) {
     height: auto;
-    min-height: 400px;
+    min-height: 350px; /* Reduce minimum height on mobile */
+    margin-top: 0;
   }
 `;
 
@@ -129,16 +134,15 @@ const HeroContent = styled.div`
   z-index: 2;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 1rem 2rem 2rem; /* Reduce padding */
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding-bottom: 5rem;
   
   @media (max-width: 768px) {
-    padding-top: 100px;
-    padding-bottom: 3rem;
+    padding-top: 60px; /* Reduce top padding on mobile */
+    padding-bottom: 2rem;
     justify-content: center;
   }
 `;
@@ -179,19 +183,23 @@ const ProjectCategory = styled.div`
   animation: ${fadeIn} 0.8s ease forwards;
 `;
 
-const ProjectTitle = styled.h1`
+const HeroTitle = styled.h1`
   font-size: 3.5rem;
-  margin-bottom: 1.5rem;
-  animation: ${fadeIn} 0.8s ease 0.2s forwards;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  animation: ${fadeIn} 0.8s ease forwards;
   opacity: 0;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  line-height: 1.2;
   
   @media (max-width: 768px) {
     font-size: 2.5rem;
+    margin-top: 0;
   }
   
   @media (max-width: 480px) {
     font-size: 2rem;
+    margin-top: 0;
   }
 `;
 
@@ -675,161 +683,415 @@ const CTAButtons = styled.div`
 `;
 
 const CTAButton = styled.a`
-  display: inline-block;
-  padding: 1rem 2.5rem;
-  background: ${props => props.primary ? 'linear-gradient(to right, #0A66C2, #064584)' : 'transparent'};
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #0A66C2 0%, #0e4f8b 100%);
   color: white;
-  border: ${props => props.primary ? 'none' : '2px solid #0A66C2'};
-  border-radius: 50px;
-  font-size: 1.1rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 600;
   text-decoration: none;
   transition: all 0.3s ease;
+  margin-top: 1rem;
+  border: none;
+  cursor: pointer;
   
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: ${props => props.primary ? '0 10px 20px rgba(10, 102, 194, 0.4)' : 'none'};
-    background: ${props => props.primary ? 'linear-gradient(to right, #0A66C2, #064584)' : 'rgba(10, 102, 194, 0.1)'};
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(10, 102, 194, 0.2);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 `;
 
-// Mock projects data - in a real app, this would come from an API or context
-const projects = [
-  {
-    id: 1,
-    title: "E-Commerce Platform",
-    category: "web",
-    categoryLabel: "Web Development",
-    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1470&auto=format&fit=crop",
-    technologies: ["React", "Node.js", "MongoDB", "Express"],
-    client: "Fashion Retail Chain",
-    industry: "Retail",
-    teamSize: "5 Developers, 2 Designers",
-    completionDate: "January 2023",
-    projectUrl: "#",
-    challengeDescription: "The client's existing e-commerce platform was outdated, with poor mobile responsiveness and slow loading times. They experienced high cart abandonment rates and struggled with inventory management across multiple store locations.",
-    challengeImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1470&auto=format&fit=crop",
-    approachSteps: [
-      {
-        title: "Discovery & Planning",
-        description: "We conducted comprehensive user research, competitor analysis, and stakeholder interviews to identify pain points and opportunities.",
-        icon: faLightbulb
-      },
-      {
-        title: "UX Design & Prototyping",
-        description: "Created wireframes and interactive prototypes, tested with real users to ensure intuitive navigation and checkout process.",
-        icon: faPuzzlePiece
-      },
-      {
-        title: "Agile Development",
-        description: "Built the platform in sprints, with regular client feedback and continuous integration/deployment practices.",
-        icon: faCode
-      },
-      {
-        title: "Testing & Optimization",
-        description: "Performed extensive testing across devices, optimized performance, and trained the client team on the new platform.",
-        icon: faChartLine
-      }
-    ],
-    solutionDescription: "We developed a modern, responsive e-commerce platform with a focus on user experience, fast loading times, and seamless integration with the client's inventory and fulfillment systems.",
-    features: [
-      {
-        title: "Advanced Filtering",
-        description: "Intelligent product search and filtering options to help customers find products quickly."
-      },
-      {
-        title: "Seamless Checkout",
-        description: "Streamlined checkout process with multiple payment options and abandoned cart recovery."
-      },
-      {
-        title: "Inventory Management",
-        description: "Real-time inventory tracking across all store locations and warehouses."
-      },
-      {
-        title: "Customer Profiles",
-        description: "Personalized user accounts with order history, wishlist, and product recommendations."
-      },
-      {
-        title: "Analytics Dashboard",
-        description: "Comprehensive data visualization of sales, customer behavior, and inventory performance."
-      },
-      {
-        title: "Mobile-First Design",
-        description: "Fully responsive experience optimized for all devices, with native-like mobile functionality."
-      }
-    ],
-    gallery: [
-      "https://images.unsplash.com/photo-1563986768494-4dee09f74f5b?q=80&w=1470&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1470&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1506104489822-562ca25152fe?q=80&w=1469&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?q=80&w=1470&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1555421689-491a97ff2040?q=80&w=1470&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1556742111-a301076d9d18?q=80&w=1470&auto=format&fit=crop"
-    ],
-    results: [
-      {
-        title: "50% Increase in Conversion Rate",
-        description: "Optimized user experience and streamlined checkout process led to significant improvement in conversions."
-      },
-      {
-        title: "35% Reduction in Cart Abandonment",
-        description: "Simplified checkout and saved customer information reduced friction in the purchase process."
-      },
-      {
-        title: "123% Growth in Mobile Sales",
-        description: "Mobile-first approach resulted in dramatic improvement in mobile conversion rates and revenue."
-      },
-      {
-        title: "28% Higher Average Order Value",
-        description: "Personalized product recommendations and bundling features increased per-order revenue."
-      }
-    ],
-    chartData: {
-      before: [
-        { name: 'Jan', value: 4000 },
-        { name: 'Feb', value: 4200 },
-        { name: 'Mar', value: 3800 },
-        { name: 'Apr', value: 4100 },
-        { name: 'May', value: 3900 },
-        { name: 'Jun', value: 4300 }
-      ],
-      after: [
-        { name: 'Jan', value: 6000 },
-        { name: 'Feb', value: 6500 },
-        { name: 'Mar', value: 6300 },
-        { name: 'Apr', value: 7100 },
-        { name: 'May', value: 7500 },
-        { name: 'Jun', value: 8200 }
-      ]
-    },
-    testimonial: {
-      quote: "The new e-commerce platform has transformed our business. Not only has it improved our online sales dramatically, but the inventory management system has streamlined our operations across all store locations. The DEVIGO team truly understood our challenges and delivered a solution that exceeded our expectations.",
-      author: "Sarah Johnson",
-      role: "E-Commerce Director, Fashion Retail Chain",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1374&auto=format&fit=crop"
+const HeroBackground = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url(${props => props.style?.backgroundImage});
+  background-size: cover;
+  background-position: center;
+  opacity: ${props => props.style?.opacity || 0.2};
+  z-index: -1;
+`;
+
+const HeroSubtitle = styled.p`
+  font-size: 1.5rem;
+  max-width: 700px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+  animation: ${fadeIn} 0.8s ease 0.4s forwards;
+  opacity: 0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+`;
+
+const MetadataContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem; /* Reduce top margin */
+  animation: ${fadeIn} 0.8s ease forwards;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`;
+
+const MetadataItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  
+  svg {
+    color: #0A66C2;
+  }
+  
+  span {
+    color: rgba(255, 255, 255, 0.9);
+  }
+`;
+
+const MetadataLabel = styled.span`
+  font-size: 1.2rem;
+  font-weight: bold;
+`;
+
+const MetadataValue = styled.span`
+  font-size: 1.2rem;
+`;
+
+const DetailContent = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 5rem 2rem;
+  
+  @media (max-width: 768px) {
+    padding: 3rem 1.5rem;
+  }
+`;
+
+const MainImageContainer = styled.div`
+  margin-bottom: 3rem;
+`;
+
+const MainImage = styled.img`
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  object-fit: cover;
+`;
+
+const SectionWithPadding = styled.div`
+  padding: 3rem 0;
+  background-color: ${props => props.bgColor || '#121212'};
+`;
+
+const Description = styled.p`
+  font-size: 1.2rem;
+  max-width: 700px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+  animation: ${fadeIn} 0.8s ease 0.4s forwards;
+  opacity: 0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+`;
+
+const TechnologySection = styled.div`
+  margin-bottom: 3rem;
+`;
+
+const SectionSubtitle = styled.h3`
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--primary-white);
+`;
+
+const TechList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const TechItem = styled.li`
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+`;
+
+const ChallengesList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const ChallengeItem = styled.li`
+  margin-bottom: 1rem;
+`;
+
+const ChallengeTitle = styled.h4`
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-white);
+`;
+
+const ChallengeDescription = styled.p`
+  font-size: 1.2rem;
+  color: var(--gray-text);
+  line-height: 1.6;
+`;
+
+const ApproachContainer = styled.div`
+  margin-top: 2rem;
+`;
+
+const ApproachItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+`;
+
+const ApproachNumber = styled.div`
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+`;
+
+const ApproachTitle = styled.h5`
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-white);
+`;
+
+const ApproachDescription = styled.p`
+  font-size: 1.2rem;
+  color: var(--gray-text);
+  line-height: 1.6;
+`;
+
+const GalleryImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const ResultsContainer = styled.div`
+  margin-top: 2rem;
+`;
+
+const ResultItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+`;
+
+const ResultIcon = styled.div`
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--primary-white);
+`;
+
+const ResultTitle = styled.h4`
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-white);
+`;
+
+const ResultDescription = styled.p`
+  font-size: 1.2rem;
+  color: var(--gray-text);
+  line-height: 1.6;
+`;
+
+const TestimonialContainer = styled.div`
+  position: relative;
+  padding: 2rem;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  animation: ${fadeIn} 0.8s ease forwards;
+`;
+
+const TestimonialQuoteMark = styled.span`
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 3rem;
+  color: rgba(10, 102, 194, 0.3);
+`;
+
+const TestimonialText = styled.p`
+  font-size: 1.5rem;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.9);
+`;
+
+const CTAContent = styled.div`
+  max-width: 700px;
+  margin: 0 auto;
+`;
+
+const CTADescription = styled.p`
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+`;
+
+const RelatedProjects = styled.div`
+  margin-top: 2rem;
+`;
+
+const BreadcrumbsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  animation: ${fadeInLeft} 0.8s ease forwards;
+`;
+
+const BreadcrumbLink = styled(Link)`
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+  
+  &:hover {
+    color: #0A66C2;
+  }
+`;
+
+const BreadcrumbCurrent = styled.span`
+  color: white;
+  font-size: 1rem;
+`;
+
+const StatusBadge = styled.span`
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background-color: ${props => {
+    switch(props.status) {
+      case 'completed': return 'rgba(46, 204, 113, 0.2)';
+      case 'in_progress': return 'rgba(52, 152, 219, 0.2)';
+      case 'planning': return 'rgba(241, 196, 15, 0.2)';
+      case 'archived': return 'rgba(189, 195, 199, 0.2)';
+      default: return 'rgba(46, 204, 113, 0.2)';
     }
-  },
-  // More projects would be added here
-];
+  }};
+  color: ${props => {
+    switch(props.status) {
+      case 'completed': return '#2ecc71';
+      case 'in_progress': return '#3498db';
+      case 'planning': return '#f1c40f';
+      case 'archived': return '#bdc3c7';
+      default: return '#2ecc71';
+    }
+  }};
+`;
+
+const TeamSection = styled.div`
+  margin-top: 2rem;
+`;
+
+const TestimonialInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const TestimonialImage = styled.img`
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #0A66C2;
+`;
+
+const TestimonialAuthorInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const TestimonialAuthorName = styled.h4`
+  font-size: 1.2rem;
+  margin: 0;
+  color: var(--primary-white);
+`;
+
+const TestimonialAuthorRole = styled.p`
+  font-size: 1rem;
+  color: #0A66C2;
+  margin: 0;
+`;
 
 const PortfolioDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
-  // In a real application, you would fetch the project data from an API
+  // API base URL - same as in projectService.js
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+  
   useEffect(() => {
-    // Simulating API call with setTimeout
-    const timer = setTimeout(() => {
-      const foundProject = projects.find(p => p.id === parseInt(id));
-      if (foundProject) {
-        setProject(foundProject);
-      }
+    const fetchProjectDetails = async () => {
+      try {
+        setLoading(true);
+        console.log(`Fetching project with ID: ${id}`);
+        const response = await axios.get(`${API_BASE_URL}/projects/${id}`);
+        console.log('Project data from API:', response.data);
+        
+        // Handle different response formats
+        let projectData;
+        if (response.data && typeof response.data === 'object') {
+          projectData = response.data.project || response.data;
+        } else {
+          throw new Error('Invalid project data format received');
+        }
+        
+        setProject(projectData);
       setLoading(false);
-    }, 500);
+      } catch (err) {
+        console.error('Error fetching project details:', err);
+        setError('Failed to load project details. Please try again later.');
+        setLoading(false);
+      }
+    };
     
-    return () => clearTimeout(timer);
-  }, [id]);
+    if (id) {
+      fetchProjectDetails();
+    }
+  }, [id, API_BASE_URL]);
   
   const handleGoBack = () => {
     navigate('/portfolio');
@@ -844,232 +1106,343 @@ const PortfolioDetail = () => {
   }
   
   return (
-    <DetailPage>
+    <DetailPageContainer>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '5rem 0' }}>
+          <p>Loading project details...</p>
+        </div>
+      ) : error ? (
+        <div style={{ textAlign: 'center', padding: '5rem 0', color: 'red' }}>
+          <p>{error}</p>
+        </div>
+      ) : project ? (
+        <>
       <HeroSection>
-        <HeroImage>
-          <img 
-            src={project.image} 
-            alt={project.title} 
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = "https://via.placeholder.com/1200x600?text=Project+Hero+Image";
-            }}
-          />
-        </HeroImage>
+            <HeroBackground 
+              style={{ 
+                backgroundImage: `url(${project.image_url || project.image})`,
+                opacity: 0.2
+              }} 
+            />
         <HeroContent>
-          <BackButton onClick={handleGoBack}>
-            <FontAwesomeIcon icon={faArrowLeft} />
-            Back to Portfolio
-          </BackButton>
-          <ProjectCategory>{project.categoryLabel}</ProjectCategory>
-          <ProjectTitle>{project.title}</ProjectTitle>
-          <ProjectSummary>
-            A comprehensive solution designed to address the client's specific needs and deliver measurable business results.
-          </ProjectSummary>
-          <ProjectMeta>
-            <MetaItem>
-              <FontAwesomeIcon icon={faBuilding} />
-              <span>Client: {project.client}</span>
-            </MetaItem>
-            <MetaItem>
-              <FontAwesomeIcon icon={faUsers} />
-              <span>Team: {project.teamSize}</span>
-            </MetaItem>
-            <MetaItem>
-              <FontAwesomeIcon icon={faCalendarAlt} />
-              <span>Completed: {project.completionDate}</span>
-            </MetaItem>
-            <MetaItem>
-              <FontAwesomeIcon icon={faLink} />
-              <span>Industry: {project.industry}</span>
-            </MetaItem>
-          </ProjectMeta>
+              <BreadcrumbsContainer>
+                <BreadcrumbLink to="/">Home</BreadcrumbLink>
+                <span> / </span>
+                <BreadcrumbLink to="/portfolio">Portfolio</BreadcrumbLink>
+                <span> / </span>
+                <BreadcrumbCurrent>{project.title}</BreadcrumbCurrent>
+              </BreadcrumbsContainer>
+              
+              <HeroTitle>{project.title}</HeroTitle>
+              <HeroSubtitle>{project.short_description || project.description?.substring(0, 120)}</HeroSubtitle>
+              
+              <MetadataContainer>
+                <MetadataItem>
+                  <MetadataLabel>Client</MetadataLabel>
+                  <MetadataValue>{project.client || "Confidential Client"}</MetadataValue>
+                </MetadataItem>
+                <MetadataItem>
+                  <MetadataLabel>Industry</MetadataLabel>
+                  <MetadataValue>{project.industry || "Technology"}</MetadataValue>
+                </MetadataItem>
+                <MetadataItem>
+                  <MetadataLabel>Category</MetadataLabel>
+                  <MetadataValue>{project.category || "Web Development"}</MetadataValue>
+                </MetadataItem>
+                <MetadataItem>
+                  <MetadataLabel>Completed</MetadataLabel>
+                  <MetadataValue>{project.completion_date || new Date().getFullYear()}</MetadataValue>
+                </MetadataItem>
+              </MetadataContainer>
         </HeroContent>
       </HeroSection>
       
-      <ContentSection>
-        <SectionTitle>Challenge & Approach</SectionTitle>
-        <Grid>
-          <ChallengeSection>
-            <h3>The Challenge</h3>
-            <p>{project.challengeDescription}</p>
-            <ChallengeImage>
-              <img 
-                src={project.challengeImage} 
-                alt="Challenge visualization" 
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "https://via.placeholder.com/600x400?text=Challenge+Image";
-                }}
+          <DetailContent>
+            <MainImageContainer>
+              <MainImage 
+                src={project.image_url || project.image} 
+                alt={project.title}
               />
-            </ChallengeImage>
-          </ChallengeSection>
-          
-          <ApproachSection>
-            <h3>Our Approach</h3>
-            <p>We implemented a structured methodology to address the client's challenges and create a solution that would not only solve immediate problems but also provide long-term value.</p>
+            </MainImageContainer>
             
-            <ProcessSteps>
-              {project.approachSteps.map((step, index) => (
-                <ProcessStep key={index}>
-                  <h3>
-                    <FontAwesomeIcon icon={step.icon} />
-                    {step.title}
-                  </h3>
-                  <p>{step.description}</p>
-                </ProcessStep>
-              ))}
-            </ProcessSteps>
-          </ApproachSection>
-        </Grid>
-      </ContentSection>
-      
-      <SolutionSection>
-        <SolutionContent>
-          <SolutionHeader>
-            <h2>Our Solution</h2>
-            <p>{project.solutionDescription}</p>
-          </SolutionHeader>
-          
-          <FeaturesGrid>
-            {project.features.map((feature, index) => (
-              <FeatureCard key={index} index={index}>
-                <FontAwesomeIcon icon={faTrophy} />
-                <h3>{feature.title}</h3>
-                <p>{feature.description}</p>
-              </FeatureCard>
-            ))}
-          </FeaturesGrid>
-        </SolutionContent>
-      </SolutionSection>
-      
-      <GallerySection>
-        <SectionTitle>Project Gallery</SectionTitle>
-        <p>Explore the visual elements of our solution and see how it addresses the client's needs.</p>
-        
+            <SectionWithPadding>
+              <SectionTitle>Overview</SectionTitle>
+              <Description>{project.description}</Description>
+              
+              <MetadataContainer style={{ marginTop: '2rem' }}>
+                <MetadataItem>
+                  <MetadataLabel>Status</MetadataLabel>
+                  <MetadataValue>
+                    <StatusBadge status={project.status || 'completed'}>
+                      {project.status === 'in_progress' ? 'In Progress' : 
+                       project.status === 'planning' ? 'Planning' :
+                       project.status === 'archived' ? 'Archived' : 'Completed'}
+                    </StatusBadge>
+                  </MetadataValue>
+                </MetadataItem>
+                
+                {project.start_date && (
+                  <MetadataItem>
+                    <MetadataLabel>Started</MetadataLabel>
+                    <MetadataValue>{new Date(project.start_date).toLocaleDateString()}</MetadataValue>
+                  </MetadataItem>
+                )}
+                
+                {project.completion_date && (
+                  <MetadataItem>
+                    <MetadataLabel>Completed</MetadataLabel>
+                    <MetadataValue>{new Date(project.completion_date).toLocaleDateString()}</MetadataValue>
+                  </MetadataItem>
+                )}
+                
+                {project.team_size && (
+                  <MetadataItem>
+                    <MetadataLabel>Team Size</MetadataLabel>
+                    <MetadataValue>{project.team_size}</MetadataValue>
+                  </MetadataItem>
+                )}
+              </MetadataContainer>
+              
+              {project.website_url && (
+                <div style={{ marginTop: '1.5rem' }}>
+                  <CTAButton href={project.website_url} target="_blank" rel="noopener noreferrer">
+                    <FontAwesomeIcon icon={faLink} /> View Live Demo
+                  </CTAButton>
+                </div>
+              )}
+              
+              <TechnologySection>
+                <SectionSubtitle>Technologies & Tools Used</SectionSubtitle>
+                <TechList>
+                  {project.technologies && typeof project.technologies === 'object' && !Array.isArray(project.technologies) ? 
+                    Object.keys(project.technologies).map((tech, index) => (
+                      <TechItem key={index}>{tech}</TechItem>
+                    ))
+                    : 
+                    Array.isArray(project.technologies) && project.technologies.map((tech, index) => (
+                      <TechItem key={index}>{typeof tech === 'object' ? tech.name : tech}</TechItem>
+                    ))}
+                </TechList>
+                
+                {project.services && project.services.length > 0 && (
+                  <>
+                    <SectionSubtitle style={{ marginTop: '1.5rem' }}>Services Provided</SectionSubtitle>
+                    <TechList>
+                      {project.services.map((service, index) => (
+                        <TechItem key={`service-${index}`} style={{ backgroundColor: 'rgba(10, 102, 194, 0.1)' }}>
+                          {service.title || service.name || (typeof service === 'string' ? service : '')}
+                        </TechItem>
+                      ))}
+                    </TechList>
+                  </>
+                )}
+              </TechnologySection>
+            </SectionWithPadding>
+            
+            {/* Challenge and Solution Section */}
+            {(project.challenge_description || (project.challenges && project.challenges.length > 0)) && (
+              <SectionWithPadding style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
+                <SectionTitle>Challenge</SectionTitle>
+                <Description>
+                  {project.challenge_description || 
+                    (typeof project.challenges === 'string' ? project.challenges : 
+                      project.challenges && project.challenges.length > 0 ? 
+                        typeof project.challenges[0] === 'object' ? 
+                          project.challenges[0].description : project.challenges[0] 
+                        : 'No challenge description available')}
+                </Description>
+              </SectionWithPadding>
+            )}
+            
+            {project.solution_description && (
+              <SectionWithPadding>
+                <SectionTitle>Our Approach & Solution</SectionTitle>
+                <Description>{project.solution_description}</Description>
+              </SectionWithPadding>
+            )}
+            
+            {project.challenges && project.challenges.length > 0 && (
+              <SectionWithPadding bgColor="#f7f9fc">
+                <SectionTitle>Challenges</SectionTitle>
+                {typeof project.challenges === 'string' ? (
+                  <Description>{project.challenges}</Description>
+                ) : Array.isArray(project.challenges) ? (
+                  <ChallengesList>
+                    {project.challenges.map((challenge, index) => (
+                      <ChallengeItem key={index}>
+                        <div>
+                          <ChallengeTitle>
+                            {typeof challenge === 'object' ? challenge.title : `Challenge ${index + 1}`}
+                          </ChallengeTitle>
+                          <ChallengeDescription>
+                            {typeof challenge === 'object' ? challenge.description : challenge}
+                          </ChallengeDescription>
+                        </div>
+                      </ChallengeItem>
+                    ))}
+                  </ChallengesList>
+                ) : (
+                  <Description>No challenges specified for this project</Description>
+                )}
+              </SectionWithPadding>
+            )}
+            
+            {project.approach && (
+              <SectionWithPadding>
+                <SectionTitle>Our Approach</SectionTitle>
+                {typeof project.approach === 'string' ? (
+                  <Description>{project.approach}</Description>
+                ) : project.approach.length > 0 ? (
+                  <ApproachContainer>
+                    {project.approach.map((item, index) => (
+                      <ApproachItem key={index}>
+                        <ApproachNumber>{index + 1}</ApproachNumber>
+                        <div>
+                          <ApproachTitle>
+                            {typeof item === 'object' ? item.title : `Phase ${index + 1}`}
+                          </ApproachTitle>
+                          <ApproachDescription>
+                            {typeof item === 'object' ? item.description : item}
+                          </ApproachDescription>
+                        </div>
+                      </ApproachItem>
+                    ))}
+                  </ApproachContainer>
+                ) : null}
+              </SectionWithPadding>
+            )}
+            
+            {project.gallery && project.gallery.length > 0 && (
+              <SectionWithPadding bgColor="#f7f9fc">
+                <SectionTitle>Gallery</SectionTitle>
         <GalleryGrid>
-          {project.gallery.map((image, index) => (
-            <GalleryItem key={index} index={index}>
-              <img 
-                src={image} 
-                alt={`Project screenshot ${index + 1}`} 
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "https://via.placeholder.com/600x400?text=Gallery+Image";
-                }}
+                  {project.gallery.map((galleryItem, index) => {
+                    const imgSrc = typeof galleryItem === 'object' ? 
+                      (galleryItem.image_url || galleryItem.url || galleryItem.src) : 
+                      galleryItem;
+                    
+                    return (
+                      <GalleryItem key={index}>
+                        <GalleryImage 
+                          src={imgSrc} 
+                          alt={`Project gallery ${index + 1}`}
               />
             </GalleryItem>
-          ))}
+                    );
+                  })}
         </GalleryGrid>
-      </GallerySection>
+              </SectionWithPadding>
+            )}
       
-      <ResultsSection>
+            {project.results && (project.results.length > 0 || typeof project.results === 'string') && (
+              <SectionWithPadding>
         <SectionTitle>Results & Impact</SectionTitle>
-        <p>The implementation of our solution delivered significant measurable results for the client.</p>
-        
-        <ResultsGrid>
-          <ResultsContent>
-            <ResultsList>
+                {typeof project.results === 'string' ? (
+                  <Description>{project.results}</Description>
+                ) : (
+                  <ResultsContainer>
               {project.results.map((result, index) => (
-                <ResultsItem key={index}>
-                  <FontAwesomeIcon icon={faCheck} />
+                      <ResultItem key={index}>
+                        <ResultIcon>
+                          <FontAwesomeIcon icon={
+                            index === 0 ? faTrophy : 
+                            index === 1 ? faChartLine : 
+                            index === 2 ? faUsers : faLightbulb
+                          } />
+                        </ResultIcon>
                   <div>
-                    <h4>{result.title}</h4>
-                    <p>{result.description}</p>
+                          <ResultTitle>
+                            {typeof result === 'object' ? result.title : `Result ${index + 1}`}
+                          </ResultTitle>
+                          <ResultDescription>
+                            {typeof result === 'object' ? result.description : result}
+                          </ResultDescription>
                   </div>
-                </ResultsItem>
-              ))}
-            </ResultsList>
-          </ResultsContent>
-          
-          <ResultsChart>
-            <h3>Performance Comparison</h3>
-            <p>Monthly sales before and after implementation (in thousands)</p>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis 
-                  dataKey="name" 
-                  tick={{ fill: 'rgba(255,255,255,0.7)' }}
-                  stroke="rgba(255,255,255,0.2)" 
-                />
-                <YAxis 
-                  tick={{ fill: 'rgba(255,255,255,0.7)' }} 
-                  stroke="rgba(255,255,255,0.2)" 
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#2a2a2a', 
-                    border: 'none',
-                    borderRadius: '8px',
-                    color: 'white'
-                  }} 
-                />
-                <Legend />
-                <Line 
-                  name="Before" 
-                  data={project.chartData.before} 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="#8884d8" 
-                  strokeWidth={2}
-                  dot={{ fill: '#8884d8', strokeWidth: 2 }}
-                  activeDot={{ r: 8 }}
-                />
-                <Line 
-                  name="After" 
-                  data={project.chartData.after} 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="#0A66C2" 
-                  strokeWidth={2}
-                  dot={{ fill: '#0A66C2', strokeWidth: 2 }}
-                  activeDot={{ r: 8 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </ResultsChart>
-        </ResultsGrid>
-      </ResultsSection>
-      
-      <TestimonialSection>
-        <TestimonialContent>
-          <Testimonial>
-            <FontAwesomeIcon icon={faQuoteLeft} className="quote-icon" />
-            <p>{project.testimonial.quote}</p>
-            <TestimonialAuthor>
-              <div className="author-image">
-                <img 
-                  src={project.testimonial.image} 
-                  alt={project.testimonial.author}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "https://via.placeholder.com/150x150?text=Client";
-                  }}
-                />
-              </div>
-              <h4>{project.testimonial.author}</h4>
-              <p>{project.testimonial.role}</p>
-            </TestimonialAuthor>
-          </Testimonial>
-        </TestimonialContent>
-      </TestimonialSection>
+                      </ResultItem>
+                    ))}
+                  </ResultsContainer>
+                )}
+              </SectionWithPadding>
+            )}
+            
+            {/* Testimonial Section */}
+            {project.testimonial_quote && (
+              <SectionWithPadding style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
+                <SectionTitle>Client Testimonial</SectionTitle>
+                <TestimonialContainer>
+                  <TestimonialQuoteMark>
+                    <FontAwesomeIcon icon={faQuoteLeft} />
+                  </TestimonialQuoteMark>
+                  <TestimonialText>"{project.testimonial_quote}"</TestimonialText>
+                  
+                  <TestimonialInfo>
+                    {project.testimonial_image_url && (
+                      <TestimonialImage 
+                        src={project.testimonial_image_url} 
+                        alt={project.testimonial_author || 'Client'} 
+                      />
+                    )}
+                    <TestimonialAuthorInfo>
+                      <TestimonialAuthorName>
+                        {project.testimonial_author || 'Client'}
+                      </TestimonialAuthorName>
+                      {project.testimonial_role && (
+                        <TestimonialAuthorRole>
+                          {project.testimonial_role}
+                        </TestimonialAuthorRole>
+                      )}
+                    </TestimonialAuthorInfo>
+                  </TestimonialInfo>
+                </TestimonialContainer>
+              </SectionWithPadding>
+            )}
       
       <CTASection>
-        <CTATitle>Ready for Similar Results?</CTATitle>
-        <CTAText>
-          Let's discuss how we can help your business achieve similar success with our tailored solutions and expertise.
-        </CTAText>
+              <CTAContent>
+                <CTATitle>Interested in a similar solution?</CTATitle>
+                <CTADescription>
+                  Let's discuss how we can help you achieve your business goals with a custom technology solution.
+                </CTADescription>
         <CTAButtons>
-          <CTAButton href="/contact" primary>
-            Start Your Project
+                  <CTAButton primary to="/contact">Contact Us</CTAButton>
+                  {project.project_url && (
+                    <CTAButton href={project.project_url} target="_blank" rel="noopener noreferrer">
+                      Visit Live Project
           </CTAButton>
-          <CTAButton href="/portfolio">
-            View More Work
-          </CTAButton>
+                  )}
         </CTAButtons>
+              </CTAContent>
       </CTASection>
-    </DetailPage>
+            
+            <SectionWithPadding>
+              <SectionTitle>More Projects</SectionTitle>
+              <RelatedProjects />
+            </SectionWithPadding>
+          </DetailContent>
+          
+          {/* CTA Section */}
+          <SectionWithPadding style={{ textAlign: 'center', backgroundColor: 'rgba(10, 102, 194, 0.1)' }}>
+            <SectionTitle>Interested in a similar solution?</SectionTitle>
+            <CTAContent>
+              <CTADescription>
+                Let's discuss how we can help you achieve your business goals with a custom
+                technology solution.
+              </CTADescription>
+              <CTAButton as={Link} to="/contact">
+                <FontAwesomeIcon icon={faEnvelope} /> Contact Us
+              </CTAButton>
+            </CTAContent>
+          </SectionWithPadding>
+        </>
+      ) : (
+        <div style={{ textAlign: 'center', padding: '5rem 0' }}>
+          <p>Project not found or has been removed.</p>
+          <Link to="/portfolio" style={{ display: 'inline-block', marginTop: '2rem', color: 'var(--primary-color)' }}>
+            Back to Portfolio
+          </Link>
+        </div>
+      )}
+    </DetailPageContainer>
   );
 };
 

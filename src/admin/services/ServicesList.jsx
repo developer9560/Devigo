@@ -51,6 +51,17 @@ import { format } from 'date-fns';
 import { servicesApi } from '../../utility/api';
 import { toast } from 'react-toastify';
 
+// Simple date formatting function to replace date-fns
+// const formatDate = (dateString) => {
+//   if (!dateString) return 'Not set';
+  
+//   const date = new Date(dateString);
+//   if (isNaN(date.getTime())) return 'Invalid date';
+  
+//   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+//   return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+// };
+
 const ServicesList = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);

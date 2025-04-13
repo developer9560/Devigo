@@ -1,11 +1,17 @@
 import axios from 'axios';
 
 // API Configuration
-// Use environment variable or fallback to localhost for development
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://backend-django-pct4.onrender.com/api/v1'|| 'http://localhost:8000/api/v1' || 'http://127.0.0.1:8000/api/v1';
+// Use environment variable or fallback to production URL, then localhost options
+const API_BASE_URL = process.env.REACT_APP_API_URL || 
+                     'https://backend-django-pct4.onrender.com/api/v1'
 
-// Log the API base URL to help with debugging (will be removed in production)
-console.log('API is configured with base URL:', API_BASE_URL);
+
+
+// Log the API base URL to help with debugging
+console.log('API configuration details:');
+console.log('- Environment URL:', process.env.REACT_APP_API_URL || '(not set)');
+console.log('- Fallback chain URL:', API_BASE_URL);
+
 
 const AUTH_TOKEN_KEY = 'devigo_auth_token';
 const REFRESH_TOKEN_KEY = 'devigo_refresh_token';
@@ -30,6 +36,9 @@ const publicApi = axios.create({
 // Request interceptor for adding auth token
 api.interceptors.request.use(
   (config) => {
+    // Log outgoing requests for debugging
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
+    
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
@@ -43,6 +52,13 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Log response errors
+    console.error('API Error:', error.message);
+    if (error.response) {
+      console.error('Status:', error.response.status);
+      console.error('Data:', error.response.data);
+    }
+    
     const originalRequest = error.config;
 
     // If error is 401 and we haven't tried to refresh the token yet
