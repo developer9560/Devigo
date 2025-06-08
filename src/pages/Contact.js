@@ -18,6 +18,7 @@ import {
 } from '@fortawesome/free-brands-svg-icons';
 import axios from 'axios';
 import { api, inquiriesApi, servicesApi } from '../utility/api';
+import { set } from 'date-fns';
 
 // Get the base API URL from environment variable or use a default
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
@@ -699,7 +700,52 @@ const Contact = () => {
         subject: subject,
         message: formData.message
       };
+
+      const serviceName = getServiceNameById(formData.service)|| "service inquiry from website";
       
+      // prepare data for google sheet
+      const formSheetData={
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || '',
+        company: formData.company || '',
+        subject: subject,
+        message: formData.message,
+        service: serviceName
+      };
+
+      const response = await fetch("https://script.google.com/macros/s/AKfycbxAK16PUIpQtkrNl2MYaxTahtK2T9zX8XoVGfe_nydA1bjmduryJ3FOGO42o9ZFEcV7ZQ/exec", {
+        method: "POST",
+        body:new URLSearchParams(formSheetData),
+      });
+      if (!response.ok) {
+        setSubmitStatus({
+          loading: false,
+          success: false,
+          error: 'Failed to submit form to Google Sheets'
+        });
+      
+
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        service: '',
+        message: '',
+        subject: ''
+      });
+
+      window.scrollTo({
+        top: document.getElementById('contact-form').offsetTop - 100,
+        behavior: 'smooth'
+      });
+
+    } else{
+      throw new Error('Failed to submit form to Google Sheets');
+    }
+ 
+
       // Set service_id if a service is selected
       if (formData.service) {
         // Parse to integer if possible, otherwise leave as null
@@ -710,16 +756,16 @@ const Contact = () => {
       console.log('Sending inquiry payload:', payload);
       
       // Try the inquiriesApi first
-      try {
-        // Make API call to backend using the inquiriesApi
-        const response = await inquiriesApi.create(payload);
-        console.log('Inquiry submitted successfully', response);
-      } catch (apiError) {
-        console.error('Error using inquiriesApi, trying direct axios call:', apiError);
+      // try {
+      //   // Make API call to backend using the inquiriesApi
+      //   const response = await inquiriesApi.create(payload);
+      //   console.log('Inquiry submitted successfully', response);
+      // } catch (apiError) {
+      //   console.error('Error using inquiriesApi, trying direct axios call:', apiError);
         
-        // Fallback to direct axios call with the full URL
-        await axios.post(`${API_BASE_URL}/inquiries/`, payload);
-      }
+      //   // Fallback to direct axios call with the full URL
+      //   await axios.post(`${API_BASE_URL}/inquiries/`, payload);
+      // }
       
       // Handle success
       setSubmitStatus({
