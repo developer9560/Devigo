@@ -716,7 +716,10 @@ const Contact = () => {
 
       const response = await fetch("https://script.google.com/macros/s/AKfycbxAK16PUIpQtkrNl2MYaxTahtK2T9zX8XoVGfe_nydA1bjmduryJ3FOGO42o9ZFEcV7ZQ/exec", {
         method: "POST",
-        body:new URLSearchParams(formSheetData),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams(formSheetData),
       });
       if (!response.ok) {
         setSubmitStatus({
