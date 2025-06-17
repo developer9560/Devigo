@@ -704,7 +704,7 @@ const Contact = () => {
 
     // Optional hidden fields (you can remove these lines if not needed)
     formDataToSend.append('_captcha', 'false'); // Disable captcha
-    formDataToSend.append('_next', 'https://devigo.in/thank-you'); // Redirect after submit
+    formDataToSend.append('_next', 'https://devigo.in/contact'); // Redirect after submit
 
     // Send request to FormSubmit
     await fetch('https://formsubmit.co/ae8839d31314d97a37e00eed99194c5d', {

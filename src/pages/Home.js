@@ -603,14 +603,10 @@ const Home = () => {
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
               <Link 
-                to={service.link || `/services/${service.id}`} 
+                to={service.link || `/services/${service.slug}`} 
                 className="text-blue-500 font-semibold flex items-center group hover:text-blue-400 transition-colors duration-300"
               >
-                Learn More 
-                <FontAwesomeIcon 
-                  icon={faLongArrowAltRight} 
-                  className="ml-2 group-hover:translate-x-1 transition-transform duration-300" 
-                />
+                Learn More <span className="ml-2 group-hover:translate-x-1 transition-transform duration-300"><FontAwesomeIcon icon={faLongArrowAltRight} /></span>
             </Link>
             </motion.div>
           </motion.div>
