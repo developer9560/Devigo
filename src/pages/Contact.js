@@ -487,7 +487,6 @@ const useElementOnScreen = (options) => {
   const containerRef = useRef(null);
   
   useEffect(() => {
-        window.scrollTo(0, 0);
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -508,6 +507,7 @@ const useElementOnScreen = (options) => {
 };
 
 const Contact = () => {
+  window.scrollTo(0, 0); // Scroll to top on component mount
   const containerRef = useElementOnScreen({
     root: null,
     rootMargin: '0px',
