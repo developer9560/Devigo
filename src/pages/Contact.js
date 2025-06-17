@@ -487,6 +487,7 @@ const useElementOnScreen = (options) => {
   const containerRef = useRef(null);
   
   useEffect(() => {
+        window.scrollTo(0, 0);
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -678,133 +679,164 @@ const Contact = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Reset status
+  e.preventDefault();
+
+  // Reset status
+  setSubmitStatus({
+    loading: true,
+    success: false,
+    error: null
+  });
+
+  try {
+    const subject = formData.subject || `Inquiry about ${getServiceNameById(formData.service)}` || 'Website Inquiry';
+    const serviceName = getServiceNameById(formData.service) || "Service Inquiry";
+
+    // Build form data in FormSubmit compatible format
+    const formDataToSend = new URLSearchParams();
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('phone', formData.phone || '');
+    formDataToSend.append('company', formData.company || '');
+    formDataToSend.append('subject', subject);
+    formDataToSend.append('service', serviceName);
+    formDataToSend.append('message', formData.message);
+
+    // Optional hidden fields (you can remove these lines if not needed)
+    formDataToSend.append('_captcha', 'false'); // Disable captcha
+    formDataToSend.append('_next', 'http://localhost:3000/thank-you'); // Redirect after submit
+
+    // Send request to FormSubmit
+    await fetch('https://formsubmit.co/ae8839d31314d97a37e00eed99194c5d', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: formDataToSend
+    });
+
+    // Success
     setSubmitStatus({
-      loading: true,
-      success: false,
+      loading: false,
+      success: true,
       error: null
     });
+
+    // Reset form
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      company: '',
+      service: '',
+      message: '',
+      subject: ''
+    });
+
+    // Scroll to top of form
+    window.scrollTo({
+      top: document.getElementById('contact-form').offsetTop - 100,
+      behavior: 'smooth'
+    });
+
+  } catch (error) {
+    console.error('Contact form submission error:', error);
+    setSubmitStatus({
+      loading: false,
+      success: false,
+      error: 'Failed to send message. Please try again.'
+    });
+  }
+};
+
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
     
-    try {
-      // Ensure subject is not empty
-      const subject = formData.subject || `Inquiry about ${getServiceNameById(formData.service)}` || 'Website Inquiry';
+  //   // Reset status
+  //   setSubmitStatus({
+  //     loading: true,
+  //     success: false,
+  //     error: null
+  //   });
+    
+  //   try {
+  //     // Ensure subject is not empty
+  //     const subject = formData.subject || `Inquiry about ${getServiceNameById(formData.service)}` || 'Website Inquiry';
       
-      // Map form data to match the backend API expectations
-      const payload = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone || '',
-        company: formData.company || '',
-        subject: subject,
-        message: formData.message
-      };
+  //     // Map form data to match the backend API expectations
+  //     const payload = {
+  //       name: formData.name,
+  //       email: formData.email,
+  //       phone: formData.phone || '',
+  //       company: formData.company || '',
+  //       subject: subject,
+  //       message: formData.message
+  //     };
 
-      const serviceName = getServiceNameById(formData.service)|| "service inquiry from website";
+  //     const serviceName = getServiceNameById(formData.service)|| "service inquiry from website";
       
-      // prepare data for google sheet
-      const formSheetData={
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone || '',
-        company: formData.company || '',
-        subject: subject,
-        message: formData.message,
-        service: serviceName
-      };
+  //     // prepare data for google sheet
+  //     const formSheetData={
+  //       name: formData.name,
+  //       email: formData.email,
+  //       phone: formData.phone || '',
+  //       company: formData.company || '',
+  //       subject: subject,
+  //       message: formData.message,
+  //       service: serviceName
+  //     };
 
-      const response = await fetch("https://script.google.com/macros/s/AKfycbyRWuRzMf7KazJCmEyvVBi4CavPjgfMYKln2toDiqTK0031zrz3NExChvLP0ws03P6Vzw/exec", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: new URLSearchParams(formSheetData),
-      });
-      if (!response.ok) {
-        setSubmitStatus({
-          loading: false,
-          success: false,
-          error: 'Failed to submit form to Google Sheets'
-        });
       
-
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        company: '',
-        service: '',
-        message: '',
-        subject: ''
-      });
-
-      window.scrollTo({
-        top: document.getElementById('contact-form').offsetTop - 100,
-        behavior: 'smooth'
-      });
-
-    } else{
-      throw new Error('Failed to submit form to Google Sheets');
-    }
- 
-
-      // Set service_id if a service is selected
-      if (formData.service) {
-        // Parse to integer if possible, otherwise leave as null
-        const serviceId = parseInt(formData.service, 10);
-        payload.service_id = !isNaN(serviceId) ? serviceId : null;
-      }
       
-      console.log('Sending inquiry payload:', payload);
       
-      // Try the inquiriesApi first
-      // try {
-      //   // Make API call to backend using the inquiriesApi
-      //   const response = await inquiriesApi.create(payload);
-      //   console.log('Inquiry submitted successfully', response);
-      // } catch (apiError) {
-      //   console.error('Error using inquiriesApi, trying direct axios call:', apiError);
+  //     // Try the inquiriesApi first
+  //     try {
+  //       // Make API call to backend using the inquiriesApi
+  //       const response = await inquiriesApi.create(payload);
+  //       console.log('Inquiry submitted successfully', response);
+  //     } catch (apiError) {
+  //       console.error('Error using inquiriesApi, trying direct axios call:', apiError);
         
-      //   // Fallback to direct axios call with the full URL
-      //   await axios.post(`${API_BASE_URL}/inquiries/`, payload);
-      // }
+  //       // Fallback to direct axios call with the full URL
+  //       await axios.post(`${API_BASE_URL}/inquiries/`, payload);
+  //     }
       
-      // Handle success
-      setSubmitStatus({
-        loading: false,
-        success: true,
-        error: null
-      });
+  //     // Handle success
+  //     setSubmitStatus({
+  //       loading: false,
+  //       success: true,
+  //       error: null
+  //     });
       
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        company: '',
-        service: '',
-        message: '',
-        subject: ''
-      });
+  //     // Reset form
+  //     setFormData({
+  //       name: '',
+  //       email: '',
+  //       phone: '',
+  //       company: '',
+  //       service: '',
+  //       message: '',
+  //       subject: ''
+  //     });
       
-      // Scroll to top of form
-      window.scrollTo({
-        top: document.getElementById('contact-form').offsetTop - 100,
-        behavior: 'smooth'
-      });
+  //     // Scroll to top of form
+  //     window.scrollTo({
+  //       top: document.getElementById('contact-form').offsetTop - 100,
+  //       behavior: 'smooth'
+  //     });
       
-    } catch (error) {
-      console.error('Contact form submission error:', error);
+  //   } catch (error) {
+  //     console.error('Contact form submission error:', error);
       
-      // Handle error
-      setSubmitStatus({
-        loading: false,
-        success: false,
-        error: error.response?.data?.message || 'Something went wrong. Please try again.'
-      });
-    }
-  };
+  //     // Handle error
+  //     setSubmitStatus({
+  //       loading: false,
+  //       success: false,
+  //       error: error.response?.data?.message || 'Something went wrong. Please try again.'
+  //     });
+  //   }
+  // };
 
   return (
     <ContactPage ref={containerRef}>

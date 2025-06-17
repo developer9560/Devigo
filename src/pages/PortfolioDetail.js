@@ -1066,6 +1066,7 @@ const PortfolioDetail = () => {
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
   useEffect(() => {
+        window.scrollTo(0, 0);
     const fetchProjectDetails = async () => {
       try {
         setLoading(true);

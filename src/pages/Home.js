@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import servicesData from '../pages/services.json';
 import { 
   faCode, 
   faDesktop, 
@@ -18,7 +19,26 @@ import {
   faPenRuler,
   faHeadset,
   faExclamationTriangle,
-  faDatabase
+  faDatabase,
+    faLaptopCode, 
+    faMobileScreen, 
+    faServer, 
+    faShieldHalved,
+    faCheck,
+    faArrowRight,
+
+    faListCheck,
+    faSpinner,
+
+    faShoppingCart,
+
+    faGlobe,
+    faTools,
+    faBezierCurve,
+    faStore,
+    faCreditCard,
+    faMobile,
+    faTabletAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { motion, useInView, useScroll, useTransform, useAnimation, AnimatePresence } from 'framer-motion';
 import { servicesApi } from '../utility/api'; // Import the services API
@@ -131,6 +151,63 @@ const Home = () => {
     "Turn Your Vision into Digital Reality",
     "Custom Software That Drives Business Growth"
   ];
+
+   const iconMapping = {
+      // Web Development
+      'code': faCode,
+      'web': faLaptopCode,
+      'integration_instructions': faCode,
+      'developer_mode': faCode,
+      'html': faCode,
+      'laptop_code': faLaptopCode,
+      
+      // Design
+      'design_services': faPaintBrush,
+      'palette': faPaintBrush,
+      'brush': faPaintBrush,
+      'format_paint': faPaintBrush,
+      'style': faPaintBrush,
+      'paint_brush': faPaintBrush,
+      'bezier_curve': faBezierCurve,
+      
+      // Mobile
+      'smartphone': faMobileScreen,
+      'android': faMobileScreen,
+      'ios_share': faMobileScreen,
+      'phonelink': faMobileScreen,
+      'app_shortcut': faMobileScreen,
+      'mobile_screen': faMobileScreen,
+      'mobile': faMobile,
+      'tablet_alt': faTabletAlt,
+      
+      // Marketing
+      'trending_up': faChartLine,
+      'campaign': faChartLine,
+      'search': faSearch,
+      'public': faGlobe,
+      'ads_click': faChartLine,
+      'chart_line': faChartLine,
+      
+      // Infrastructure 
+      'cloud': faServer,
+      'storage': faServer,
+      'dns': faServer,
+      'security': faShieldHalved,
+      'memory': faServer,
+      'shield_halved': faShieldHalved,
+      'server': faServer,
+      'database': faDatabase,
+      'tools': faTools,
+      
+      // Business
+      'shopping_cart': faShoppingCart,
+      'store': faStore,
+      'payments': faCreditCard,
+      'business': faDesktop,
+      'analytics': faChartLine
+    };
+
+  
   
   // Create controls for animations
   const controls = useAnimation();
@@ -141,6 +218,7 @@ const Home = () => {
 
   // Inject performance optimization styles
   useEffect(() => {
+        window.scrollTo(0, 0);
     // Create style element
     const style = document.createElement('style');
     style.innerHTML = preloadStyles;
@@ -250,29 +328,33 @@ const Home = () => {
   useEffect(() => {
     // Start animations when component mounts
     controls.start("visible");
-    
-    const fetchServices = async () => {
-      try {
-        setLoadingServices(true);
-        setServiceError(null); // Reset error state
-        const response = await servicesApi.getAll({ featured: true }); // Fetch only featured services
-        if (response.data && response.data.results) {
-          // Limit to 6 services
-          const limitedServices = response.data.results.slice(0, 6).map(service => ({
-            ...service,
-            icon: serviceIconMap[service.title] || serviceIconMap.default, // Map title to icon or use default
-            excerpt: service.excerpt ? (service.excerpt.length > 100 ? `${service.excerpt.substring(0, 100)}...` : service.excerpt) : 'No description available', // Handle possible null excerpts
-            link: service.slug ? `/services/${service.slug}` : `/services/${service.id}` // Ensure link exists
-          }));
-          setServices(limitedServices);
-        }
-      } catch (error) {
-        console.error('Error fetching services:', error);
-        setServiceError('Error fetching services. Please try again later.');
-      } finally {
-        setLoadingServices(false);
-      }
-    };
+
+
+    // const fetchServices = async () => {
+    //   try {
+    //     setLoadingServices(true);
+    //     setServiceError(null); // Reset error state
+    //     const response = await servicesApi.getAll({ featured: true }); // Fetch only featured services
+    //     if (response.data && response.data.results) {
+    //       // Limit to 6 services
+    //       const limitedServices = response.data.results.slice(0, 6).map(service => ({
+    //         ...service,
+    //         icon: serviceIconMap[service.title] || serviceIconMap.default, // Map title to icon or use default
+    //         excerpt: service.excerpt ? (service.excerpt.length > 100 ? `${service.excerpt.substring(0, 100)}...` : service.excerpt) : 'No description available', // Handle possible null excerpts
+    //         link: service.slug ? `/services/${service.slug}` : `/services/${service.id}` // Ensure link exists
+    //       }));
+    //       setServices(limitedServices);
+    //     }
+    //   } catch (error) {
+    //     console.error('Error fetching services:', error);
+    //     setServiceError('Error fetching services. Please try again later.');
+    //   } finally {
+    //     setLoadingServices(false);
+    //   }
+    // };
+
+    setServices(servicesData); // Use local JSON data for now
+    setLoadingServices(false); // Set loading to false after setting services
 
     const fetchProjects = async () => {
       try {
@@ -327,7 +409,7 @@ const Home = () => {
       }
     };
 
-    fetchServices();
+    // fetchServices();
     fetchProjects();
   }, [controls, API_BASE_URL]);
 
@@ -512,7 +594,7 @@ const Home = () => {
               whileHover={{ rotate: 5, scale: 1.1 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <FontAwesomeIcon icon={service.icon || faCode} />
+              <FontAwesomeIcon icon={iconMapping[service.icon] || faCode} />
             </motion.div>
             <h3 className="text-xl font-bold mb-4 text-white">{service.title}</h3>
             <p className="text-gray-400 mb-6 leading-relaxed">{service.excerpt}</p>

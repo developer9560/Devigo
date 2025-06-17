@@ -16,7 +16,12 @@ import {
 import { motion } from 'framer-motion';
 import { servicesApi } from '../utility/api';
 import SEO from '../components/SEO/SEO';
-import ServiceSchema, { generateWebDevSchema, generateMobileAppSchema, generateUIUXSchema } from '../components/SEO/ServiceSchema';
+import ServiceSchema, { 
+  generateWebDevSchema, 
+  generateMobileAppSchema, 
+  generateUIUXSchema 
+} from '../components/SEO/ServiceSchema';
+import servicesData from '../pages/services.json';
 
 const ServiceDetail = () => {
   const { serviceId } = useParams();
@@ -34,114 +39,40 @@ const ServiceDetail = () => {
 
   // Fetch service data from API
   useEffect(() => {
-    const fetchService = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch the specific service by slug
-        const response = await servicesApi.getBySlug(serviceId);
-        
-        // Check if we got results and find the matching service
-        if (response.data) {
-          let serviceData;
-          
-          // Handle both paginated and non-paginated responses
-          if (response.data.results && response.data.results.length > 0) {
-            // Paginated response
-            serviceData = response.data.results[0];
-          } else if (Array.isArray(response.data) && response.data.length > 0) {
-            // Non-paginated array response
-            serviceData = response.data[0];
-          } else {
-            throw new Error('Service not found');
-          }
-          
-          setService(serviceData);
-          
-          // After getting the service, fetch related services
-          if (serviceData && serviceData.id) {
-            fetchRelatedServices(serviceData.id);
-          }
-        } else {
-          throw new Error('Service not found');
-        }
-      } catch (error) {
-        console.error('Error fetching service details:', error);
-        setError('Failed to load service details. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Fetch related services, excluding the current one
-    const fetchRelatedServices = async (currentServiceId) => {
-      try {
-        const response = await servicesApi.getAll({ 
-          status: 'active',
-          featured: true
-        });
-        
-        let services = [];
-        if (response.data && response.data.results) {
-          services = response.data.results;
-        } else if (Array.isArray(response.data)) {
-          services = response.data;
-        }
-        
-        // Filter out the current service and take up to 3
-        const related = services
-          .filter(s => s.id !== currentServiceId)
-          .slice(0, 3);
-          
-        setRelatedServices(related);
-      } catch (error) {
-        console.error('Error fetching related services:', error);
-        // We don't set the main error state as this is not critical
-      }
-    };
-
-    fetchService();
+    // Scroll to top when component mounts or route changes
+    window.scrollTo(0, 0);
+    
+    console.log('Fetching service details for ID:', serviceId);
+    const matchedServices = servicesData.filter(service => service.slug === serviceId);
+    if (matchedServices.length > 0) {
+      setService(matchedServices[0]); // Set the actual service object, not in an array
+      setLoading(false);
+    } else {
+      setError('Service not found');
+      setLoading(false);
+    }
   }, [serviceId]);
 
   // Generate structured data for this specific service
   const getServiceStructuredData = () => {
     if (!service) return null;
     
-    // Determine which schema to use based on service type/slug
+    const schemaData = {
+      name: service.title || '',
+      description: service.excerpt || service.description || '',
+      image: service.image || `https://devigo.in/images/services/${service.slug || 'default'}.jpg`,
+      url: `https://devigo.in/services/${service.slug || service.id || ''}`
+    };
+    
     if (service.slug?.includes('web') || service.title?.toLowerCase().includes('web')) {
-      return generateWebDevSchema({
-        name: service.title || '',
-        description: service.excerpt || service.description || '',
-        image: service.image || `https://devigo.in/images/services/${service.slug || 'default'}.jpg`,
-        url: `https://devigo.in/services/${service.slug || service.id || ''}`
-      });
-    } else if (service.slug?.includes('mobile') || service.slug?.includes('app') || 
-              service.title?.toLowerCase().includes('mobile') || service.title?.toLowerCase().includes('app')) {
-      return generateMobileAppSchema({
-        name: service.title || '',
-        description: service.excerpt || service.description || '',
-        image: service.image || `https://devigo.in/images/services/${service.slug || 'default'}.jpg`,
-        url: `https://devigo.in/services/${service.slug || service.id || ''}`
-      });
-    } else if (service.slug?.includes('ui') || service.slug?.includes('ux') || service.slug?.includes('design') ||
-              service.title?.toLowerCase().includes('ui') || service.title?.toLowerCase().includes('ux') || 
-              service.title?.toLowerCase().includes('design')) {
-      return generateUIUXSchema({
-        name: service.title || '',
-        description: service.excerpt || service.description || '',
-        image: service.image || `https://devigo.in/images/services/${service.slug || 'default'}.jpg`,
-        url: `https://devigo.in/services/${service.slug || service.id || ''}`
-      });
-    } else {
-      // Default schema for other service types
-      return ServiceSchema({
-        name: service.title || '',
-        description: service.excerpt || service.description || '',
-        image: service.image || `https://devigo.in/images/services/${service.slug || 'default'}.jpg`,
-        url: `https://devigo.in/services/${service.slug || service.id || ''}`,
-        serviceType: 'ProfessionalService'
-      });
+      return generateWebDevSchema(schemaData);
+    } else if (service.slug?.includes('mobile') || service.slug?.includes('app')) {
+      return generateMobileAppSchema(schemaData);
+    } else if (service.slug?.includes('ui') || service.slug?.includes('ux') || service.slug?.includes('design')) {
+      return generateUIUXSchema(schemaData);
     }
+    
+    return ServiceSchema(schemaData);
   };
 
   // Loading state
@@ -230,7 +161,7 @@ const ServiceDetail = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                {service.title}
+                {service?.title}
               </motion.h1>
               
               <motion.p 
@@ -239,7 +170,7 @@ const ServiceDetail = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
-                {service.excerpt}
+                {service?.excerpt}
               </motion.p>
               
               <motion.div
@@ -473,4 +404,4 @@ const ServiceDetail = () => {
   );
 };
 
-export default ServiceDetail; 
+export default ServiceDetail;

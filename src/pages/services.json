@@ -1,0 +1,325 @@
+[
+    {
+        "id": "1",
+        "title": "Full Stack Development",
+        "description": "Full Stack Development refers to the complete development of web applications — both the frontend (what users see) and the backend (server-side logic, database, and API integration). Our full stack development service ensures that your project is built from the ground up using scalable, secure, and high-performing technologies. Whether it's a startup MVP or a large enterprise application, we deliver end-to-end solutions tailored to your needs..",
+        "slug": "full-stack-development",
+        "excerpt": "We build powerful full stack web applications — from stunning interfaces to secure, scalable backends — using modern technologies.",
+        "icon": "developer_mode",
+        "image_url": "/images/FullStack.png",
+        "status": "active",
+        "featured": true,
+        "order": 1,
+        "features": [
+            "End-to-end development (frontend + backend + database)",
+            "Clean, responsive UI/UX design",
+            "RESTful API & third-party integrations",
+            "Scalable and secure backend systems",
+            "Database management and optimization",
+            "Optimized for speed, SEO, and mobile"
+
+
+        ],
+        "benefits": [
+            "Single team handles the full application – faster delivery",
+            "Cost-effective development and maintenance",
+            "Seamless integration between frontend and backend",
+            "Highly scalable architecture to support growth",
+            "Ongoing support & easy feature enhancements",
+            "Custom solutions for unique business needs"
+        ],
+        "technologies": {
+            "frontend": [
+                "React",
+                "Vue.js",
+                "Angular",
+                "HTML",
+                "CSS",
+                "JavaScript",
+                "Bootstrap",
+                "Tailwind CSS",
+                "Next.js"
+            ],
+            "backend": [
+                "Node.js (Express.js)",
+                "Python with Django or FastAPI",
+                "Ruby on Rails",
+                "Java (Spring Boot)",
+                "PHP (Laravel)"
+            ],
+            "database": [
+                "MongoDB",
+                "PostgreSQL",
+                "MySQL",
+                "SQLite",
+                "Firebase" 
+            ]
+        }
+    },
+    {
+        "id": "2",
+        "title": "Mobile App Development",
+        "description": "Crafting high-quality mobile applications for iOS and Android.",
+        "slug": "mobile-app-development",
+        "excerpt": "Native and cross-platform mobile applications with intuitive interfaces and powerful features.",
+        "icon": "android",
+        "image_url": "https://res.cloudinary.com/dofjr7o8l/image/upload/v1747826114/w7pa4a0numpidmzod9u1.jpg",
+        "status": "active",
+        "featured": false,
+        "order": 2,
+        "features": [
+            "Cross-platform apps",
+            "User-friendly interfaces",
+            "Performance optimization",
+            "App maintenance and support",
+            "Android and iOS compatibility"
+        ],
+        "benefits": [
+            "Wider audience reach",
+            "Enhanced user engagement",
+            "Increased brand visibility"
+        ],
+        "technologies": {
+            "frontend": [
+                "Flutter",
+                "React Native"
+            ],
+            "backend": [
+                "Firebase",
+                "Express.js"
+            ],
+            "database": [
+                "SQLite",
+                "Realm"
+            ]
+        }
+    },
+    {
+        "id": "3",
+        "title": "UI/UX Design",
+        "description": "Creating user-centric designs that enhance user experience.",
+        "slug": "ui-ux-design",
+        "excerpt": "Our UI/UX design services focus on delivering intuitive and engaging user experiences.",
+        "icon": "paint_brush",
+        "image_url": "https://res.cloudinary.com/dofjr7o8l/image/upload/c_thumb,w_200,g_face/v1744520473/devigo_uploads/u9ejegptarqafqbz9n0l.jpg",
+        "status": "active",
+        "featured": false,
+        "order": 3,
+        "features": [
+            "Visual design & branding",
+            "Interaction design",
+            "User research and analysis",
+            "Wireframing",
+            "Prototyping",
+            "Usability testing"
+        ],
+        "benefits": [
+            "Improved user satisfaction",
+            "Increased conversion rates",
+            "Enhanced brand loyalty"
+        ],
+        "technologies": {
+            "design": [
+                "Figma",
+                "Adobe XD",
+                "Sketch"
+            ],
+            "frontend": [
+                "HTML",
+                "CSS",
+                "JavaScript"
+            ]
+        }
+    },
+    {
+        "id": "4",
+        "title": "Web Design & Development",
+        "description": "Building visually appealing and functional websites.",
+        "slug": "web-design-development",
+        "excerpt": "We craft visually stunning, high-performance websites tailored to your business. Our expertise ensures seamless performance, responsive design, and user engagement. Whether it's a business site, portfolio, or web app, we deliver exceptional digital solutions.",
+        "icon": "web",
+        "image_url": "/images/Webdesign.jpg",
+        "status": "active",
+        "featured": false,
+        "order": 4,
+        "features": [
+            "Responsive design",
+            "Custom web applications",
+            "E-commerce solutions",
+            "E-commerce integration",
+            "Content management systems",
+            "Website maintenance",
+            "Full-stack development"
+        ],
+        "benefits": [
+            "Increased online visibility",
+            "Enhanced user experience",
+            "Higher conversion rates"
+        ],
+        "technologies": {
+            "frontend": [
+                "React",
+                "Vue.js",
+                "Angular"
+            ],
+            "backend": [
+                "Node.js",
+                "Django",
+                "Ruby on Rails"
+            ],
+            "database": [
+                "MongoDB",
+                "PostgreSQL",
+                "MySQL"
+            ]
+        }
+    },
+    {
+        "id": "5",
+        "title": "Website Maintenance & Optimization",
+        "description": "Ensuring your website runs smoothly and efficiently.",
+        "slug": "website-maintenance-optimization",
+        "excerpt": "Our website maintenance and optimization services ensure your site remains up-to-date, secure, and performing at its best.",
+        "icon": "design_services",
+        "image_url": "/images/websiteMantainance.png",
+        "status": "active",
+        "featured": false,
+        "order": 5,
+        "features": [
+            "Regular updates",
+            "Performance monitoring",
+            "Security enhancements",
+            "Backup and recovery"
+        ],
+        "benefits": [
+            "Increased website longevity",
+            "Improved user experience",
+            "Higher search engine rankings"
+        ],
+        "technologies": {
+            "frontend": [
+                "HTML",
+                "CSS",
+                "JavaScript"
+            ],
+            "backend": [
+                "Node.js",
+                "Django",
+                "Ruby on Rails"
+            ],
+            "database": [
+                "MongoDB",
+                "PostgreSQL",
+                "MySQL"
+            ]
+        }
+    },
+    {
+        "id": "6",
+        "title": "Digital Marketing",
+        "description": "Boost your online presence with our digital marketing services.",
+        "slug": "digital-marketing",
+        "excerpt": "Our digital marketing services help you reach a wider audience and increase your online visibility.",
+        "icon": "trending_up",
+        "image_url": "/images/digitalMarketing.jpg",
+        "status": "active",
+        "featured": false,
+        "order": 6,
+        "features": [
+            "SEO optimization",
+            "Social media marketing",
+            "Content marketing",
+            "Email marketing"
+        ],
+        "benefits": [
+            "Increased brand awareness",
+            "Higher engagement rates",
+            "Improved conversion rates"
+        ],
+        "technologies": {
+            "seo": [
+                "Google Analytics",
+                "SEMrush"
+            ],
+            "social_media": [
+                "Facebook Ads",
+                "Google Ads"
+            ]
+        }
+    },
+    {
+        "id": "7",
+        "title":"Custom Software Development",
+        "description": "Tailored software solutions to meet your unique business needs.",
+        "slug": "custom-software-development",
+        "excerpt": "Our custom software development services provide tailored solutions to meet your specific business requirements.",
+        "icon": "custom-software-icon",
+        "image_url": "/images/customSoftware.webp",
+        "status": "active",
+        "featured": false,
+        "order": 7,
+        "features": [
+            "Bespoke software solutions",
+            "API development",
+            "Legacy system integration",
+            "Cloud-native applications"
+        ],
+        "benefits": [
+            "Increased operational efficiency",
+            "Scalability and flexibility",
+            "Enhanced user experience"
+        ],
+        "technologies": {
+            "frontend": [
+                "React",
+                "Vue.js",
+                "Angular"
+            ],
+            "backend": [
+                "Node.js",
+                "Django",
+                "Ruby on Rails"
+            ],
+            "database": [
+                "MongoDB",
+                "PostgreSQL",
+                "MySQL"
+            ]
+        }
+    },
+    { 
+        "id": "8",
+        "title": "WordPress Development",
+        "description": "Expert WordPress development services for your business.",
+        "slug": "wordpress-development",
+        "excerpt": "Our WordPress development services offer customized solutions to enhance your online presence.",
+        "icon": "laptop_code",
+        "image_url": "/images/Wordpress.png",
+        "status": "active",
+        "featured": false,
+        "order": 8,
+        "features": [
+            "Custom theme development",
+            "Plugin development",
+            "WooCommerce integration",
+            "Website optimization"
+        ],
+        "benefits": [
+            "Enhanced website functionality",
+            "Improved user experience",
+            "Increased online sales"
+        ],
+        "technologies": {
+            "frontend": [
+                "HTML",
+                "CSS",
+                "JavaScript"
+            ],
+            "backend": [
+                "PHP",
+                "MySQL"
+            ]
+        }
+    }
+
+]

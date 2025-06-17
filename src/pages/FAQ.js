@@ -341,6 +341,7 @@ const CTAButton = styled(Link)`
 const useElementOnScreen = (options) => {
   const containerRef = useRef(null);
   useEffect(() => {
+        window.scrollTo(0, 0);
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {

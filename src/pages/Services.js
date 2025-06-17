@@ -33,11 +33,18 @@ import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { api, servicesApi } from '../utility/api';
 import SEO from '../components/SEO/SEO';
 import ServiceSchemas from '../components/SEO/ServiceSchema';
+import { set } from 'date-fns';
+import servicesData from '../pages/services.json';
+import { all } from 'axios';
 
 const Services = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const allservices = servicesData || [];
+
+
 
   // Icon mapping for service icons - expanded with all Material icon equivalents
   const iconMapping = {
@@ -95,30 +102,40 @@ const Services = () => {
     'analytics': faChartLine
   };
 
-  // Fetch services from API
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        setLoading(true);
-        const response = await servicesApi.getAll({ status: 'active' });
-        
-        if (response.data && (response.data.results || Array.isArray(response.data))) {
-          // Handle paginated response or array response
-          const servicesData = response.data.results || response.data;
-          setServices(servicesData);
-        } else {
-          throw new Error('Invalid response format');
-        }
-      } catch (error) {
-        console.error('Error fetching services:', error);
-        setError('Failed to load services. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Import services data
 
-    fetchServices();
+  // Set static services data
+  useEffect(() => {
+        window.scrollTo(0, 0);
+    setServices(allservices);
+    setLoading(false);
   }, []);
+  // Initialize services state
+
+  // Fetch services from API
+  // useEffect(() => {
+  //   const fetchServices = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const response = await servicesApi.getAll({ status: 'active' });
+        
+  //       if (response.data && (response.data.results || Array.isArray(response.data))) {
+  //         // Handle paginated response or array response
+  //         const servicesData = response.data.results || response.data;
+  //         setServices(servicesData);
+  //       } else {
+  //         throw new Error('Invalid response format');
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching services:', error);
+  //       setError('Failed to load services. Please try again later.');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchServices();
+  // }, []);
 
   // Technology stack data
   const techStack = [

@@ -587,6 +587,7 @@ const Portfolio = () => {
   
   // Fetch projects from API
   useEffect(() => {
+        window.scrollTo(0, 0);
     const fetchProjects = async () => {
       try {
         setLoading(true);
