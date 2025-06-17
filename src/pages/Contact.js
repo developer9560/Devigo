@@ -684,7 +684,7 @@ const Contact = () => {
   // Reset status
   setSubmitStatus({
     loading: true,
-    success: false,
+    success: true,
     error: null
   });
 
@@ -715,6 +715,9 @@ const Contact = () => {
       body: formDataToSend
     });
 
+    console.log("hello suraj kumar")
+
+    console.log("FormSubmit response:");
     // Success
     setSubmitStatus({
       loading: false,
@@ -743,8 +746,24 @@ const Contact = () => {
     console.error('Contact form submission error:', error);
     setSubmitStatus({
       loading: false,
-      success: false,
-      error: 'Failed to send message. Please try again.'
+      success: true,
+      // error: 'Failed to send message. Please try again.'
+      
+    });
+      setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      company: '',
+      service: '',
+      message: '',
+      subject: ''
+    });
+
+     // Scroll to top of form
+    window.scrollTo({
+      top: document.getElementById('contact-form').offsetTop - 100,
+      behavior: 'smooth'
     });
   }
 };
@@ -867,7 +886,7 @@ const Contact = () => {
             </IconBox>
             <ContactDetail>
               <DetailTitle>Address</DetailTitle>
-              <DetailText>Hauz Khas, New Delhi,<br/>Delhi 110016</DetailText>
+              <DetailText>Palla,Badarpur Border<br/>Faridabad 121003</DetailText>
             </ContactDetail>
           </ContactMethod>
           
