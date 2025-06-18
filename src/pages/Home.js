@@ -920,7 +920,7 @@ const Home = () => {
       <SEO 
         title="Devigo | Web & Mobile App Development Agency" 
         description="Transform your ideas into powerful digital products. We build custom web and mobile applications that bring your vision to life with modern technology and stunning design."
-        keywords="web development, app development, React, Node.js, mobile apps, UI/UX design, digital transformation, custom software"
+        keywords=" WordPress website development, WordPress developer, WordPress design services, WordPress development company, WordPress development agency, hire WordPress developer, custom WordPress development, WordPress plugin development, WordPress theme development, WordPress e-commerce development, affordable WordPress development, WordPress web design, best WordPress developers, WordPress site development services, WordPress maintenance services, WordPress development services India. web design company, responsive web design, user interface design, user experience design, UX/UI design, UI/UX agency, UI design services, UX design company, website redesign services, website UI design, mobile app UI design, professional UI design, UI/UX design studio, user experience consultancy, UI/UX design agency, UI/UX design company, UI/UX design services India"
         canonicalUrl="https://devigo.in/"
         ogImage="https://devigo.in/og-image.jpg"
         structuredData={organizationSchema}

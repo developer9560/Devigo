@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import SEO from '../components/SEO/SEO.js';
 import { 
   faLinkedinIn, 
   faTwitter, 
@@ -965,6 +966,7 @@ const CTASection = styled.section`
 const useElementOnScreen = (options) => {
   const containerRef = useRef(null);
   useEffect(() => {
+        window.scrollTo(0, 0);
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -1223,6 +1225,9 @@ const About = () => {
   
   return (
     <AboutPage ref={containerRef}>
+      <SEO/>
+      <SEO title="About DEVIGO" description="Learn about DEVIGO, our story, values, and the team behind our innovative digital solutions." 
+      keywords='web development Delhi, software company Delhi, Android app development Delhi, web design Faridabad, IT services Faridabad, WordPress development Delhi, custom software Faridabad, Android developer Faridabad, mobile app company Delhi, Delhi NCR web development, Delhi UI/UX design, web development services in Delhi, app developer in Faridabad, Delhi web design agency, Faridabad software solutions, best web developer Delhi.'/>
       <HeroSection>
         <PageTitle style={{opacity: 1, display: 'block'}}>About DEVIGO</PageTitle>
         <PageSubtitle style={{opacity: 1, display: 'block'}}>Discover our story, our team, and the values that drive us to create exceptional digital experiences</PageSubtitle>
