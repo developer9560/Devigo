@@ -1,0 +1,155 @@
+[
+    {
+        "id": "1",
+        "title ": "Modern Bistro – Responsive Restaurant Website",
+        "slug": "modern-bistro-responsive-restaurant-website",
+        "description": "A mobile-first responsive site for a bistro, built using React and Tailwind CSS, featuring an interactive menu, reservation form, and dynamic visuals.",
+        "client": "Modern Bistro Café",
+        "category": "Website Design",
+        "industry": "food & beverage",
+        "services": [
+            " UI/UX Design",
+            "Web Development",
+            "Responsive Design"
+        ],
+        "image": "https://res.cloudinary.com/dofjr7o8l/image/upload/v1748060809/quick-share-qr/file_1748060808660.png",
+        "gallery": [],
+        "featured": true,
+        "status": "Completed",
+        "start_date": "2024-01-15",
+        "completion_date": "2024-03-10",
+        "website_url": "https://restraunt-zeta.vercel.app/",
+        "technologies": [
+            "React",
+            "Tailwind CSS",
+            "Node.js"
+        ],
+        "team_size": "2 Developers, 1 Designer",
+        "challenge_description": "The client needed a modern, responsive website to showcase their menu and allow for online reservations.",
+        "solution_description": "We developed a mobile-first website using React and Tailwind CSS, ensuring a seamless user experience across devices.",
+        "features": [
+            "Interactive menu",
+            "Online reservation form",
+            "Dynamic visuals",
+            "Mobile-friendly navigation"
+        ],
+        "results": [
+            "Increased online reservations by 30%",
+            "Improved user engagement"
+        ],
+        "testimonials": [
+            "Our Bistro’s online presence has never looked better—our customers love the sleek design and booking process."
+        ],
+        "testimonial_quote": "The team at Devigo was a pleasure to work with. They understood our vision and brought it to life.",
+        "testimonial_author": " Sophie Lee",
+        "testimonial_role": "Owner",
+        "testimonial_image": ""
+    },
+    {
+        "id": "2",
+        "title ": "Personalized Travel Booking & Guide Platform",
+        "slug": "trip-travels-personalized-travel-platform",
+        "description": "A dynamic, user-friendly travel booking and discovery website that enables users to explore curated destinations, book unique travel experiences, and access essential trip details, all in a sleek and responsive interface powered by React and Tailwind CSS.",
+        "client": "Trip Travels (self-initiated – portfolio / demo project)",
+        "category": "Web Application / Booking Platform",
+        "industry": "Travel & Tourism",
+        "services": [
+            " UI/UX Design",
+            "Web Development",
+            "Responsive Design",
+            "Integration of booking forms and listing filters",
+            "Performance optimization"
+        ],
+        "image": "https://res.cloudinary.com/dofjr7o8l/image/upload/v1744567672/devigo_uploads/rzm4k4zfymbmudb2a2du.png",
+        "gallery": [],
+        "featured": true,
+        "status": "Completed",
+        "start_date": "2024-05-15",
+        "completion_date": "2024-06-10",
+        "website_url": "https://trip-travels-mu.vercel.app/",
+        "technologies": [
+            {
+                "frontend": [
+                    "React",
+                    "Tailwind CSS"
+                ],
+                "hosting": [
+                    "Vercel"
+                ],
+                "images": [
+                    "Cloudinary or similar"
+                ],
+                "forms": [
+                    "React Hook Form / Custom Hooks"
+                ]
+            }
+        ],
+        "team_size": "Solo (1 Full‑Stack Developer)",
+        "challenge_description": "TCreate a high-performance, mobile-first travel discovery site that allows users to find destinations, view curated experiences, and initiate bookings — all without overwhelming infrastructure or costly APIs, while providing fast load times and smooth interactivity.",
+        "solution_description": "Built with a React component-driven architecture, styled with Tailwind CSS for rapid UI development. Optimized images (via Cloudinary or local assets), lazy-loading for listings, and clean booking form handling without heavy external dependencies. Deployed to Vercel for zero-config CI/CD and instant previews.",
+        "features": [
+          {" Hero Section":"Full-width responsive hero image with value proposition (“Book Your Perfect Trip”) and clear CTA buttons (“Explore Destinations”, “Get Started”)"},
+          
+          {
+            "Destination Listings":
+              "Grid layout with card-style entries displaying destination name, location preview, brief description, and interactive filters/sorting."
+          },
+          {
+            "Booking Flow":
+              "Clean, user-friendly booking form with date pickers, guest selectors, and “Book Now” button—all designed responsively."
+          },
+          {
+            "Client Reviews":
+              "A “5-star rating” section showcasing trust-building reviews or user confidence metrics."
+          },
+          {
+            "Footer":
+              "Contact info, social media links, and a community tagline (“Adventure starts here”)."
+          },
+          {
+            "Augmented Maps / Guides":
+              "Visual placeholders or interactive map integration (future-ready) to show trip routes or highlights."
+          },
+          {
+            "App Promotion Section":
+              "Clear “Get it free” banners with links to App Store/Play Store (demonstrative badges)."
+          },
+          {
+            "Responsive Design":
+              "Fully adapts from mobile through desktop, with accessible layouts and optimized performance."
+          },
+          {
+            "Performance Optimization":
+              "Fast loading times, minimal dependencies, and efficient image handling for a smooth user experience."
+          },
+          {
+            "Footer":
+              "Contact Info (email/phone), legal links, social-media icons, and a community tagline (“Adventure starts here”)."
+          }
+        ],
+        "results": [
+           { "Loading Performance":
+            "Achieved Lighthouse scores > 90 for performance, accessibility, and best practices."},
+
+            { "User Engagement":
+            "Strong visual hierarchy and CTAs improved user interaction flow."},
+
+            { "Scalability":
+            "Lightweight architecture allows easy addition of new destinations or features."},
+
+            { "Booking Efficiency":
+            "Streamlined booking process with minimal friction, leading to higher conversion rates."},
+
+            { "Visual Appeal":
+            "Modern, clean design that enhances user trust and encourages exploration."
+          }
+        ],
+        "testimonials": [
+            "rip Travels’ clean UI and seamless flow make exploring new adventures exciting — I feel confident booking right from the homepage.."
+        ],
+        "testimonial_quote": "The team at Devigo was a pleasure to work with. They understood our vision and brought it to life.",
+        "testimonial_author": " Emily Chen, UX Enthusiast & Beta Tester",
+        "testimonial_role": "Owner",
+        "testimonial_image": ""
+    }
+]

@@ -24,6 +24,7 @@ import {
   PieChart, Pie, Cell, LineChart, Line, Legend
 } from 'recharts';
 import axios from 'axios';
+import projectService from '../pages/Project.json';
 
 // Animation keyframes
 const fadeIn = keyframes`
@@ -1067,33 +1068,42 @@ const PortfolioDetail = () => {
 
   useEffect(() => {
         window.scrollTo(0, 0);
-    const fetchProjectDetails = async () => {
-      try {
-        setLoading(true);
-        console.log(`Fetching project with ID: ${id}`);
-        const response = await axios.get(`${API_BASE_URL}/projects/${id}`);
-        console.log('Project data from API:', response.data);
-
-        // Handle different response formats
-        let projectData;
-        if (response.data && typeof response.data === 'object') {
-          projectData = response.data.project || response.data;
+     console.log('Fetching service details for ID:', id);
+        const matchedServices = projectService.filter(service => service.id === id);
+        if (matchedServices.length > 0) {
+          setProject(matchedServices[0]); // Set the actual service object, not in an array
+          setLoading(false);
         } else {
-          throw new Error('Invalid project data format received');
+          setError('Service not found');
+          setLoading(false);
         }
+    // const fetchProjectDetails = async () => {
+    //   try {
+    //     setLoading(true);
+    //     console.log(`Fetching project with ID: ${id}`);
+    //     const response = await axios.get(`${API_BASE_URL}/projects/${id}`);
+    //     console.log('Project data from API:', response.data);
 
-        setProject(projectData);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching project details:', err);
-        setError('Failed to load project details. Please try again later.');
-        setLoading(false);
-      }
-    };
+    //     // Handle different response formats
+    //     let projectData;
+    //     if (response.data && typeof response.data === 'object') {
+    //       projectData = response.data.project || response.data;
+    //     } else {
+    //       throw new Error('Invalid project data format received');
+    //     }
 
-    if (id) {
-      fetchProjectDetails();
-    }
+    //     setProject(projectData);
+    //     setLoading(false);
+    //   } catch (err) {
+    //     console.error('Error fetching project details:', err);
+    //     setError('Failed to load project details. Please try again later.');
+    //     setLoading(false);
+    //   }
+    // };
+
+    // if (id) {
+    //   fetchProjectDetails();
+    // }
   }, [id, API_BASE_URL]);
 
   const handleGoBack = () => {

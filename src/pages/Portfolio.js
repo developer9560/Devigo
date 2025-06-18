@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import projectService from '../pages/Project.json';
+import { set } from 'date-fns';
 
 // Define the keyframe animations
 const fadeIn = keyframes`
@@ -588,67 +590,69 @@ const Portfolio = () => {
   // Fetch projects from API
   useEffect(() => {
         window.scrollTo(0, 0);
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        console.log('Fetching projects from:', `${API_BASE_URL}/projects/`);
-        const response = await axios.get(`${API_BASE_URL}/projects/`);
-        console.log('Projects API response:', response);
-        console.log('Projects from API:', response.data);
+  //   const fetchProjects = async () => {
+  //     try {
+  //       setLoading(true);
+  //       console.log('Fetching projects from:', `${API_BASE_URL}/projects/`);
+  //       const response = await axios.get(`${API_BASE_URL}/projects/`);
+  //       console.log('Projects API response:', response);
+  //       console.log('Projects from API:', response.data);
         
-        // Handle different response formats
-        let projectsData;
-        if (Array.isArray(response.data)) {
-          console.log('Response is an array with', response.data.length, 'projects');
-          projectsData = response.data;
-        } else if (response.data && typeof response.data === 'object') {
-          if (response.data.results) {
-            console.log('Found results array with', response.data.results.length, 'projects');
-            projectsData = response.data.results;
-          } else if (response.data.projects) {
-            console.log('Found projects array with', response.data.projects.length, 'projects');
-            projectsData = response.data.projects;
-          } else if (response.data.data) {
-            console.log('Found data array with', response.data.data.length, 'projects');
-            projectsData = response.data.data;
-          } else if (Array.isArray(Object.values(response.data)[0])) {
-            // Sometimes the API returns the array in the first property
-            const firstArrayProp = Object.keys(response.data).find(key => Array.isArray(response.data[key]));
-            if (firstArrayProp) {
-              console.log(`Found array in property '${firstArrayProp}' with`, response.data[firstArrayProp].length, 'projects');
-              projectsData = response.data[firstArrayProp];
-            } else {
-              projectsData = [];
-            }
-          } else {
-            // Check if the response object itself contains projects (with id properties)
-            const possibleProjects = Object.values(response.data).filter(item => 
-              item && typeof item === 'object' && (item.id || item._id)
-            );
+  //       // Handle different response formats
+  //       let projectsData;
+  //       if (Array.isArray(response.data)) {
+  //         console.log('Response is an array with', response.data.length, 'projects');
+  //         projectsData = response.data;
+  //       } else if (response.data && typeof response.data === 'object') {
+  //         if (response.data.results) {
+  //           console.log('Found results array with', response.data.results.length, 'projects');
+  //           projectsData = response.data.results;
+  //         } else if (response.data.projects) {
+  //           console.log('Found projects array with', response.data.projects.length, 'projects');
+  //           projectsData = response.data.projects;
+  //         } else if (response.data.data) {
+  //           console.log('Found data array with', response.data.data.length, 'projects');
+  //           projectsData = response.data.data;
+  //         } else if (Array.isArray(Object.values(response.data)[0])) {
+  //           // Sometimes the API returns the array in the first property
+  //           const firstArrayProp = Object.keys(response.data).find(key => Array.isArray(response.data[key]));
+  //           if (firstArrayProp) {
+  //             console.log(`Found array in property '${firstArrayProp}' with`, response.data[firstArrayProp].length, 'projects');
+  //             projectsData = response.data[firstArrayProp];
+  //           } else {
+  //             projectsData = [];
+  //           }
+  //         } else {
+  //           // Check if the response object itself contains projects (with id properties)
+  //           const possibleProjects = Object.values(response.data).filter(item => 
+  //             item && typeof item === 'object' && (item.id || item._id)
+  //           );
             
-            if (possibleProjects.length > 0) {
-              console.log('Found', possibleProjects.length, 'projects in object format');
-              projectsData = possibleProjects;
-            } else {
-              projectsData = [];
-            }
-          }
-        } else {
-          projectsData = [];
-        }
+  //           if (possibleProjects.length > 0) {
+  //             console.log('Found', possibleProjects.length, 'projects in object format');
+  //             projectsData = possibleProjects;
+  //           } else {
+  //             projectsData = [];
+  //           }
+  //         }
+  //       } else {
+  //         projectsData = [];
+  //       }
         
-        console.log('Processed projects data:', projectsData, 'Count:', projectsData.length);
-        setProjects(projectsData);
-      } catch (err) {
-        console.error('Error fetching projects:', err);
-        const errorMessage = err.response?.data?.message || err.message || 'Failed to load projects. Please try again later.';
-        setError(`Error loading projects: ${errorMessage}`);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //       console.log('Processed projects data:', projectsData, 'Count:', projectsData.length);
+  //       setProjects(projectsData);
+  //     } catch (err) {
+  //       console.error('Error fetching projects:', err);
+  //       const errorMessage = err.response?.data?.message || err.message || 'Failed to load projects. Please try again later.';
+  //       setError(`Error loading projects: ${errorMessage}`);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
     
-    fetchProjects();
+  //   fetchProjects();
+  setProjects(projectService);
+  setLoading(false);
   }, [API_BASE_URL]);
   
   // Close modal when clicking outside
